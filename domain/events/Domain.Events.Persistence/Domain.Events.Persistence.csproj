@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <LangVersion>default</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>QuantInfra.Domain.Events.Persistence</AssemblyName>
+        <RootNamespace>QuantInfra.Domain.Events.Persistence</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Domain.Events.Accounts.AccountsService\Domain.Events.Accounts.AccountsService.csproj" />
+      <ProjectReference Include="..\Domain.Events.Accounts.Management\Domain.Events.Accounts.Management.csproj" />
+      <ProjectReference Include="..\Domain.Events.Strategies.AccountsService\Domain.Events.Strategies.AccountsService.csproj" />
+      <ProjectReference Include="..\Domain.Events.Strategies.Management\Domain.Events.Strategies.Management.csproj" />
+    </ItemGroup>
+
+</Project>

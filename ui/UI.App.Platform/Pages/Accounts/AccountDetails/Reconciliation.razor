@@ -1,0 +1,74 @@
+@using QuantInfra.Common.Interfaces.Api.Accounts
+@using QuantInfra.Sdk.Accounts
+@using UI.SharedComponents.Base
+@using UI.SharedComponents.Components
+@inherits LayoutComponentBase
+
+@layout AccountBase
+
+@page "/accounts/{AccountId:int}/reconciliation"
+
+<NavigationTabsView BasePath=@($"/accounts/{AccountBase?.Account?.AccountId}/reconciliation")
+                    Tabs=@_tabs
+                    SelectedTabPath=@Path
+                    DisplayAsList=@string.IsNullOrEmpty(Path)>
+    <ChildContent>
+        <CascadingValue Value=@this>
+            @Body
+        </CascadingValue>
+    </ChildContent>
+</NavigationTabsView>
+
+@code {
+    [Parameter] public int AccountId { get; set; }
+    [CascadingParameter] public AccountBase? AccountBase { get; set; }
+
+    private AccountListModel? _account;
+    private AccountListModel? Account
+    {
+        get => _account;
+        set
+        {
+            if (value != _account && value != null)
+            {
+                _account = value;
+                
+                if (_account.AccountType == AccountType.BrokerAccount)
+                {
+                    _tabs.Add(new() { Text = "SSA", Path = "broker-ssa" });
+                    _tabs.Add(new() { Text = "Broker", Path = "broker" });
+                }
+                
+                StateHasChanged();
+            }
+        }
+    }
+
+    private string _path;
+    public string Path
+    {
+        get => _path;
+        set
+        {
+            _path = value;
+            StateHasChanged();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        AccountBase!.Path = "reconciliation";
+        AccountBase.AccountLoaded = new EventCallback<AccountListModel>(this, OnAccountLoaded);
+        Account = AccountBase.Account;
+        
+        if (string.IsNullOrEmpty(Path)) AccountBase.Id = AccountId; // otherwise, the child component will set the ID
+    }
+
+    private List<NavigationTabsItem> _tabs = new();
+   
+
+    private void OnAccountLoaded(AccountListModel account)
+    {
+        Account = account;
+    }
+}

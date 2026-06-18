@@ -1,0 +1,20 @@
+@using QuantInfra.Common.Interfaces.Api.Accounts
+
+@page "/accounts/{AccountId:int}/reporting/trade-history"
+
+@layout Reporting
+
+<UI.SharedComponents.Components.Accounts.TradesHistory SingleAccount="true" Filter=@(new TradeFilter { AccountId = AccountId }) />
+
+@code {
+    [Parameter] public int AccountId { get; set; }
+    
+    [CascadingParameter] public AccountBase AccountBase { get; set; }
+    [CascadingParameter] public Reporting Reporting { get; set; }
+
+    protected override void OnInitialized()
+    {
+        AccountBase.Id = AccountId;
+        Reporting.Path = "trade-history";
+    }
+}

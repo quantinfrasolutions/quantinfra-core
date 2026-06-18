@@ -1,0 +1,21 @@
+@* @using Common.Strategies *@
+@* @using Microsoft.AspNetCore.Components.Forms *@
+@* @using UI.Interfaces *@
+@* *@
+@* @inject HostedStrategiesLoader HostedStrategiesesLoader *@
+@* @inject ISettingsStorage Storage *@
+@* *@
+@* <InputFile OnChange="@OnChange" /> *@
+@* *@
+@* @code { *@
+@*     [Parameter] public EventCallback ValueChanged { get; set; } *@
+@* *@
+@*     async Task OnChange(InputFileChangeEventArgs e) *@
+@*     { *@
+@*         await using MemoryStream ms = new(); *@
+@*         await e.File.OpenReadStream().CopyToAsync(ms); *@
+@*         HostedStrategiesesLoader.LoadAssembly(ms.GetBuffer()); *@
+@*         await Storage.SetValue("strategies.dll path", e.File.Name); *@
+@*         await ValueChanged.InvokeAsync(); *@
+@*     } *@
+@* } *@

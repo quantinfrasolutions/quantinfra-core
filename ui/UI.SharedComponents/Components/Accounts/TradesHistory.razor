@@ -1,0 +1,127 @@
+@using QuantInfra.Common.Interfaces.Api.Accounts
+@using UI.Interfaces.Accounts
+@using UI.SharedComponents.Base
+
+@inject IUiAccountsRepository Repository
+
+
+@if (Filter != null)
+{
+    <EditableView TItem="TradeView"
+                  TFilter="TradeFilter"
+                  EmptyText="No trades found"
+                  SearchFunc=@Repository.GetTradesHistory
+                  Filter=@Filter
+                  HideRefreshButton=@HideRefreshButton
+                  RunSearchImmediately=@RunSearchImmediately
+                  Variant=@Variant
+                  AllowSorting=@AllowSorting
+                  DefaultOrderBy=@DefaultOrderBy
+                  DefaultOrderByDescending=@DefaultOrderByDescending
+                  @ref=_view>
+        <SearchForm>
+            @if (ShowFilter)
+            {
+                <TradeFilterForm @bind-Filter=@Filter HideAccountSelector=@SingleAccount/>
+            }
+        </SearchForm>
+        <Columns>
+            @if (Columns != null)
+            {
+                @if (!SingleAccount && Columns.Contains("AccountId"))
+                {
+                    <RadzenDataGridColumn TItem="TradeView" Title="AccountId" Property=@nameof(TradeView.AccountId) Width="100px" />
+                }
+
+                @if (Columns.Contains("TradeId"))
+                {
+                    <RadzenDataGridColumn TItem="TradeView" Title="TradeId" Property=@nameof(TradeView.TradeId) Width="100px" Frozen="true" />
+                }
+
+                @if (Columns.Contains("Dt"))
+                {
+                    <RadzenDataGridColumn TItem="TradeView" Property=@nameof(TradeView.Dt) Title="Dt" Width="180px"/>
+                }
+
+                @if (Columns.Contains("ClOrdId"))
+                {
+                    <RadzenDataGridColumn TItem="TradeView" Property=@nameof(TradeView.ClOrdId) Title="ClOrdId" Width="120px"/>
+                }
+
+                @if (Columns.Contains("Contract"))
+                {
+                    <RadzenDataGridColumn TItem="TradeView" Title="Contract" Width="150px">
+                        <Template Context="p">
+                            <IdNameView Id="@p.ContractId" Name="@p.ContractName"/>
+                        </Template>
+                    </RadzenDataGridColumn>
+                }
+
+                @if (Columns.Contains("OrderId"))
+                {
+                    <RadzenDataGridColumn TItem="TradeView" Title="OrderId" Property=@nameof(TradeView.OrderId) Width="120px" />
+                }
+
+                @if (Columns.Contains("StrategyPositionId"))
+                {
+                    <RadzenDataGridColumn TItem="TradeView" Property=@(nameof(TradeView.StrategyPositionId)) Title="StrategyPositionId" Width="100px"/>
+                }
+
+                @if (Columns.Contains("Side"))
+                {
+                    <RadzenDataGridColumn TItem="TradeView" Property=@nameof(TradeView.Side) Title="Side" Width="100px"/>
+                }
+
+                @if (Columns.Contains("Volume"))
+                {
+                    <RadzenDataGridColumn TItem="TradeView" Property=@nameof(TradeView.Volume) Title="Volume" Width="100px"/>
+                }
+
+                @if (Columns.Contains("Price"))
+                {
+                    <RadzenDataGridColumn TItem="TradeView" Property=@nameof(TradeView.Price) Title="Price" Width="100px" />
+                }
+
+                @* @if (Columns.Contains("CommRate")) *@
+                @* { *@
+                @*     <RadzenDataGridColumn TItem="TradeView" Property=@nameof(TradeView.CommRate) Title="CommRate" Width="100px"/> *@
+                @* } *@
+
+                @if (Columns.Contains("Commission"))
+                {
+                    <RadzenDataGridColumn TItem="TradeView" Property=@nameof(TradeView.Commission) Title="Commission" Width="100px"/>
+                }
+                
+                @if (Columns.Contains("PositionEffect"))
+                {
+                    <RadzenDataGridColumn TItem="TradeView" Property=@nameof(TradeView.PositionEffect) Title="PositionEffect" Width="100px"/>
+                }
+            }
+        </Columns>
+    </EditableView>
+}
+
+@code
+{
+    [Parameter] public TradeFilter? Filter { get; set; }
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public bool SingleAccount { get; set; }
+    [Parameter] public List<string>? Columns { get; set; }
+    [Parameter] public bool ShowFilter { get; set; } = true;
+    [Parameter] public bool HideRefreshButton { get; set; }
+    [Parameter] public Variant Variant { get; set; } = Variant.Filled;
+    [Parameter] public bool AllowSorting { get; set; }
+    [Parameter] public string? DefaultOrderBy { get; set; }
+    [Parameter] public string? DefaultOrderByDescending { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        Filter ??= new();
+        Columns ??= ["AccountId", "TradeId", "Dt", "ClOrdId", "Contract", "OrderId", "StrategyPositionId", "PositionEffect", "Side", "Volume", "Price", "CommRate", "Commission"];
+    }
+
+    private EditableView<TradeView,TradeFilter> _view;
+    public Task Refresh() => _view.RunSearch();
+}
+

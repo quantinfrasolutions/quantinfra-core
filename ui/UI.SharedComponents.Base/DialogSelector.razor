@@ -1,0 +1,19 @@
+﻿@typeparam TItem
+@typeparam TSelector where TSelector : ComponentBase, UI.SharedComponents.Components.ISelector<TItem>
+@inject DialogService DialogService
+
+@code {
+    [Parameter]
+    public string? Title { get; set; }
+
+    public async Task<TItem> Show() =>
+        await DialogService.OpenAsync<DialogSelectorForm<TItem, TSelector>>(
+            Title,
+            null,
+            new DialogOptions
+            {
+                ShowTitle = !string.IsNullOrEmpty(Title)
+            }
+        );
+}
+

@@ -1,0 +1,75 @@
+﻿@using QuantInfra.Common.Interfaces.Api.Accounts
+@using UI.Interfaces.Accounts
+@using UI.SharedComponents.Base
+
+@inject IUiAccountsRepository Repository
+
+
+@if (Filter != null)
+{
+    <EditableView TItem="BalanceOperationHistoryModel"
+                  TFilter="BalanceOperationsFilter"
+                  EmptyText="No trades found"
+                  SearchFunc=@Repository.GetBalanceOperations
+                  Filter=@Filter
+                  HideRefreshButton=@HideRefreshButton
+                  RunSearchImmediately=@RunSearchImmediately
+                  Variant=@Variant
+                  AllowSorting=@AllowSorting
+                  DefaultOrderBy=@DefaultOrderBy
+                  DefaultOrderByDescending=@DefaultOrderByDescending
+                  @ref=_view>
+        <SearchForm>
+            @if (ShowFilter)
+            {
+                <BalanceOperationsFilterForm @bind-Filter=@Filter HideAccountSelector=@SingleAccount/>
+            }
+        </SearchForm>
+        <Columns>
+            @if (!SingleAccount && Columns.Contains("AccountId"))
+            {
+                <RadzenDataGridColumn TItem="BalanceOperationHistoryModel" Title="AccountId" Property=@nameof(BalanceOperationHistoryModel.AccountId) Width="100px" />
+            }
+            <RadzenDataGridColumn TItem="BalanceOperationHistoryModel" Title="AS" Property=@nameof(BalanceOperationHistoryModel.AccountServiceName) Width="100px" />
+            <RadzenDataGridColumn TItem="BalanceOperationHistoryModel" Title="Id" Property=@nameof(BalanceOperationHistoryModel.BalanceOperationId) Width="100px" />
+            <RadzenDataGridColumn TItem="BalanceOperationHistoryModel" Title="ExternalId" Property=@nameof(BalanceOperationHistoryModel.ExternalId) Width="100px" />
+            <RadzenDataGridColumn TItem="BalanceOperationHistoryModel" Title="Dt" Property=@nameof(BalanceOperationHistoryModel.Dt) Width="160px" />
+            <RadzenDataGridColumn TItem="BalanceOperationHistoryModel" Title="Amount" Property=@nameof(BalanceOperationHistoryModel.Amount) Width="100px" />
+            <RadzenDataGridColumn TItem="BalanceOperationHistoryModel" Title="Asset" Property=@nameof(BalanceOperationHistoryModel.AssetId) Width="80px" />
+            <RadzenDataGridColumn TItem="BalanceOperationHistoryModel" Title="" Property=@nameof(BalanceOperationHistoryModel.AssetName) Width="120px" />
+            <RadzenDataGridColumn TItem="BalanceOperationHistoryModel" Title="Price" Property=@nameof(BalanceOperationHistoryModel.Price) Width="100px" />
+            <RadzenDataGridColumn TItem="BalanceOperationHistoryModel" Title="FxRate" Property=@nameof(BalanceOperationHistoryModel.FxRate) Width="100px" />
+            <RadzenDataGridColumn TItem="BalanceOperationHistoryModel" Title="ValueInAccCcy" Property=@nameof(BalanceOperationHistoryModel.ValueInAccountCcy) Width="100px" />
+            <RadzenDataGridColumn TItem="BalanceOperationHistoryModel" Title="Description" Property=@nameof(BalanceOperationHistoryModel.Description) Width="120px" />
+            <RadzenDataGridColumn TItem="BalanceOperationHistoryModel" Title="IsCorrection" Property=@nameof(BalanceOperationHistoryModel.IsCorrection) Width="60px" />
+            <RadzenDataGridColumn TItem="BalanceOperationHistoryModel" Title="Affects PnL" Property=@nameof(BalanceOperationHistoryModel.AffectsPnL) Width="60px" />
+            <RadzenDataGridColumn TItem="BalanceOperationHistoryModel" Title="Affects investment" Property=@nameof(BalanceOperationHistoryModel.AffectsInvestment) Width="60px" />
+            <RadzenDataGridColumn TItem="BalanceOperationHistoryModel" Title="Affects balance" Property=@nameof(BalanceOperationHistoryModel.AffectsBalance) Width="60px" />
+            <RadzenDataGridColumn TItem="BalanceOperationHistoryModel" Title="Affects share count" Property=@nameof(BalanceOperationHistoryModel.AffectsShareCount) Width="60px" />
+        </Columns>
+    </EditableView>
+}
+
+@code
+{
+    [Parameter] public BalanceOperationsFilter? Filter { get; set; }
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public bool SingleAccount { get; set; }
+    [Parameter] public List<string>? Columns { get; set; }
+    [Parameter] public bool ShowFilter { get; set; } = true;
+    [Parameter] public bool HideRefreshButton { get; set; }
+    [Parameter] public Variant Variant { get; set; } = Variant.Filled;
+    [Parameter] public bool AllowSorting { get; set; }
+    [Parameter] public string? DefaultOrderBy { get; set; }
+    [Parameter] public string? DefaultOrderByDescending { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        Filter ??= new();
+    }
+
+    private EditableView<BalanceOperationHistoryModel, BalanceOperationsFilter> _view;
+    public Task Refresh() => _view.RunSearch();
+}
+

@@ -1,0 +1,66 @@
+@using Microsoft.JSInterop
+@inject TooltipService TooltipService
+@inject IJSRuntime JSRuntime
+
+@if (!string.IsNullOrEmpty(_shortText))
+{
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Stretch">
+        @if (string.IsNullOrEmpty(Path))
+        {
+            <RadzenText TextStyle=@TextStyle MouseEnter="@(args => ShowTooltip(args, TooltipOptions))">
+                @_shortText
+            </RadzenText>
+        }
+        else
+        {
+            <RadzenLink Path=@Path>
+                <RadzenText TextStyle=@TextStyle MouseEnter="@(args => ShowTooltip(args, TooltipOptions))">
+                    @_shortText
+                </RadzenText>
+            </RadzenLink>
+        }
+        <RadzenButton Icon="content_copy" Variant="Variant.Text" Click="@Callback"/>
+    </RadzenStack>
+}
+
+@code {
+    private string _shortText, _longText;
+    private Guid _id;
+
+    [Parameter, EditorRequired]
+    public Guid? Id
+    {
+        get => _id;
+        set
+        {
+            if (value != null)
+            {
+                _id = value.Value;
+                _longText = _id.ToString();
+                _shortText = _longText.Split('-').First();
+            }
+            else
+            {
+                _id = Guid.Empty;
+                _longText = string.Empty;
+                _shortText = string.Empty;
+            }
+        }
+    }
+    
+    [Parameter] public string? Path { get; set; }
+
+    [Parameter] public TextStyle TextStyle { get; set; } = TextStyle.Body2;
+    [Parameter] public TooltipOptions TooltipOptions { get; set; } = new() { Position = TooltipPosition.Right };
+    
+    void ShowTooltip(ElementReference elementReference, TooltipOptions options = null) => 
+        TooltipService.Open(elementReference, _longText, options);
+
+    public static string GetShortAccountId(Guid id) => id.ToString().Split('-').First();
+
+    private void Callback()
+    {
+        if (Id.HasValue) JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", Id.ToString());
+    }
+
+}

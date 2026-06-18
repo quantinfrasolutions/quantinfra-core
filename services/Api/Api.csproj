@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <LangVersion>default</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>QuantInfra.Services.Api</AssemblyName>
+        <RootNamespace>QuantInfra.Services.Api</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\common\Common.Interfaces.Api\Common.Interfaces.Api.csproj" />
+      <ProjectReference Include="..\..\db\Databases.Main\Databases.Main.csproj" />
+    </ItemGroup>
+</Project>

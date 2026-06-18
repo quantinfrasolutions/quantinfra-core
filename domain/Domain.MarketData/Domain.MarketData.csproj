@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <LangVersion>default</LangVersion>
+        <RootNamespace>QuantInfra.Domain.MarketData</RootNamespace>
+        <AssemblyName>QuantInfra.Domain.MarketData</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\common\Common.EventSourcing\Common.EventSourcing.csproj" />
+      <ProjectReference Include="..\events\Domain.Events.MarketData\Domain.Events.MarketData.csproj" />
+      <ProjectReference Include="..\queries\Domain.Queries.MarketData\Domain.Queries.MarketData.csproj" />
+      <ProjectReference Include="..\queries\Domain.Queries.StaticData\Domain.Queries.StaticData.csproj" />
+    </ItemGroup>
+
+</Project>

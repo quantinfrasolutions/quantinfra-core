@@ -1,0 +1,39 @@
+﻿@using QuantInfra.Common.StaticData.Abstractions
+@using QuantInfra.Sdk.StaticData
+@using UI.Interfaces.StaticData
+@using UI.SharedComponents.Base
+
+@inject IUiAssetsRepository Repository
+
+<EditableView TItem="Asset"
+             TFilter="AssetFilter"
+             EmptyText="No assets found"
+             SearchFunc="@Repository.GetAssets"
+             Filter="@Filter"
+             RunSearchImmediately="false"
+             CreateAction="@Repository.CreateAsset"
+             Variant=@Variant
+             HideActionsColumn=@(!EnableActions)
+             AllowSelectRow=@AllowSelect
+             SelectionMode="DataGridSelectionMode.Single"
+             SelectAction=@ValueChanged>
+    <SearchForm>
+        <AssetsFilterForm @bind-Filter=@Filter />
+    </SearchForm>
+    <Columns>
+        <RadzenDataGridColumn TItem="Asset" Property="Id" Width="100px" Title="Id" />
+        <RadzenDataGridColumn TItem="Asset" Property="Name" Width="200px" Title="Name" />
+        <RadzenDataGridColumn TItem="Asset" Property="AssetType" Width="200px" Title="Type" />
+        <RadzenDataGridColumn TItem="Asset" Property="Description" MinWidth="200px" Title="Description" />
+    </Columns>
+</EditableView>
+
+@code {
+    [Parameter] public AssetFilter Filter { get; set; } = new();
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public bool AllowEdit { get; set; }
+    [Parameter] public bool AllowSelect { get; set; }
+    [Parameter] public Variant Variant { get; set; } = Variant.Filled;
+    [Parameter] public bool EnableActions { get; set; } = true;
+    [Parameter] public EventCallback<Asset> ValueChanged { get; set; }
+}

@@ -1,0 +1,160 @@
+﻿@using UI.Interfaces.Accounts
+@using Common.Trading
+@using QuantInfra.Sdk.Accounts
+@using QuantInfra.Sdk.Trading.Orders
+@using UI.SharedComponents.Components.StaticData
+
+@inject IUiAccountsRepository Repository
+
+<RadzenTemplateForm TItem="NewOrderSingle"
+                    Data="@_nos"
+                    Submit=@SendOrder>
+    <RadzenStack Gap="1rem" AlignItems="AlignItems.Stretch">
+        <RadzenRow>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+                <RadzenText TextStyle="TextStyle.Body2" Text="Side" />
+                <RadzenSelectBar TValue="Side" @bind-Value=@_nos.Side>
+                    <Items>
+                        <RadzenSelectBarItem Value="Side.Buy" Text="BUY"/>
+                        <RadzenSelectBarItem Value="Side.Sell" Text="SELL"/>
+                    </Items>
+                </RadzenSelectBar>
+            </RadzenStack>
+        </RadzenRow>
+        @if (!HideAccountSelector || _nos.AccountId == 0)
+        {
+            <RadzenRow>
+                <AccountsSelector @bind-Value=@_nos.AccountId @bind-Value:after=@(() => AccountId = _nos.AccountId)/>
+            </RadzenRow>
+        }
+        <RadzenRow>
+            <RadzenFormField Text="ClOrdId" Variant="Variant.Text">
+                <RadzenTextBox @bind-Value="_nos.ClOrdId"/>
+            </RadzenFormField>
+        </RadzenRow>
+        <RadzenRow>
+            <ContractsSelector @bind-Value="_nos.ContractId" />
+        </RadzenRow>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+            <RadzenText TextStyle="TextStyle.Body2" Text="Type" />
+            <RadzenSelectBar TValue="OrdType" @bind-Value=@_nos.OrdType>
+                <Items>
+                    <RadzenSelectBarItem Value="OrdType.Market" Text="Market" />
+                    <RadzenSelectBarItem Value="OrdType.Limit" Text="Limit" />
+                    <RadzenSelectBarItem Value="OrdType.StopMarket" Text="Stop" />
+                    <RadzenSelectBarItem Value="OrdType.StopLimit" Text="StopLimit" />
+                    <RadzenSelectBarItem Value="OrdType.MarketIfTouched" Text="MIT" />
+                </Items>
+            </RadzenSelectBar>
+        </RadzenStack>
+        <RadzenRow>
+            <RadzenFormField Text="Qty" Variant="Variant.Text">
+                <RadzenNumeric TValue="decimal" @bind-Value="_nos.OrderQty" ShowUpDown="false" />
+            </RadzenFormField>
+        </RadzenRow>
+        @if (_nos.OrdType == OrdType.Limit || _nos.OrdType == OrdType.StopLimit)
+        {
+            <RadzenRow>
+                <RadzenFormField Text="Price" Variant="Variant.Text">
+                    <RadzenNumeric TValue="decimal?" @bind-Value="_nos.Price"/>
+                </RadzenFormField>
+            </RadzenRow>
+        }
+        @if (_nos.OrdType == OrdType.StopMarket || _nos.OrdType == OrdType.StopLimit || _nos.OrdType == OrdType.MarketIfTouched)
+        {
+            <RadzenRow>
+                <RadzenFormField Text="StopPx" Variant="Variant.Text">
+                    <RadzenNumeric TValue="decimal?" @bind-Value="_nos.StopPx"/>
+                </RadzenFormField>
+            </RadzenRow>
+        }
+        @if (_account?.PositionAccounting == PositionAccounting.Hedged)
+        {
+            <RadzenRow>
+                <RadzenFormField Text="StrategyPositionId" Variant="Variant.Text">
+                    <RadzenTextBox @bind-Value="_nos.StrategyPositionId"/>
+                </RadzenFormField>
+            </RadzenRow>
+            <RadzenRow>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+                    <RadzenText TextStyle="TextStyle.Body2" Text="Position effect" />
+                    <RadzenSelectBar TValue="PositionEffect?" @bind-Value=@_nos.PositionEffect>
+                        <Items>
+                            <RadzenSelectBarItem Value="PositionEffect.Open" Text="Open"/>
+                            <RadzenSelectBarItem Value="PositionEffect.Close" Text="Close"/>
+                        </Items>
+                    </RadzenSelectBar>
+                </RadzenStack>
+            </RadzenRow>
+        }
+        <RadzenRow JustifyContent="JustifyContent.End">
+            <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" Text="Send order" Variant="Variant.Text" />
+        </RadzenRow>
+    </RadzenStack>
+</RadzenTemplateForm>
+
+
+@code {
+    private bool _isLoading;
+    private NewOrderSingle _nos;
+    private int? _accountId;
+    private AccountRecordV6? _account;
+
+    [Parameter]
+    public int? AccountId
+    {
+        get => _accountId;
+        set
+        {
+            if (value != _accountId)
+            {
+                _accountId = value;
+                Task.Run(LoadAccount);
+            }
+        }
+    }
+
+    [Parameter] public bool HideAccountSelector { get; set; }
+    [Parameter] public EventCallback OnCompleted { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        _nos = new Accounts.NewOrderSingle();
+        if (_accountId.HasValue)
+        {
+            _nos.AccountId = _accountId.Value;
+            AccountId = _accountId;
+        }
+    }
+
+    private async Task SendOrder()
+    {
+        try
+        {
+            _isLoading = true;
+            await Repository.SendNewOrder(_nos.ToNewOrderSingle());
+            await OnCompleted.InvokeAsync();
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task LoadAccount()
+    {
+        if (AccountId == null) return;
+        try
+        {
+            _isLoading = true;
+            _account = await Repository.GetAccount(AccountId.Value);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+        StateHasChanged();
+    }
+}
+

@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <RootNamespace>QuantInfra.Domain.Accounts.AccountStateClientManager</RootNamespace>
+        <LangVersion>default</LangVersion>
+        <AssemblyName>QuantInfra.Domain.Accounts.AccountStateClientManager</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Common\Common.Infrastructure.Abstractions\Common.Infrastructure.Abstractions.csproj" />
+      <ProjectReference Include="..\..\Common\Common.Metrics\Common.Metrics.csproj" />
+      <ProjectReference Include="..\Domain.Accounts.Execution.State\Domain.Accounts.Execution.State.csproj" />
+      <ProjectReference Include="..\events\Domain.Events.Accounts.AccountsService\Domain.Events.Accounts.AccountsService.csproj" />
+      <ProjectReference Include="..\queries\Domain.Queries.Accounts.AccountsService\Domain.Queries.Accounts.AccountsService.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="prometheus-net" Version="8.2.1" />
+    </ItemGroup>
+
+</Project>

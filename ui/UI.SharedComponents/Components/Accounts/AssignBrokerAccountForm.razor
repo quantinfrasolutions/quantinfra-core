@@ -1,0 +1,45 @@
+﻿@using QuantInfra.Common.Interfaces.Api.Accounts
+@using QuantInfra.Sdk.Accounts
+@using UI.Interfaces.Accounts
+
+@inject IUiAccountsRepository Repository
+
+<RadzenTemplateForm TItem="CreateSubaccountRequest"
+                    Data="@_request"
+                    Submit=@CreateSubscription>
+    <RadzenStack Gap="1rem" AlignItems="AlignItems.Stretch">
+        <RadzenRow>
+            <AccountsSelector TValue="int" @bind-Value=@_subaccountId AccountType="AccountType.BrokerAccount" Disabled=@_isLoading />
+        </RadzenRow>
+        <RadzenRow JustifyContent="JustifyContent.End">
+            <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" Text="Assign" Variant="Variant.Text" Disabled=@_isLoading />
+        </RadzenRow>
+    </RadzenStack>
+</RadzenTemplateForm>
+
+
+@code {
+    private bool _isLoading;
+    private int _subaccountId;
+    private CreateSubaccountRequest _request = new();
+    
+    [Parameter, EditorRequired] public int AccountId { get; set; }
+    [Parameter] public EventCallback OnCompleted { get; set; }
+
+    public async Task CreateSubscription()
+    {
+        try
+        {
+            _isLoading = true;
+            await Repository.CreateSubaccount( 
+                new() { AccountId = AccountId, Classifier = SubaccountType.Broker, SubaccountId = _subaccountId }
+            );
+            await OnCompleted.InvokeAsync();
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}
+

@@ -1,0 +1,31 @@
+@using QuantInfra.Common.Interfaces.Api.Accounts
+@using UI.SharedComponents.Base
+@if (!HideAccountSelector)
+{
+    <AccountsSelector @bind-Value=@Filter.AccountId Required="false" />
+}
+<RadzenFormField Text="FromDt" Variant="@Variant.Text" Style="min-width: 180px;">
+    <RadzenDatePicker TValue="DateTime?" ShowTime="true" ShowSeconds="true" HourFormat="24" 
+                      Value=@(Filter.FromDt?.ToDateTimeUtc())
+                      ValueChanged=@(dt => Filter.FromDt = dt.ParseInput())
+                      Disabled="@Disabled" />
+</RadzenFormField>
+<RadzenFormField Text="ToDt" Variant="@Variant.Text" Style="min-width: 180px;">
+    <RadzenDatePicker TValue="DateTime?" ShowTime="true" ShowSeconds="true" HourFormat="24"
+                      Value=@(Filter.ToDt?.ToDateTimeUtc())
+                      ValueChanged=@(dt => Filter.ToDt = dt.ParseInput())
+                      Disabled="@Disabled" />
+</RadzenFormField>
+<RadzenFormField Text="TradeId" Variant="@Variant.Text" Style="min-width: 180px;">
+    <RadzenNumeric TValue="long?" @bind-Value=@Filter.TradeId Disabled="@Disabled" />
+</RadzenFormField>
+    
+
+@code {
+    [Parameter, EditorRequired] public TradeFilter Filter { get; set; }
+    [Parameter] public EventCallback<TradeFilter>? FilterChanged { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public bool HideAccountSelector { get; set; }
+    
+    private Task OnPropUpdated() => FilterChanged?.InvokeAsync(Filter) ?? Task.CompletedTask;
+}

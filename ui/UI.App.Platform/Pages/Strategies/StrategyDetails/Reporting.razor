@@ -1,0 +1,57 @@
+@using Radzen.Blazor
+@using UI.SharedComponents.Components
+@inherits LayoutComponentBase
+
+@page "/strategies/{StrategyId:int}/reporting"
+
+@layout StrategyBase
+
+<RadzenStack>
+    @if (string.IsNullOrEmpty(Path) && StrategyBase?.Strategy is not null)
+    {
+        <RadzenRow>
+            <RadzenLink Path=@($"/accounts/{StrategyBase.Strategy.Account.AccountId}/reporting") Text="Account reports" />
+        </RadzenRow>
+    }
+    @* <RadzenRow> *@
+    @*     <NavigationTabsView BasePath=@($"/strategies/{StrategyBase?.Strategy?.StrategyId}/reporting") *@
+    @*                         Tabs=@_tabs *@
+    @*                         SelectedTabPath=@Path *@
+    @*                         DisplayAsList=@string.IsNullOrEmpty(Path)> *@
+    @*         <ChildContent> *@
+    @*             <CascadingValue Value=@this> *@
+    @*                 @Body *@
+    @*             </CascadingValue> *@
+    @*         </ChildContent> *@
+    @*     </NavigationTabsView> *@
+    @* </RadzenRow> *@
+</RadzenStack>
+
+@code {
+    [Parameter] public int StrategyId { get; set; }
+    [CascadingParameter] public StrategyBase? StrategyBase { get; set; }
+
+    private string _path;
+    public string Path
+    {
+        get => _path;
+        set
+        {
+            _path = value;
+            StateHasChanged();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        StrategyBase.Path = "reporting";
+        
+        if (string.IsNullOrEmpty(Path)) StrategyBase.Id = StrategyId; // otherwise, the child component will set the ID
+    }
+
+    private List<NavigationTabsItem> _tabs = new()
+    {
+        
+    };
+
+}

@@ -1,0 +1,16 @@
+@using UI.SharedComponents.Components.Accounts
+
+@page "/accounts/esa"
+@layout Accounts
+
+<ExecutableSubaccountsView />
+
+@code {
+    [CascadingParameter] public Accounts Accounts { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Accounts.Path = "esa";
+    }
+
+}

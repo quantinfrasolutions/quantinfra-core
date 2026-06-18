@@ -1,0 +1,10 @@
+delete from projections.share_price_history;
+delete from projections.positions_history;
+delete from events.share_price_updates;
+delete from events.end_of_day_positions;
+delete from events.share_count_updates;
+delete from events.external_trades;
+delete from events.events;
+delete from history.trades;
+delete from history.orders_history;
+delete from history.balance_operations;

@@ -1,0 +1,141 @@
+@* @using QuantInfra.Common.Accounts.Abstractions.Api *@
+@* @using UI.Interfaces.Accounts *@
+@* @using QuantInfra.Common.Accounts.Abstractions *@
+@* @using QuantInfra.Common.Strategies.Api *@
+@* @using UI.Interfaces.Strategies *@
+@* @using NodaTime.Text *@
+@* @using System.Globalization *@
+@* @using QuantInfra.Common.Interfaces.Api *@
+@* *@
+@* @inject IUIStrategiesRepository Repository *@
+@* @inject TooltipService TooltipService *@
+@* *@
+@* <EditableView TItem="StrategyExecutionViewItem" *@
+@*               TFilter="PagingFilter" *@
+@*               EmptyText="No execution configuration" *@
+@*               SearchFunc=@Repository.GetStrategiesExecutionConfiguration *@
+@*               RunSearchImmediately="true" *@
+@*               SearchButtonText="Refresh" *@
+@*               Filter=@_filter *@
+@*               RowExpandable=@(item => item.ExecutionAccounts.Count > 1) *@
+@*               CellRender=@CellRender> *@
+@*     <SearchForm> *@
+@*     </SearchForm> *@
+@*     <Template Context="strategy"> *@
+@*         <RadzenStack Gap="1rem"> *@
+@*             <RadzenRow> *@
+@*                 <RadzenCard Style="width: 400px;"> *@
+@*                     <RadzenDataGrid TItem="AccountViewBriefWithInvestment" *@
+@*                                     Data=@strategy.ExecutionAccounts> *@
+@*                         <Columns> *@
+@*                             <RadzenDataGridColumn TItem="AccountViewBriefWithInvestment" Title="AccountId" Width="120px"> *@
+@*                                 <Template Context="account"> *@
+@*                                     <TooltipGuidViewer Id=@account.AccountId/> *@
+@*                                 </Template> *@
+@*                             </RadzenDataGridColumn> *@
+@*                             <RadzenDataGridColumn TItem="AccountViewBriefWithInvestment" Title="Account" Width="120px"> *@
+@*                                 <Template Context="account"> *@
+@*                                     <RadzenLink Text=@account.AccountName Path=@($"/accounts/{account.AccountId}")/> *@
+@*                                 </Template> *@
+@*                             </RadzenDataGridColumn> *@
+@*                             <RadzenDataGridColumn TItem="AccountViewBriefWithInvestment" Property=@nameof(AccountViewBriefWithInvestment.Investment) Title="Trade notional" Width="120px"/> *@
+@*                         </Columns> *@
+@*                     </RadzenDataGrid> *@
+@*                 </RadzenCard> *@
+@*             </RadzenRow> *@
+@*         </RadzenStack> *@
+@*     </Template> *@
+@*     <Columns> *@
+@*         <RadzenDataGridColumn TItem="StrategyExecutionViewItem" Title="Strategy Id" Width="120px"> *@
+@*             <Template Context="strategy"> *@
+@*                 <TooltipGuidViewer Id=@strategy.StrategyId/> *@
+@*             </Template> *@
+@*         </RadzenDataGridColumn> *@
+@*         <RadzenDataGridColumn TItem="StrategyExecutionViewItem" Title="Name" Property=@nameof(StrategyExecutionViewItem.Name) Width="120px"> *@
+@*             <Template Context="strategy"> *@
+@*                 <RadzenLink Text=@strategy.Name Path=@($"/strategies/{strategy.StrategyId}") /> *@
+@*             </Template> *@
+@*         </RadzenDataGridColumn> *@
+@*         <RadzenDataGridColumn TItem="StrategyExecutionViewItem" Title="Class name" Width="220px"> *@
+@*             <Template Context="strategy"> *@
+@*                 <RadzenText TextStyle="TextStyle.Body2" MouseEnter="@(args => ShowTooltip(args, strategy.StrategyClassName, new TooltipOptions { Position = TooltipPosition.Right }))"> *@
+@*                     @strategy.StrategyClassName.Split('.').Last() *@
+@*                 </RadzenText> *@
+@*             </Template> *@
+@*         </RadzenDataGridColumn> *@
+@*         <RadzenDataGridColumn TItem="StrategyExecutionViewItem" Property="Symbols" Title="Symbols" Width="250px"> *@
+@*             <Template Context="strategy"> *@
+@*                 <RadzenText TextStyle="TextStyle.Body2"> *@
+@*                     @foreach (var p in strategy.Symbols.OrderBy(p => p.Id)) *@
+@*                     { *@
+@*                         <div class="rz-chip"> *@
+@*                             <span class="rz-chip-text">@IdNameView.GetLabel(p.Id, p.Name)</span> *@
+@*                         </div> *@
+@*                     } *@
+@*                 </RadzenText> *@
+@*             </Template> *@
+@*         </RadzenDataGridColumn> *@
+@*         <RadzenDataGridColumn TItem="StrategyExecutionViewItem" Title="Account type" Property="Account.AccountType" Width="120px"/> *@
+@*         <RadzenDataGridColumn TItem="StrategyExecutionViewItem" Title="Executed on" Width="360px"> *@
+@*             <Columns> *@
+@*                 <RadzenDataGridColumn TItem="StrategyExecutionViewItem" Title="Account type" Width="120px"> *@
+@*                     <Template Context="strategy"> *@
+@*                         @if (strategy.ExecutionAccounts.Count == 0) *@
+@*                         { *@
+@*                             <RadzenText TextStyle="TextStyle.Body2" Text="No real execution configured"/> *@
+@*                         } *@
+@*                         else if (strategy.ExecutionAccounts.Count == 1) *@
+@*                         { *@
+@*                             <TooltipGuidViewer Id=@strategy.ExecutionAccounts.First().AccountId /> *@
+@*                         } *@
+@*                         else *@
+@*                         { *@
+@*                             <RadzenText TextStyle="TextStyle.Body2" Text="Multiple accounts"/> *@
+@*                         } *@
+@*                     </Template> *@
+@*                 </RadzenDataGridColumn> *@
+@*                 <RadzenDataGridColumn TItem="StrategyExecutionViewItem" Width="120px"> *@
+@*                     <Template Context="strategy"> *@
+@*                         @if (strategy.ExecutionAccounts.Count == 1) *@
+@*                         { *@
+@*                             var account = strategy.ExecutionAccounts.First(); *@
+@*                             <RadzenLink Text=@account.AccountName Path=@($"/accounts/{account.AccountId}") /> *@
+@*                         } *@
+@*                     </Template> *@
+@*                 </RadzenDataGridColumn> *@
+@*                 <RadzenDataGridColumn TItem="StrategyExecutionViewItem" Title="Account type" Width="120px"> *@
+@*                     <Template Context="strategy"> *@
+@*                         @if (strategy.ExecutionAccounts.Count == 1) *@
+@*                         { *@
+@*                             <RadzenText TextStyle="TextStyle.Body2" Text=@strategy.ExecutionAccounts.First().AccountType.ToString() /> *@
+@*                         } *@
+@*                     </Template> *@
+@*                 </RadzenDataGridColumn> *@
+@*             </Columns> *@
+@*         </RadzenDataGridColumn> *@
+@*         <RadzenDataGridColumn TItem="StrategyExecutionViewItem" Title="Trade notional" Width="120px"> *@
+@*             <Template Context="strategy"> *@
+@*             <RadzenText TextStyle="TextStyle.Body2"  *@
+@*                         Text=@((strategy.ExecutionAccounts.Count == 0 ? 0 : strategy.ExecutionAccounts.Sum(a => a.Investment)).ToString(CultureInfo.InvariantCulture)) /> *@
+@*             </Template> *@
+@*         </RadzenDataGridColumn> *@
+@*     </Columns> *@
+@* </EditableView> *@
+@* *@
+@* @code { *@
+@*     private PagingFilter _filter = new(); *@
+@* *@
+@*     private string GetLookIntoHref(StrategyViewBrief a) => $"/strategies/{a.StrategyId}"; *@
+@*     private void ShowTooltip(ElementReference elementReference, string text, TooltipOptions options = null) =>  *@
+@*         TooltipService.Open(elementReference, text, options); *@
+@* *@
+@*     private void CellRender(DataGridCellRenderEventArgs<StrategyExecutionViewItem> args) *@
+@*     { *@
+@*         if (args.Data.ExecutionAccounts.Count == 0  *@
+@*             || args.Data.ExecutionAccounts.Sum(a => a.Investment) == 0 *@
+@*             || args.Data.ExecutionAccounts.Any(a => a.Investment == 0) *@
+@*         )  *@
+@*             args.Attributes.Add("class", "rz-background-color-warning-lighter"); *@
+@*     } *@
+@* *@
+@* } *@

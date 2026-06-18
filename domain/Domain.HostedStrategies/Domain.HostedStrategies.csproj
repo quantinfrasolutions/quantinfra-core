@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <LangVersion>default</LangVersion>
+        <RootNamespace>QuantInfra.Domain.HostedStrategies</RootNamespace>
+        <AssemblyName>QuantInfra.Domain.HostedStrategies</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\common\Common.MarketData\Common.MarketData.csproj" />
+      <ProjectReference Include="..\..\Common\Common.Metrics\Common.Metrics.csproj" />
+      <ProjectReference Include="..\..\common\Common.Strategies\Common.Strategies.csproj" />
+      <ProjectReference Include="..\Domain.Accounts.AccountStateClientManager\Domain.Accounts.AccountStateClientManager.csproj" />
+      <ProjectReference Include="..\events\Domain.Events.MarketData\Domain.Events.MarketData.csproj" />
+      <ProjectReference Include="..\queries\Domain.Queries.MarketData\Domain.Queries.MarketData.csproj" />
+      <ProjectReference Include="..\queries\Domain.Queries.Strategies\Domain.Queries.Strategies.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,51 @@
+@using UI.SharedComponents.Components
+@inject NavigationManager NavigationManager
+
+@if (!DisplayAsList)
+{
+    <RadzenTabs SelectedIndex=@_selectedIndex SelectedIndexChanged=@OnSelectedIndexChanged class="full-width-tabs" @ref=_tabs>
+        <Tabs>
+            @foreach (var t in Tabs)
+            {
+                <RadzenTabsItem Text=@t.Text Disabled=@(t.Disabled || _tabs?.SelectedTab?.Text == t.Text)/>
+            }
+        </Tabs>
+    </RadzenTabs>
+}
+else
+{
+    <RadzenCard>
+        <RadzenStack Gap="1rem">
+            @foreach (var t in Tabs)
+            {
+                <RadzenRow>
+                    <RadzenLink Text=@t.Text Path=@($"{BasePath}/{t.Path}")/>
+                </RadzenRow>
+            }
+        </RadzenStack>
+    </RadzenCard>
+}
+@ChildContent
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter, EditorRequired] public string SelectedTabPath { get; set; }
+    [Parameter, EditorRequired] public virtual List<NavigationTabsItem> Tabs { get; set; }
+    [Parameter, EditorRequired] public string BasePath { get; set; }
+    [Parameter] public bool DisplayAsList { get; set; }
+    
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        _selectedIndex = Math.Max(Tabs.FindIndex(t => t.Path == SelectedTabPath), 0);
+    }
+
+    private int _selectedIndex;
+    private void OnSelectedIndexChanged(int index)
+    {
+        NavigationManager.NavigateTo($"{BasePath}/{Tabs[index].Path}");
+    }
+
+    private RadzenTabs _tabs;
+}

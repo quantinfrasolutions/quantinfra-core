@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <RootNamespace>QuantInfra.Common.Messaging.Patterns</RootNamespace>
+        <LangVersion>default</LangVersion>
+        <AssemblyName>QuantInfraCommon.Messaging.Patterns</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Disruptor" Version="6.0.1" />
+      <PackageReference Include="NodaTime" Version="3.2.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Common.Messaging\Common.Messaging.csproj" />
+      <ProjectReference Include="..\Common.Metrics\Common.Metrics.csproj" />
+      <ProjectReference Include="..\Common.ServiceBase\Common.ServiceBase.csproj" />
+      <ProjectReference Include="..\Common.Utils.Collections\Common.Utils.Collections.csproj" />
+    </ItemGroup>
+
+</Project>

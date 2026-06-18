@@ -1,0 +1,37 @@
+﻿@inject DialogService DialogService
+
+@if (RenderButton)
+{
+    <RadzenButton ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Text="Subscribe" Click=@Show />
+}
+
+@code {
+
+    dynamic dialog;
+
+    [Parameter] [EditorRequired] public Guid AccountId { get; set; }
+    [Parameter] public Func<Task>? OnCompleted { get; set; }
+    [Parameter] public bool RenderButton { get; set; }
+
+    public async Task Show()
+    {
+        dialog = await DialogService.OpenAsync<AccountSubscribeForm>(
+            "Create subscription",
+            new Dictionary<string, object>()
+            {
+                { "AccountId", AccountId },
+                { "OnCompleted", Close }
+            }
+        );
+    }
+
+    async Task Close()
+    {
+        DialogService.Close(dialog);
+        if (OnCompleted != null)
+        {
+            await OnCompleted.Invoke();
+        }
+    }
+
+}

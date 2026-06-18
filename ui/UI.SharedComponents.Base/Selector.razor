@@ -1,0 +1,155 @@
+﻿@typeparam TItem where TItem : class, new()
+@typeparam TValue
+@typeparam TKey
+
+@if (isError)
+{
+    <RadzenText TextStyle="TextStyle.Body1">
+        Error while loading. <RadzenButton Variant="Variant.Text" Click="() => Reload()">Reload?</RadzenButton>
+    </RadzenText>
+}
+else
+{
+    <RadzenFormField Text="@Text" Variant="@Variant.Text" Style="width: 100%;">
+        <ChildContent>            
+            @if (Formatter != null)
+            {
+                <RadzenDropDown Value="@Value"
+                                ValueChanged="@ValueChanged"
+                                Data="@items"
+                                TValue="@TValue"
+                                ValueProperty="@ValueProperty"
+                                TextProperty="@TextProperty"
+                                Name="Item"
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                FilterOperator="StringFilterOperator.Contains"
+                                AllowFiltering="true"
+                                Disabled="isLoading || Disabled"
+                                @ref="dropdown"
+                                OpenOnFocus="true"
+                                AllowClear="!Required"
+                                AllowVirtualization="true"
+                                Multiple="@Multiple"
+                                Chips="@Multiple">
+                    <Template Context="item">
+                        @Formatter(item)
+                    </Template>
+                </RadzenDropDown>
+            }
+            else
+            {
+                <RadzenDropDown Value="@Value"
+                                ValueChanged="@ValueChanged"
+                                Data="@items"
+                                TValue="@TValue"
+                                ValueProperty="@ValueProperty"
+                                TextProperty="@TextProperty"
+                                Name="Item"
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                FilterOperator="StringFilterOperator.Contains"
+                                AllowFiltering="true"
+                                Disabled="isLoading || Disabled"
+                                @ref="dropdown"
+                                OpenOnFocus="true"
+                                AllowClear="!Required"
+                                AllowVirtualization="true"
+                                Multiple="@Multiple"
+                                Chips="@Multiple"/>
+            }
+            @if (ShowRefreshButton)
+            {
+                <RadzenButton Icon="refresh" Variant="Variant.Text" Size="ButtonSize.Small" Style="position: absolute; right: 30px;" Click="@Refresh" />
+            }
+            @if (Required)
+            {
+                <RadzenRequiredValidator Component="Item" Text="@requiredText" Style="position: absolute" />
+            }
+        </ChildContent>
+    </RadzenFormField>
+}
+
+@code {
+    [Parameter] public string Text { get; set; }
+    [Parameter] public TValue Value { get; set; }
+    [Parameter] public EventCallback<TValue> ValueChanged { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public bool Required { get; set; } = false;
+    [Parameter] public RenderFragment<TItem>? Template { get; set; }
+    [Parameter] public Func<Task<IEnumerable<TItem>>> RefreshAction { get; set; }
+    [Parameter] public string ValueProperty { get; set; }
+    [Parameter] public string TextProperty { get; set; }
+    [Parameter] public Func<TItem, string>? Formatter { get; set; }
+    [Parameter] public bool Multiple { get; set; }
+    [Parameter] public bool ShowRefreshButton { get; set; }
+    [Parameter] public string Style { get; set; }
+
+    const string requiredText = "Required";
+    List<TItem> items;
+    bool isError;
+    bool isLoading;
+    bool notFound;
+    RadzenDropDown<TValue> dropdown;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await Reload();
+    }
+
+    async Task Refresh() => await Reload();
+
+    async Task Reload()
+    {
+        try
+        {
+            isError = false;
+            notFound = false;
+
+            items = (await RefreshAction()).ToList();
+            await InvokeAsync(StateHasChanged);
+            //await Search();
+        }
+        catch (Exception ex)
+        {
+            //notificationService.Notify(NotificationSeverity.Error, ex.Message);
+            isError = true;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    async Task Search()
+    {
+        //if (!isLoading && assets != null)
+        //{
+        //    if (!string.IsNullOrEmpty(AssetNameToSearch))
+        //    {
+        //        var asset = assets.Where(e => e.Name.Equals(AssetNameToSearch, StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
+        //        if (asset == null)
+        //        {
+        //            notFound = true;
+        //        }
+        //        else
+        //        {
+        //            notFound = false;
+        //            await dropdown.SelectItem(asset.Id);
+        //        }
+        //    }
+        //    else if (AssetIdToSearch.HasValue)
+        //    {
+        //        var asset = assets.Where(e => e.Id == AssetIdToSearch).FirstOrDefault();
+        //        if (asset == null)
+        //        {
+        //            notFound = true;
+        //        }
+        //        else
+        //        {
+        //            notFound = false;
+        //            await dropdown.SelectItem(asset.Id);
+        //        }
+        //    }
+        //}
+    }
+}

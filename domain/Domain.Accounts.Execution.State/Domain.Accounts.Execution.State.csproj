@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <LangVersion>default</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>QuantInfra.Domain.Account.Execution.State</RootNamespace>
+        <AssemblyName>QuantInfra.Domain.Accounts.Execution.State</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Domain.Accounts.Base.State\Domain.Accounts.Base.State.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,23 @@
+@using UI.SharedComponents.Accounts
+
+@page "/accounts/{AccountId:int}/trading"
+
+@layout AccountBase
+
+@if (AccountBase?.Account != null)
+{
+    <AccountTradingView AccountId=@AccountBase.Account.AccountId AccountType=@AccountBase.Account.AccountType />
+}
+
+@code {
+    
+    
+    [Parameter] public int AccountId { get; set; }
+    [CascadingParameter] public AccountBase? AccountBase { get; set; }
+
+    protected override void OnInitialized()
+    {
+        AccountBase!.Id = AccountId;
+        AccountBase.Path = "trading";
+    }
+}

@@ -1,0 +1,70 @@
+﻿@using UI.Interfaces.Accounts
+@using QuantInfra.Common.Interfaces.Api.Accounts
+@using QuantInfra.Sdk.Accounts
+@using UI.SharedComponents.Base
+
+@inject IUiAccountsRepository Repository
+
+@if (_filter != null)
+{
+    <EditableView TItem="AccountListModel"
+                  TFilter="AccountsFilter"
+                  EmptyText="No accounts found"
+                  SearchFunc=@Repository.GetAccounts
+                  Filter=@_filter
+                  AllowSelectRow=@AllowSelect
+                  SelectionMode="DataGridSelectionMode.Single"
+                  SelectAction=@OnRowSelected
+                  Variant=@Variant
+                  RunSearchImmediately=@RunSearchImmediately
+                  LookIntoHref=@GetLookIntoHref
+                  HideActionsColumn=@(!EnableActions)>
+        <SearchForm>
+            <AccountsFilterForm @bind-Filter=@_filter HideAccountType=@_hideAccountType />
+        </SearchForm>
+        <CreateButton>
+            @if (EnableActions)
+            {
+                <CreateAccountDialog ShowButton="true"/>
+            }
+        </CreateButton>
+        <Columns>
+            <RadzenDataGridColumn TItem="AccountListModel" Title="Account Id" Property=@nameof(AccountListModel.AccountId) Width="120px" />
+            <RadzenDataGridColumn TItem="AccountListModel" Property="Name" Title="Name" Width="220px"/>
+            <RadzenDataGridColumn TItem="AccountListModel" Property="AccountType" Title="Type" Width="220px"/>
+            <RadzenDataGridColumn TItem="AccountListModel" Title="Currency" Width="140px">
+                <Template Context="account">
+                    <IdNameView Id="@account.CurrencyId" Name="@account.CurrencyName"/>
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </EditableView>
+}
+
+@code {
+    AccountsFilter? _filter;
+    private bool _hideAccountType;
+    
+    [Parameter] public bool AllowSelect { get; set; }
+    [Parameter] public Action<AccountListModel>? ValueChanged { get; set; }
+    [Parameter] public Variant Variant { get; set; } = Variant.Filled;
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public bool EnableActions { get; set; }
+    [Parameter] public int? StrategyId { get; set; }
+    [Parameter] public AccountType? AccountType { get; set; }
+    [Parameter] public List<AccountType>? AccountTypes { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        _filter = new()
+        {
+            StrategyId = StrategyId,
+            AccountTypes = AccountType.HasValue ? [AccountType.Value] : AccountTypes,
+        };
+        if (AccountType != null) _hideAccountType = true;
+    }
+
+    private string GetLookIntoHref(AccountListModel a) => $"/accounts/{a.AccountId}";
+    private void OnRowSelected(AccountListModel c) => ValueChanged?.Invoke(c);
+}

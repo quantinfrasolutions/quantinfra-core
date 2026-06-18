@@ -1,0 +1,86 @@
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@using NodaTime
+@using NodaTime.Serialization.SystemTextJson
+@using QuantInfra.Common.Strategies
+@using QuantInfra.Sdk.Strategies
+@using Radzen
+@using Radzen.Blazor
+@using UI.SharedComponents.Components.Strategies
+
+@page "/strategies/{StrategyId:int}"
+@page "/strategies/{StrategyId:int}/summary"
+
+@layout StrategyBase
+
+@if (StrategyBase?.Strategy != null)
+{
+    <RadzenStack Gap="1rem">
+        <RadzenRow Gap="1rem">
+            <RadzenColumn SizeXS="12" SizeSM="12" SizeMD="12" Size="6" Style="min-width: 550px; max-width: 800px;">
+                <RadzenCard class="details-form-card" Style="padding: 0;">
+                    <RadzenTabs>
+                        <Tabs>
+                            <RadzenTabsItem Text="Details">
+                                <StrategySummary Strategy=@StrategyBase.Strategy/>
+                            </RadzenTabsItem>
+                            <RadzenTabsItem Text="Parameters">
+                                <RadzenFormField Variant="Variant.Text">
+                                    <RadzenTextArea Value=@GetParams() Disabled="true" Rows="30" />
+                                </RadzenFormField>
+                            </RadzenTabsItem>
+                            <RadzenTabsItem Text="Strategy config">
+                                <RadzenFormField Variant="Variant.Text">
+                                    <RadzenTextArea Value=@GetConfig() Disabled="true" Rows="30" />
+                                </RadzenFormField>
+                            </RadzenTabsItem>
+                        </Tabs>
+                    </RadzenTabs>
+                </RadzenCard>
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenStack>
+}
+
+@code {
+    [Parameter] public int StrategyId { get; set; }
+
+    [CascadingParameter] public StrategyBase? StrategyBase { get; set; }
+
+    protected override void OnInitialized()
+    {
+        StrategyBase!.Id = StrategyId;
+        StrategyBase.Path = "summary";
+    }
+
+    private string GetParams()
+    {
+        var options = new JsonSerializerOptions() { WriteIndented = true };
+        options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+        options.Converters.Add(new JsonStringEnumConverter());
+
+        return JsonSerializer.Serialize(
+            JsonDocument.Parse(StrategyBase.Strategy.Params),
+            options
+        );
+    }
+
+    private string GetConfig()
+    {
+        var options = new JsonSerializerOptions() { WriteIndented = true };
+        options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+        options.Converters.Add(new JsonStringEnumConverter());
+
+        var s = StrategyBase.Strategy;
+
+        return JsonSerializer.Serialize(
+            new StrategyConfig(s.StrategyId, s.Name, s.StrategyClassName, s.Params,
+                s.RequiredBarStorages.ToDictionary(kv => kv.Key, kv => kv.Value.ToBarStorageConfig()),
+                s.Symbols.ToDictionary(kv => kv.Key, kv => kv.Value.Id),
+                s.LiquidationParameters, s.UseSignalGroups),
+            options
+        ).Replace('\u0022', '\"');
+        
+        // .Replace('\u0022', '\"')
+    }
+}

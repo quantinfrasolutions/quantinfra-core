@@ -1,0 +1,24 @@
+﻿@using UI.Interfaces.Strategies
+
+@inject IUiStrategyClassesRepository Repository
+
+<UI.SharedComponents.Components.Selector TItem="StrategyTypeDescription"
+                                         TValue="List<string>"
+                                         TKey="string"
+                                         RefreshAction="Repository.GetAvailableStrategyClasses"
+                                         ValueProperty="FullName"
+                                         TextProperty="Name"                                         
+                                         Value="@Value"
+                                         ValueChanged="@ValueChanged"
+                                         Text="Class"
+                                         Required="true"
+                                         Disabled="@Disabled"
+                                         ShowRefreshButton="false"
+                                         Multiple="true"/>
+
+@code {
+    [Parameter] public List<string> Value { get; set; } = new();
+    [Parameter] public EventCallback<List<string>> ValueChanged { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+}
+

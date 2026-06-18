@@ -1,0 +1,36 @@
+@using QuantInfra.Common.Interfaces.Api.Accounts
+@using UI.Interfaces.Accounts
+@using UI.SharedComponents.Base
+
+@if (AccountId != null && AccountId != 0)
+{
+    <EditableView TItem="SubaccountListModel"
+                  TFilter="int"
+                  EmptyText="No broker accounts"
+                  SearchFunc=@Repository.GetBrokerAccountsForSsa
+                  Filter=@AccountId
+                  RunSearchImmediately="true"
+                  @ref=_view>
+        <SearchForm/>
+        <CreateButton>
+            <AssignBrokerAccountDialog AccountId=@AccountId AssignmentChanged=@(() => _view.RunSearch())/>
+        </CreateButton>
+        <Columns>
+            <RadzenDataGridColumn TItem="SubaccountListModel" Title="Broker Id" Property=@nameof(SubaccountListModel.BrokerId) Width="100px"/>
+            <RadzenDataGridColumn TItem="SubaccountListModel" Title="Broker" Property=@nameof(SubaccountListModel.BrokerName) Width="120px"/>
+            <RadzenDataGridColumn TItem="SubaccountListModel" Title="Account Id" Property=@nameof(SubaccountListModel.SubaccountId) Width="120px" />
+            <RadzenDataGridColumn TItem="SubaccountListModel" Title="Name" Width="220px">
+                <Template Context="account">
+                    <RadzenLink Text=@account.SubaccountName Path=@($"/accounts/{account.SubaccountId}")/>
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </EditableView>
+}
+
+@code {
+    [Parameter, EditorRequired] public int AccountId { get; set; }
+    [Inject] private IUiAccountsRepository Repository { get; set; }
+    
+    private EditableView<SubaccountListModel, int> _view;
+}

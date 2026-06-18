@@ -1,0 +1,99 @@
+@typeparam TItem where TItem : class
+@typeparam TKey where TKey : struct
+
+@if (!HidePageTitle)
+{
+    <RadzenText TextStyle="TextStyle.H4">@Title</RadzenText>
+}
+
+<RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+    @if (SummaryContent != null)
+    {
+        <RadzenRow>
+            <RadzenColumn Size="6">
+                <RadzenCard>
+                    @SummaryContent
+                </RadzenCard>
+            </RadzenColumn>
+        </RadzenRow>
+    }
+    <RadzenRow>
+        <RadzenColumn Size="12" class="full-width-tabs">
+            @if (TabsContent != null)
+            {
+                <RadzenTabs @ref="tabs">
+                    <Tabs>
+                        @TabsContent
+                    </Tabs>
+                </RadzenTabs>
+            }
+            @if (Content != null)
+            {
+                @Content
+            }
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    RadzenTabs tabs;
+    private string _tab;
+
+    [Parameter] public string Title { get; set; }
+    [Parameter] public TKey Id { get; set; }
+    [Parameter] public TItem? Value { get; set; }
+    [Parameter] public EventCallback<TItem> ValueChanged { get; set; }
+    [Parameter] public bool HidePageTitle { get; set; }
+
+
+    [Parameter]
+    public string Tab
+    {
+        get => _tab;
+        set 
+        {
+            _tab = value;
+            if (tabs != null && _tab != null)
+            {
+                var select = TabNames.Where(kv => kv.Value == Tab).Select(kv => kv.Key).SingleOrDefault();
+                tabs.SelectedIndex = select;
+            }
+        }
+    }
+
+    [Parameter] public Func<bool, Task<Dictionary<TKey, TItem>>>? RetrieveDictionary { get; set; }
+    [Parameter] public Func<TKey, Task<TItem>>? RetrieveItem { get; set; }
+    
+    [Parameter] public RenderFragment SummaryContent { get; set; }
+    [Parameter] public RenderFragment Content { get; set; }
+    [Parameter] public RenderFragment TabsContent { get; set; }
+    [Parameter] public Dictionary<int, string> TabNames { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        if (tabs != null && Tab != null)
+        {
+            var select = TabNames.Where(kv => kv.Value == Tab).Select(kv => kv.Key).SingleOrDefault();
+            tabs.SelectedIndex = select;
+        }
+
+        if (Value == null)
+        {
+            if (RetrieveItem != null)
+            {
+                Value = await RetrieveItem(Id);
+            }
+            else
+            {
+                Value = (await RetrieveDictionary(false))[Id];   
+            }
+            await ValueChanged.InvokeAsync(Value);
+        }
+    }
+}
+
+@code {
+    
+}

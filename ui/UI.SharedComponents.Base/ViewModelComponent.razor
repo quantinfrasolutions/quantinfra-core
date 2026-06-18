@@ -1,0 +1,38 @@
+@typeparam TViewModel where TViewModel : class, new()
+
+@code {
+    [Parameter] public Guid? Id { get; set; }
+    [Parameter] public IViewModelStore? Store { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        
+        if (Id is not null && Store is not null)
+        {
+            _viewModel = Store.Get<TViewModel>(Id.Value);
+        }
+        
+        ViewModel ??= new();
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        OnParametersSet();
+        return Task.CompletedTask;
+    }
+
+    private TViewModel? _viewModel;
+    protected TViewModel? ViewModel
+    {
+        get => _viewModel;
+        set
+        {
+            _viewModel = value;
+            if (Id is not null && Store is not null)
+            {
+                Store.Set(Id.Value, value);
+            }
+        }
+    }
+}

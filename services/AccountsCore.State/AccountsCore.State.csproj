@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <LangVersion>default</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>QuantInfra.Services.AccountsCore.State</AssemblyName>
+        <RootNamespace>QuantInfra.Services.AccountsCore.State</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Common\Common.EventSourcing\Common.EventSourcing.csproj" />
+      <ProjectReference Include="..\..\common\Common.Messaging.Patterns\Common.Messaging.Patterns.csproj" />
+      <ProjectReference Include="..\..\common\Common.ServiceBase\Common.ServiceBase.csproj" />
+      <ProjectReference Include="..\..\domain\Domain.AccountRecordsStateManager\Domain.AccountRecordsStateManager.csproj" />
+      <ProjectReference Include="..\..\Domain\Domain.Accounts.Base\Domain.Accounts.Base.csproj" />
+      <ProjectReference Include="..\..\Domain\Domain.Accounts.Execution.State\Domain.Accounts.Execution.State.csproj" />
+      <ProjectReference Include="..\..\Domain\Domain.MarketData\Domain.MarketData.csproj" />
+      <ProjectReference Include="..\..\domain\Domain.StaticData\Domain.StaticData.csproj" />
+      <ProjectReference Include="..\..\domain\Domain.Strategies\Domain.Strategies.csproj" />
+      <ProjectReference Include="..\..\domain\Domain.StrategyRecordsStateManager\Domain.StrategyRecordsStateManager.csproj" />
+    </ItemGroup>
+
+</Project>

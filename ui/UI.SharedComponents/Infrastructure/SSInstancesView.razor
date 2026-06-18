@@ -1,0 +1,36 @@
+﻿@using Common.Infrastructure.Abstractions.Api
+@using UI.Interfaces
+@using UI.Interfaces.Infrastructure
+@using UI.SharedComponents.Base
+
+@inject IUiInfrastructureRepository Repository
+
+<EditableView TItem="StrategiesServiceListView"
+             TFilter="EmptyFilter"
+             EmptyText="No locations set up"
+             SearchFunc="@Repository.GetStrategiesServiceInstances"
+             Filter="@Filter"
+             RunSearchImmediately="true"
+             SearchButtonText="Refresh"
+             Variant=@Variant
+             HideActionsColumn=@(!EnableActions)
+             AllowSelectRow=@AllowSelect
+             SelectionMode="DataGridSelectionMode.Single"
+             SelectAction=@ValueChanged>
+    <SearchForm />
+    <Columns>
+        <RadzenDataGridColumn TItem="StrategiesServiceListView" Property=@nameof(StrategiesServiceListView.Name) Width="120px" Title="Name" />
+        <RadzenDataGridColumn TItem="StrategiesServiceListView" Property=@nameof(StrategiesServiceListView.LocationName) Width="120px" Title="Location" />
+        <RadzenDataGridColumn TItem="StrategiesServiceListView" Property=@nameof(StrategiesServiceListView.ActiveStrategiesCount) Width="120px" Title="Strategies" />
+    </Columns>
+</EditableView>
+
+@code {
+    [Parameter] public EmptyFilter Filter { get; set; } = new();
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public bool AllowEdit { get; set; }
+    [Parameter] public bool AllowSelect { get; set; }
+    [Parameter] public Variant Variant { get; set; } = Variant.Filled;
+    [Parameter] public bool EnableActions { get; set; } = true;
+    [Parameter] public EventCallback<StrategiesServiceListView> ValueChanged { get; set; }
+}

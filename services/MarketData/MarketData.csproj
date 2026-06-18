@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>default</LangVersion>
+    <RootNamespace>QuantInfra.Services.MarketData</RootNamespace>
+    <Nullable>enable</Nullable>
+    <AssemblyName>QuantInfra.Services.MarketData</AssemblyName>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <Folder Include="TradeAggregators\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.6" />
+    <PackageReference Include="Quartz" Version="3.18.1" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.13" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\common\Common.MarketData\Common.MarketData.csproj" />
+    <ProjectReference Include="..\..\common\Common.Messaging.Patterns\Common.Messaging.Patterns.csproj" />
+    <ProjectReference Include="..\..\common\Common.ServiceBase\Common.ServiceBase.csproj" />
+    <ProjectReference Include="..\..\common\Common.StaticData.Abstractions\Common.StaticData.Abstractions.csproj" />
+    <ProjectReference Include="..\..\domain\events\Domain.Events.MarketData\Domain.Events.MarketData.csproj" />
+    <ProjectReference Include="..\..\domain\queries\Domain.Queries.MarketData\Domain.Queries.MarketData.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,4656 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "QuantInfra.Pro.Apps.Api | v1",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/accounts": {
+      "get": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "GetAccounts",
+        "parameters": [
+          {
+            "name": "AccountIds",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          {
+            "name": "AccountName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "AccountTypes",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/AccountType"
+              }
+            }
+          },
+          {
+            "name": "StrategyId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AccountListModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "CreateAccount",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAccountRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAccountRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAccountRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/accounts/{accountId}": {
+      "get": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "GetAccount",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountListModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/accounts/{accountId}/subaccounts": {
+      "get": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "GetSubaccounts",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Classifier",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubaccountListModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "CreateSubaccount",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSubaccountRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSubaccountRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSubaccountRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/accounts/{accountId}/subaccount-of": {
+      "get": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "GetSubaccountOf",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubaccountListModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/accounts/{accountId}/balances": {
+      "get": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "GetBalances",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BalanceModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/accounts/balance-operations": {
+      "get": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "GetBalanceOperationsHistory",
+        "parameters": [
+          {
+            "name": "AccountId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "BalanceOperationId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "FromDt",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "ToDt",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "ExternalId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BalanceOperationHistoryModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "CreateBalanceOperation",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewBalanceOperation"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewBalanceOperation"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewBalanceOperation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/accounts/{accountId}/share-price-history": {
+      "get": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "GetAccountSharePriceHistory",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SharePriceHistory"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/accounts/share-price-history": {
+      "get": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "GetSharePriceHistory",
+        "parameters": [
+          {
+            "name": "AccountId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "SortDescending",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "FromDt",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "ToDt",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "ChangeType",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SharePriceHistory"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/accounts/{accountId}/positions": {
+      "get": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "GetActivePositions",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PositionView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/accounts/positions-history": {
+      "get": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "GetPositionsHistory",
+        "parameters": [
+          {
+            "name": "CloseDtFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "CloseDtTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "Type",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "Open",
+                  "Close",
+                  "MTM"
+                ]
+              },
+              "default": null
+            }
+          },
+          {
+            "name": "OpenDtFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "OpenDtTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "HistoryOpenDtFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "HistoryOpenDtTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "AccountId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "ContractId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "TradeId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PositionView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/accounts/{accountId}/orders": {
+      "get": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "GetActiveOrders",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrderView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/accounts/orders": {
+      "post": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "NewOrder",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewOrderSingle"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewOrderSingle"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewOrderSingle"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "CancelOrder",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderCancelRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderCancelRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderCancelRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/accounts/orders-history": {
+      "get": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "GetOrdersHistory",
+        "parameters": [
+          {
+            "name": "AccountId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "OrderId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": null
+            }
+          },
+          {
+            "name": "ContractId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "OrdStatus",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "ExternalId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "ExecutionRequestId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": null
+            }
+          },
+          {
+            "name": "FromDt",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "ToDt",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "ExecType",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "Offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrderHistoryView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/accounts/{accountId}/trade": {
+      "post": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "BookTrade",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Trade"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Trade"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Trade"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/accounts/trades-history": {
+      "get": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "GetTradesHistory",
+        "parameters": [
+          {
+            "name": "FromDt",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "ToDt",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "AccountId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "TradeId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": null
+            }
+          },
+          {
+            "name": "ContractId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "ExternalId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "Offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TradeView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/infrastructure/locations": {
+      "get": {
+        "tags": [
+          "Infrastructure"
+        ],
+        "operationId": "GetLocations",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Location"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/infrastructure/as": {
+      "get": {
+        "tags": [
+          "Infrastructure"
+        ],
+        "operationId": "GetAccountServiceInstances",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AccountServiceInstance"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/infrastructure/ss": {
+      "get": {
+        "tags": [
+          "Infrastructure"
+        ],
+        "operationId": "GetStrategiesServiceInstances",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StrategiesServiceListView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/infrastructure/es": {
+      "get": {
+        "tags": [
+          "Infrastructure"
+        ],
+        "operationId": "GetExecutionServiceInstances",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExecutionServiceListView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/static-data/exchanges": {
+      "get": {
+        "tags": [
+          "StaticData"
+        ],
+        "operationId": "GetExchanges",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Exchange"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "StaticData"
+        ],
+        "operationId": "CreateExchange",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Exchange"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Exchange"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Exchange"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/static-data/exchanges/{exchangeId}": {
+      "put": {
+        "tags": [
+          "StaticData"
+        ],
+        "operationId": "UpdateExchange",
+        "parameters": [
+          {
+            "name": "exchangeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Exchange"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Exchange"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Exchange"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "StaticData"
+        ],
+        "operationId": "DeleteExchange",
+        "parameters": [
+          {
+            "name": "exchangeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/static-data/exchanges/{exchangeId}/trading-sessions": {
+      "get": {
+        "tags": [
+          "StaticData"
+        ],
+        "operationId": "GetTradingSessions",
+        "parameters": [
+          {
+            "name": "exchangeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TradingSession"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "StaticData"
+        ],
+        "operationId": "CreateTradingSession",
+        "parameters": [
+          {
+            "name": "exchangeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TradingSession"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TradingSession"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TradingSession"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/static-data/exchanges/{exchangeId}/trading-sessions/{id}": {
+      "delete": {
+        "tags": [
+          "StaticData"
+        ],
+        "operationId": "DeleteTradingSession",
+        "parameters": [
+          {
+            "name": "exchangeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/static-data/streams": {
+      "get": {
+        "tags": [
+          "StaticData"
+        ],
+        "operationId": "GetStreams",
+        "parameters": [
+          {
+            "name": "Ticker",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "ContractId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "StreamIds",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "default": null
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "Offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StreamListView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/static-data/datafeeds": {
+      "get": {
+        "tags": [
+          "StaticData"
+        ],
+        "operationId": "GetDatafeeds",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Datafeed"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "StaticData"
+        ],
+        "operationId": "CreateDatafeed",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Datafeed"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Datafeed"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Datafeed"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/static-data/datafeeds/{datafeedId}": {
+      "put": {
+        "tags": [
+          "StaticData"
+        ],
+        "operationId": "UpdateDatafeed",
+        "parameters": [
+          {
+            "name": "datafeedId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Datafeed"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Datafeed"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Datafeed"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "StaticData"
+        ],
+        "operationId": "DeleteDatafeed",
+        "parameters": [
+          {
+            "name": "datafeedId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/static-data/currencies": {
+      "get": {
+        "tags": [
+          "StaticData"
+        ],
+        "operationId": "GetCurrencies",
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": null
+            }
+          },
+          {
+            "name": "Name",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "Offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Currency"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/static-data/assets": {
+      "get": {
+        "tags": [
+          "StaticData"
+        ],
+        "operationId": "GetAssets",
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "Name",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "AssetType",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "Offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Asset"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "StaticData"
+        ],
+        "operationId": "CreateAsset",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Asset"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Asset"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Asset"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/static-data/assets/{assetId}": {
+      "put": {
+        "tags": [
+          "StaticData"
+        ],
+        "operationId": "UpdateAsset",
+        "parameters": [
+          {
+            "name": "assetId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Asset"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Asset"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Asset"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "StaticData"
+        ],
+        "operationId": "DeleteAsset",
+        "parameters": [
+          {
+            "name": "assetId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/static-data/contract-templates": {
+      "get": {
+        "tags": [
+          "StaticData"
+        ],
+        "operationId": "GetContractTemplates",
+        "parameters": [
+          {
+            "name": "TemplateId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "Name",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "Offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ContractTemplateListView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/static-data/contracts": {
+      "get": {
+        "tags": [
+          "StaticData"
+        ],
+        "operationId": "GetContracts",
+        "parameters": [
+          {
+            "name": "Ticker",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "ExchangeId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": null
+            }
+          },
+          {
+            "name": "ContractIds",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "default": null
+            }
+          },
+          {
+            "name": "CommissionId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": null
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "Offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ContractListView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/static-data/commission-structures": {
+      "get": {
+        "tags": [
+          "StaticData"
+        ],
+        "operationId": "GetCommissionStructures",
+        "parameters": [
+          {
+            "name": "CommissionId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "Name",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "CurrencyId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "Type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": null
+            }
+          },
+          {
+            "name": "BrokerId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "ExchangeId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "Offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CommissionStructure"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/static-data/brokers": {
+      "get": {
+        "tags": [
+          "StaticData"
+        ],
+        "operationId": "GetBrokers",
+        "parameters": [
+          {
+            "name": "Limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "Offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Broker"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/strategies": {
+      "get": {
+        "tags": [
+          "Strategies"
+        ],
+        "operationId": "GetStrategies",
+        "parameters": [
+          {
+            "name": "Status",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/StrategyStatus"
+              }
+            }
+          },
+          {
+            "name": "ClassNames",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "StrategyIds",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "default": null
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          },
+          {
+            "name": "Offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StrategyViewBrief"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Strategies"
+        ],
+        "operationId": "CreateStrategy",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStrategyRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStrategyRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStrategyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/strategies/validate": {
+      "post": {
+        "tags": [
+          "Strategies"
+        ],
+        "operationId": "ValidateStrategyRequest",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStrategyRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStrategyRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStrategyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateStrategyResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateStrategyResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateStrategyResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/strategies/classes": {
+      "get": {
+        "tags": [
+          "Strategies"
+        ],
+        "operationId": "GetStrategyClasses",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StrategyTypeDescription"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/strategies/classes/{className}": {
+      "get": {
+        "tags": [
+          "Strategies"
+        ],
+        "operationId": "GetStrategyClass",
+        "parameters": [
+          {
+            "name": "className",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StrategyTypeDescription"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/strategies/{strategyId}": {
+      "get": {
+        "tags": [
+          "Strategies"
+        ],
+        "operationId": "GetStrategy",
+        "parameters": [
+          {
+            "name": "strategyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StrategyViewBrief"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/strategies/{strategyId}/start": {
+      "post": {
+        "tags": [
+          "Strategies"
+        ],
+        "operationId": "StartStrategy",
+        "parameters": [
+          {
+            "name": "strategyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/strategies/{strategyId}/stop": {
+      "post": {
+        "tags": [
+          "Strategies"
+        ],
+        "operationId": "StopStrategy",
+        "parameters": [
+          {
+            "name": "strategyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StopStrategyRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StopStrategyRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/StopStrategyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccountListModel": {
+        "type": "object",
+        "properties": {
+          "currencyName": {
+            "type": "string"
+          },
+          "brokerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "brokerType": {
+            "$ref": "#/components/schemas/NullableOfBrokerType"
+          },
+          "externalAccountId": {
+            "type": "string",
+            "nullable": true
+          },
+          "strategyId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "strategyName": {
+            "type": "string",
+            "nullable": true
+          },
+          "accountId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "accountServiceName": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "currencyId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "accountType": {
+            "$ref": "#/components/schemas/AccountType"
+          },
+          "positionAccounting": {
+            "$ref": "#/components/schemas/PositionAccounting"
+          },
+          "brokerId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "enableSharePriceTracking": {
+            "type": "boolean"
+          },
+          "includeUnrealizedPnLToMtm": {
+            "type": "boolean"
+          },
+          "tradingClientConfig": {
+            "$ref": "#/components/schemas/TradingClientConfig"
+          }
+        }
+      },
+      "AccountServiceInstance": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "locationName": {
+            "type": "string"
+          }
+        }
+      },
+      "AccountType": {
+        "enum": [
+          "VirtualAccount",
+          "Fund",
+          "ExecutableSubAccount",
+          "BrokerAccount",
+          "ClientSubAccount",
+          "StrategySubAccount"
+        ]
+      },
+      "AccountViewBrief": {
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "accountType": {
+            "$ref": "#/components/schemas/AccountType"
+          },
+          "accountName": {
+            "type": "string"
+          }
+        }
+      },
+      "Allocation": {
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "qty": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "Asset": {
+        "type": "object",
+        "properties": {
+          "assetId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "assetType": {
+            "$ref": "#/components/schemas/AssetType"
+          }
+        }
+      },
+      "AssetType": {
+        "enum": [
+          "Currency",
+          "Stock",
+          "Commodity",
+          "Index"
+        ]
+      },
+      "BalanceModel": {
+        "type": "object",
+        "properties": {
+          "assetId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "assetName": {
+            "type": "string"
+          },
+          "balance": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "BalanceOperationHistoryModel": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "assetName": {
+            "type": "string"
+          },
+          "balanceOperationId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "accountServiceName": {
+            "type": "string"
+          },
+          "accountId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "dt": {
+            "$ref": "#/components/schemas/Instant"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          },
+          "assetId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "fxRate": {
+            "type": "number",
+            "format": "double"
+          },
+          "valueInAccountCcy": {
+            "type": "number",
+            "format": "double"
+          },
+          "externalId": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "isCorrection": {
+            "type": "boolean"
+          },
+          "affectsPnL": {
+            "type": "boolean"
+          },
+          "affectsInvestment": {
+            "type": "boolean"
+          },
+          "affectsBalance": {
+            "type": "boolean"
+          },
+          "affectsShareCount": {
+            "type": "boolean"
+          }
+        }
+      },
+      "BarAggregationType": {
+        "enum": [
+          "Time",
+          "Volume"
+        ]
+      },
+      "BarStorageConfig": {
+        "type": "object",
+        "properties": {
+          "idType": {
+            "$ref": "#/components/schemas/IdType"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "aggregationType": {
+            "$ref": "#/components/schemas/BarAggregationType"
+          },
+          "tradingSessionIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "timeframe": {
+            "$ref": "#/components/schemas/Period"
+          },
+          "offset": {
+            "$ref": "#/components/schemas/Period"
+          },
+          "timezone": {
+            "type": "string"
+          },
+          "lastValueOnly": {
+            "type": "boolean"
+          }
+        }
+      },
+      "BarStorageView": {
+        "type": "object",
+        "properties": {
+          "idType": {
+            "$ref": "#/components/schemas/IdType"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ticker": {
+            "type": "string"
+          },
+          "aggregationType": {
+            "$ref": "#/components/schemas/BarAggregationType"
+          },
+          "tradingSessionIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "timeframe": {
+            "$ref": "#/components/schemas/Period"
+          },
+          "offset": {
+            "$ref": "#/components/schemas/Period"
+          },
+          "timezone": {
+            "type": "string"
+          },
+          "lastValueOnly": {
+            "type": "boolean"
+          }
+        }
+      },
+      "BriefViewOfint": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "Broker": {
+        "type": "object",
+        "properties": {
+          "brokerId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "brokerType": {
+            "$ref": "#/components/schemas/BrokerType"
+          }
+        }
+      },
+      "BrokerType": {
+        "enum": [
+          "Ibkr",
+          "BinanceUsdmFutures"
+        ]
+      },
+      "CommissionStructure": {
+        "type": "object",
+        "properties": {
+          "commissionId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "fixedPerShare": {
+            "type": "number",
+            "format": "double"
+          },
+          "floating": {
+            "type": "number",
+            "format": "double"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/Currency"
+          },
+          "commissionStructureType": {
+            "$ref": "#/components/schemas/CommissionStructureType"
+          },
+          "brokerId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "exchangeId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        }
+      },
+      "CommissionStructureType": {
+        "enum": [
+          "Broker",
+          "Exchange",
+          "Other",
+          "Slippage"
+        ]
+      },
+      "ConstantStreamValue": {
+        "type": "object",
+        "properties": {
+          "streamId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "value": {
+            "type": "number",
+            "format": "double"
+          },
+          "cronExpression": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "nullable": true
+      },
+      "ContractListView": {
+        "required": [
+          "contractId",
+          "ticker",
+          "template",
+          "firstTradingDate",
+          "expirationDate",
+          "syntheticContractType",
+          "synthRequiresBarRecalculationAtRollover",
+          "externalContractId",
+          "assetId",
+          "assetName",
+          "description"
+        ],
+        "type": "object",
+        "properties": {
+          "contractId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ticker": {
+            "type": "string"
+          },
+          "template": {
+            "$ref": "#/components/schemas/ContractTemplateListView"
+          },
+          "firstTradingDate": {
+            "$ref": "#/components/schemas/NullableOfLocalDate"
+          },
+          "expirationDate": {
+            "$ref": "#/components/schemas/NullableOfLocalDate"
+          },
+          "syntheticContractType": {
+            "$ref": "#/components/schemas/NullableOfSyntheticContractType"
+          },
+          "synthRequiresBarRecalculationAtRollover": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "externalContractId": {
+            "type": "string",
+            "nullable": true
+          },
+          "assetId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "assetName": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ContractTemplateListView": {
+        "required": [
+          "templateId",
+          "name",
+          "securityType",
+          "plCalculatorType",
+          "assetId",
+          "assetName",
+          "minSize",
+          "minSizeMoney",
+          "maxSize",
+          "maxSizeMoney",
+          "sizeIncrement",
+          "tickSize",
+          "tickValue",
+          "priceQuotation",
+          "settlementCurrencyId",
+          "settlementCurrencyName",
+          "baseCurrencyId",
+          "baseCurrencyName",
+          "quoteCurrencyId",
+          "quoteCurrencyName",
+          "defaultDatafeedId",
+          "defaultDatafeedName",
+          "exchangeId",
+          "exchangeName",
+          "brokerId",
+          "brokerName",
+          "daysInYear",
+          "description"
+        ],
+        "type": "object",
+        "properties": {
+          "templateId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "securityType": {
+            "$ref": "#/components/schemas/SecurityType"
+          },
+          "plCalculatorType": {
+            "$ref": "#/components/schemas/PLCalculatorType"
+          },
+          "assetId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "assetName": {
+            "type": "string",
+            "nullable": true
+          },
+          "minSize": {
+            "type": "number",
+            "format": "double"
+          },
+          "minSizeMoney": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "maxSize": {
+            "type": "number",
+            "format": "double"
+          },
+          "maxSizeMoney": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "sizeIncrement": {
+            "type": "number",
+            "format": "double"
+          },
+          "tickSize": {
+            "type": "number",
+            "format": "double"
+          },
+          "tickValue": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "priceQuotation": {
+            "type": "number",
+            "format": "double"
+          },
+          "settlementCurrencyId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "settlementCurrencyName": {
+            "type": "string"
+          },
+          "baseCurrencyId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "baseCurrencyName": {
+            "type": "string",
+            "nullable": true
+          },
+          "quoteCurrencyId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "quoteCurrencyName": {
+            "type": "string",
+            "nullable": true
+          },
+          "defaultDatafeedId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "defaultDatafeedName": {
+            "type": "string",
+            "nullable": true
+          },
+          "exchangeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "exchangeName": {
+            "type": "string"
+          },
+          "brokerId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "brokerName": {
+            "type": "string"
+          },
+          "daysInYear": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "CreateAccountRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "accountType": {
+            "$ref": "#/components/schemas/AccountType"
+          },
+          "currencyId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "positionAccounting": {
+            "$ref": "#/components/schemas/PositionAccounting"
+          },
+          "enableSharePriceTracking": {
+            "type": "boolean"
+          },
+          "includeUnrealizedPnLToMtm": {
+            "type": "boolean"
+          },
+          "brokerId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "accountServiceName": {
+            "type": "string"
+          },
+          "addInitialInvestment": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CreateStrategyRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "className": {
+            "type": "string"
+          },
+          "params": {
+            "type": "string"
+          },
+          "requiredBarStorages": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/BarStorageConfig"
+            }
+          },
+          "symbols": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "liquidationParameters": {
+            "$ref": "#/components/schemas/NullableOfLiquidationParameters"
+          },
+          "account": {
+            "$ref": "#/components/schemas/CreateAccountRequest"
+          },
+          "startImmediately": {
+            "type": "boolean"
+          },
+          "useSignalGroups": {
+            "type": "boolean"
+          },
+          "strategyServiceName": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateSubaccountRequest": {
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "subaccountId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "classifier": {
+            "$ref": "#/components/schemas/SubaccountType"
+          }
+        }
+      },
+      "Currency": {
+        "type": "object",
+        "properties": {
+          "currencyId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "decimals": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "asset": {
+            "$ref": "#/components/schemas/Asset"
+          },
+          "brokerOverrides": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CurrencyOverride"
+            }
+          }
+        }
+      },
+      "CurrencyOverride": {
+        "type": "object",
+        "properties": {
+          "currencyId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "brokerId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "decimals": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "Datafeed": {
+        "type": "object",
+        "properties": {
+          "datafeedId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "DateTimeZone": {
+        "nullable": true
+      },
+      "Exchange": {
+        "type": "object",
+        "properties": {
+          "exchangeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "timezoneName": {
+            "type": "string"
+          },
+          "timezone": {
+            "$ref": "#/components/schemas/DateTimeZone"
+          },
+          "tradingSessions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TradingSession"
+            }
+          }
+        }
+      },
+      "ExecInst": {
+        "enum": [
+          "OkToCross"
+        ]
+      },
+      "ExecType": {
+        "enum": [
+          "New",
+          "Canceled",
+          "Replaced",
+          "PendingCancel",
+          "Rejected",
+          "PendingNew",
+          "Restated",
+          "PendingReplace",
+          "Fill",
+          "OrderStatus",
+          "TriggeredOrActivatedBySystem"
+        ]
+      },
+      "ExecutionServiceListView": {
+        "type": "object",
+        "properties": {
+          "tradingClientsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "locationName": {
+            "type": "string"
+          }
+        }
+      },
+      "IdType": {
+        "enum": [
+          "Stream",
+          "Contract"
+        ]
+      },
+      "Instant": { },
+      "IsoDayOfWeek": {
+        "enum": [
+          "None",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ]
+      },
+      "LinkType": {
+        "enum": [
+          "OneCancelsOther",
+          "OneTriggersOther"
+        ]
+      },
+      "LiquidationTiming": {
+        "enum": [
+          "OnBarClose",
+          "OnPositionClose",
+          "OnEndOfDay"
+        ]
+      },
+      "LocalTime": { },
+      "Location": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "NewBalanceOperation": {
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "dt": {
+            "$ref": "#/components/schemas/NullableOfInstant"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          },
+          "assetId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "fxRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "sharePrice": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "externalId": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "delayUntilNextEndOfDay": {
+            "type": "boolean"
+          },
+          "isCorrection": {
+            "type": "boolean"
+          },
+          "affectsPnL": {
+            "type": "boolean"
+          },
+          "affectsInvestment": {
+            "type": "boolean"
+          },
+          "affectsBalance": {
+            "type": "boolean"
+          },
+          "affectsShareCount": {
+            "type": "boolean"
+          }
+        }
+      },
+      "NewOrderSingle": {
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "clOrdId": {
+            "type": "string",
+            "nullable": true
+          },
+          "contractId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "strategyPositionId": {
+            "type": "string",
+            "nullable": true
+          },
+          "positionEffect": {
+            "$ref": "#/components/schemas/NullableOfPositionEffect"
+          },
+          "signalGroupId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "executionRequestId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "parentPositionId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "ordType": {
+            "$ref": "#/components/schemas/OrdType"
+          },
+          "side": {
+            "$ref": "#/components/schemas/Side"
+          },
+          "orderQty": {
+            "type": "number",
+            "format": "double"
+          },
+          "price": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "stopPx": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "timeInForce": {
+            "$ref": "#/components/schemas/TimeInForce"
+          },
+          "isSuspended": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/NullableOfInstant"
+          },
+          "activationDt": {
+            "$ref": "#/components/schemas/NullableOfInstant"
+          },
+          "expireDt": {
+            "$ref": "#/components/schemas/NullableOfInstant"
+          },
+          "linkedOrders": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/LinkType"
+            }
+          },
+          "tradingSessionsIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "pegInstructions": {
+            "$ref": "#/components/schemas/NullableOfPegInstructions"
+          },
+          "isSltp": {
+            "type": "boolean"
+          },
+          "execInst": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExecInst"
+            }
+          },
+          "allocations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Allocation"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "NullableOfBrokerType": {
+        "enum": [
+          "Ibkr",
+          "BinanceUsdmFutures",
+          null
+        ],
+        "nullable": true
+      },
+      "NullableOfExecTypeReason": {
+        "enum": [
+          "NotSpecified",
+          "UnsolicitedOrderCancellation",
+          "OrderChangeInitiated",
+          "PendingCxlExecuted",
+          "SuspendedOrderActivated",
+          "BrokerAccountAssignedToOrder",
+          "ExternalOrderIdAssignedToOrder",
+          null
+        ],
+        "nullable": true
+      },
+      "NullableOfInstant": {
+        "nullable": true
+      },
+      "NullableOfLiquidationParameters": {
+        "type": "object",
+        "properties": {
+          "drawdown": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "dailyDrawdown": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "liquidateAt": {
+            "$ref": "#/components/schemas/LiquidationTiming"
+          }
+        },
+        "nullable": true
+      },
+      "NullableOfLocalDate": {
+        "nullable": true
+      },
+      "NullableOfPegInstructions": {
+        "type": "object",
+        "properties": {
+          "pegOffsetValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "pegMoveType": {
+            "$ref": "#/components/schemas/PegMoveType"
+          }
+        },
+        "nullable": true
+      },
+      "NullableOfPositionChangeType": {
+        "enum": [
+          "Open",
+          "Close",
+          "MTM",
+          null
+        ],
+        "nullable": true
+      },
+      "NullableOfPositionEffect": {
+        "enum": [
+          "Open",
+          "Close",
+          "Unknown",
+          null
+        ],
+        "nullable": true
+      },
+      "NullableOfRejectReason": {
+        "enum": [
+          "NotSpecified",
+          "UnknownSymbol",
+          "ExchangeClosed",
+          "OrderExceedsLimit",
+          "ApplicationNotAvailable",
+          "UnknownOrder",
+          "DuplicateOrder",
+          "IncorrectQuantity",
+          "UnknownAccount",
+          "UnavailablePriceOrLiquidity",
+          "DuplicateVirtualAccountExecution",
+          "Other",
+          "TooLateToCancel",
+          null
+        ],
+        "nullable": true
+      },
+      "NullableOfSyntheticContractType": {
+        "enum": [
+          "Multiplicative",
+          "Index",
+          "Rolling",
+          null
+        ],
+        "nullable": true
+      },
+      "OrderCancelRequest": {
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "clOrdId": {
+            "type": "string"
+          },
+          "orderId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "origClOrdId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "OrderHistoryView": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "brokerAccountName": {
+            "type": "string",
+            "nullable": true
+          },
+          "contractName": {
+            "type": "string"
+          },
+          "lastPx": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "lastQty": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "calculatedCcyLastQty": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "execType": {
+            "$ref": "#/components/schemas/ExecType"
+          },
+          "execTypeReason": {
+            "$ref": "#/components/schemas/NullableOfExecTypeReason"
+          },
+          "requestId": {
+            "type": "string",
+            "nullable": true
+          },
+          "signedLastQty": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "execId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "ordStatus": {
+            "$ref": "#/components/schemas/OrdStatus"
+          },
+          "cumQty": {
+            "type": "number",
+            "format": "double"
+          },
+          "leavesQty": {
+            "type": "number",
+            "format": "double"
+          },
+          "transactTime": {
+            "$ref": "#/components/schemas/Instant"
+          },
+          "rejectReason": {
+            "$ref": "#/components/schemas/NullableOfRejectReason"
+          },
+          "rejectText": {
+            "type": "string",
+            "nullable": true
+          },
+          "accountServiceName": {
+            "type": "string"
+          },
+          "orderId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "externalId": {
+            "type": "string",
+            "nullable": true
+          },
+          "brokerAccountId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "isVirtual": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/Instant"
+          },
+          "accountId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "clOrdId": {
+            "type": "string",
+            "nullable": true
+          },
+          "contractId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "strategyPositionId": {
+            "type": "string",
+            "nullable": true
+          },
+          "positionEffect": {
+            "$ref": "#/components/schemas/NullableOfPositionEffect"
+          },
+          "signalGroupId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "executionRequestId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "parentPositionId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "ordType": {
+            "$ref": "#/components/schemas/OrdType"
+          },
+          "side": {
+            "$ref": "#/components/schemas/Side"
+          },
+          "orderQty": {
+            "type": "number",
+            "format": "double"
+          },
+          "price": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "stopPx": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "timeInForce": {
+            "$ref": "#/components/schemas/TimeInForce"
+          },
+          "isSuspended": {
+            "type": "boolean"
+          },
+          "activationDt": {
+            "$ref": "#/components/schemas/NullableOfInstant"
+          },
+          "expireDt": {
+            "$ref": "#/components/schemas/NullableOfInstant"
+          },
+          "linkedOrders": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/LinkType"
+            }
+          },
+          "tradingSessionsIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "pegInstructions": {
+            "$ref": "#/components/schemas/NullableOfPegInstructions"
+          },
+          "isSltp": {
+            "type": "boolean"
+          },
+          "execInst": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExecInst"
+            }
+          },
+          "allocations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Allocation"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "OrderView": {
+        "required": [
+          "accountName",
+          "brokerAccountName",
+          "contractName",
+          "ordStatus",
+          "cumQty",
+          "leavesQty",
+          "rejectReason",
+          "rejectText",
+          "accountServiceName",
+          "orderId",
+          "externalId",
+          "brokerAccountId",
+          "accountId",
+          "clOrdId",
+          "contractId",
+          "strategyPositionId",
+          "positionEffect",
+          "signalGroupId",
+          "executionRequestId",
+          "ordType",
+          "side",
+          "orderQty",
+          "price",
+          "stopPx",
+          "timeInForce",
+          "expireDt",
+          "linkedOrders",
+          "pegInstructions",
+          "isSltp"
+        ],
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "brokerAccountName": {
+            "type": "string",
+            "nullable": true
+          },
+          "contractName": {
+            "type": "string"
+          },
+          "ordStatus": {
+            "$ref": "#/components/schemas/OrdStatus"
+          },
+          "cumQty": {
+            "type": "number",
+            "format": "double"
+          },
+          "leavesQty": {
+            "type": "number",
+            "format": "double"
+          },
+          "transactTime": {
+            "$ref": "#/components/schemas/Instant"
+          },
+          "rejectReason": {
+            "$ref": "#/components/schemas/NullableOfRejectReason"
+          },
+          "rejectText": {
+            "type": "string",
+            "nullable": true
+          },
+          "accountServiceName": {
+            "type": "string"
+          },
+          "orderId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "externalId": {
+            "type": "string",
+            "nullable": true
+          },
+          "brokerAccountId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "isVirtual": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/Instant"
+          },
+          "accountId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "clOrdId": {
+            "type": "string",
+            "nullable": true
+          },
+          "contractId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "strategyPositionId": {
+            "type": "string",
+            "nullable": true
+          },
+          "positionEffect": {
+            "$ref": "#/components/schemas/NullableOfPositionEffect"
+          },
+          "signalGroupId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "executionRequestId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "parentPositionId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "ordType": {
+            "$ref": "#/components/schemas/OrdType"
+          },
+          "side": {
+            "$ref": "#/components/schemas/Side"
+          },
+          "orderQty": {
+            "type": "number",
+            "format": "double"
+          },
+          "price": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "stopPx": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "timeInForce": {
+            "$ref": "#/components/schemas/TimeInForce"
+          },
+          "isSuspended": {
+            "type": "boolean"
+          },
+          "activationDt": {
+            "$ref": "#/components/schemas/NullableOfInstant"
+          },
+          "expireDt": {
+            "$ref": "#/components/schemas/NullableOfInstant"
+          },
+          "linkedOrders": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/LinkType"
+            }
+          },
+          "tradingSessionsIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "pegInstructions": {
+            "$ref": "#/components/schemas/NullableOfPegInstructions"
+          },
+          "isSltp": {
+            "type": "boolean"
+          },
+          "execInst": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExecInst"
+            }
+          },
+          "allocations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Allocation"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "OrdStatus": {
+        "enum": [
+          "New",
+          "PartiallyFilled",
+          "Filled",
+          "Canceled",
+          "PendingCancel",
+          "Rejected",
+          "Suspended",
+          "PendingNew",
+          "PendingReplace",
+          "Split"
+        ]
+      },
+      "OrdType": {
+        "enum": [
+          "Market",
+          "Limit",
+          "StopMarket",
+          "StopLimit",
+          "MarketIfTouched"
+        ]
+      },
+      "PegMoveType": {
+        "enum": [
+          "Floating",
+          "Fixed",
+          "Approaching"
+        ]
+      },
+      "Period": { },
+      "PLCalculatorType": {
+        "enum": [
+          "Default",
+          "DefaultFutures"
+        ]
+      },
+      "PositionAccounting": {
+        "enum": [
+          "Netted",
+          "Hedged"
+        ]
+      },
+      "PositionView": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "contractName": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/NullableOfPositionChangeType"
+          },
+          "openTradeId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "accountId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "strategyPositionId": {
+            "type": "string",
+            "nullable": true
+          },
+          "contractId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "volume": {
+            "type": "number",
+            "format": "double"
+          },
+          "side": {
+            "$ref": "#/components/schemas/Side"
+          },
+          "openPrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalOpenPayments": {
+            "type": "number",
+            "format": "double"
+          },
+          "openDt": {
+            "$ref": "#/components/schemas/Instant"
+          },
+          "historyOpenDt": {
+            "$ref": "#/components/schemas/Instant"
+          },
+          "totalSettlPayments": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalSettlPaymentsInAccountCcy": {
+            "type": "number",
+            "format": "double"
+          },
+          "settlPrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "closeTradeId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "closePrice": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "closeDt": {
+            "$ref": "#/components/schemas/NullableOfInstant"
+          },
+          "isClosed": {
+            "type": "boolean"
+          },
+          "realizedPnL": {
+            "type": "number",
+            "format": "double"
+          },
+          "realizedPnLInAccountCcy": {
+            "type": "number",
+            "format": "double"
+          },
+          "floatingPnL": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalFloatingPnL": {
+            "type": "number",
+            "format": "double"
+          },
+          "commission": {
+            "type": "number",
+            "format": "double"
+          },
+          "signalGroupId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "isSynthetic": {
+            "type": "boolean"
+          },
+          "parentPositionId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "signedVolume": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "SecurityType": {
+        "enum": [
+          "Unknown",
+          "Stock",
+          "Futures",
+          "CFD",
+          "FX",
+          "Synthetic"
+        ]
+      },
+      "SharePriceHistory": {
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "dt": {
+            "$ref": "#/components/schemas/Instant"
+          },
+          "shareCount": {
+            "type": "number",
+            "format": "double"
+          },
+          "sharePrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "dailyReturn": {
+            "type": "number",
+            "format": "double"
+          },
+          "hwm": {
+            "type": "number",
+            "format": "double"
+          },
+          "investment": {
+            "type": "number",
+            "format": "double"
+          },
+          "type": {
+            "$ref": "#/components/schemas/SharePriceHistoryChangeType"
+          }
+        }
+      },
+      "SharePriceHistoryChangeType": {
+        "enum": [
+          "EndOfDay",
+          "BalanceOperation"
+        ]
+      },
+      "Side": {
+        "type": "string"
+      },
+      "StopStrategyRequest": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string"
+          },
+          "closePositions": {
+            "type": "boolean"
+          }
+        }
+      },
+      "StrategiesServiceListView": {
+        "type": "object",
+        "properties": {
+          "activeStrategiesCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "locationName": {
+            "type": "string"
+          }
+        }
+      },
+      "StrategyStatus": {
+        "enum": [
+          "Stopped",
+          "Running",
+          "Paused",
+          "Stopping"
+        ]
+      },
+      "StrategyTypeDescription": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "params": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "description": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "symbols": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "requiredBarStorages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "StrategyViewBrief": {
+        "required": [
+          "strategyId",
+          "name",
+          "strategyClassName",
+          "strategyServiceName",
+          "liquidationParameters",
+          "params",
+          "symbols",
+          "requiredBarStorages",
+          "status",
+          "useSignalGroups",
+          "account",
+          "currency"
+        ],
+        "type": "object",
+        "properties": {
+          "strategyId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "strategyClassName": {
+            "type": "string"
+          },
+          "strategyServiceName": {
+            "type": "string"
+          },
+          "liquidationParameters": {
+            "$ref": "#/components/schemas/NullableOfLiquidationParameters"
+          },
+          "params": {
+            "type": "string"
+          },
+          "symbols": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/BriefViewOfint"
+            }
+          },
+          "requiredBarStorages": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/BarStorageView"
+            }
+          },
+          "status": {
+            "$ref": "#/components/schemas/StrategyStatus"
+          },
+          "useSignalGroups": {
+            "type": "boolean"
+          },
+          "account": {
+            "$ref": "#/components/schemas/AccountViewBrief"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/BriefViewOfint"
+          }
+        }
+      },
+      "StreamListView": {
+        "required": [
+          "streamId",
+          "ticker",
+          "datafeedId",
+          "datafeedName",
+          "contractId",
+          "contractName",
+          "constantStreamValue"
+        ],
+        "type": "object",
+        "properties": {
+          "streamId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ticker": {
+            "type": "string",
+            "nullable": true
+          },
+          "datafeedId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "datafeedName": {
+            "type": "string"
+          },
+          "contractId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "contractName": {
+            "type": "string",
+            "nullable": true
+          },
+          "constantStreamValue": {
+            "$ref": "#/components/schemas/ConstantStreamValue"
+          }
+        }
+      },
+      "SubaccountListModel": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "subaccountName": {
+            "type": "string"
+          },
+          "brokerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "subaccountHistoryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "accountId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "subaccountId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "classifier": {
+            "$ref": "#/components/schemas/SubaccountType"
+          },
+          "brokerId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        }
+      },
+      "SubaccountType": {
+        "enum": [
+          "Broker"
+        ]
+      },
+      "TimeInForce": {
+        "enum": [
+          "GoodTillCancelled",
+          "ImmediateOrCancel",
+          "FillOrKill",
+          "GoodTillTime",
+          "Unknown"
+        ]
+      },
+      "Trade": {
+        "type": "object",
+        "properties": {
+          "signedVolume": {
+            "type": "number",
+            "format": "double"
+          },
+          "accountServiceName": {
+            "type": "string"
+          },
+          "tradeId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "origTradeId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "clOrdId": {
+            "type": "string",
+            "nullable": true
+          },
+          "accountId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "contractId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "orderId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "execId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "strategyPositionId": {
+            "type": "string",
+            "nullable": true
+          },
+          "signalGroupId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "positionEffect": {
+            "$ref": "#/components/schemas/NullableOfPositionEffect"
+          },
+          "side": {
+            "$ref": "#/components/schemas/Side"
+          },
+          "volume": {
+            "type": "number",
+            "format": "double"
+          },
+          "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "commission": {
+            "type": "number",
+            "format": "double"
+          },
+          "dt": {
+            "$ref": "#/components/schemas/Instant"
+          },
+          "executionRequestId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "externalTradeId": {
+            "type": "string",
+            "nullable": true
+          },
+          "commissions": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          "paymentCurrencyId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fxRate": {
+            "type": "number",
+            "format": "double"
+          },
+          "calculatedCcyLastQty": {
+            "type": "number",
+            "format": "double"
+          },
+          "parentPositionId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "isSynthetic": {
+            "type": "boolean"
+          }
+        }
+      },
+      "TradeView": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "contractName": {
+            "type": "string"
+          },
+          "signedVolume": {
+            "type": "number",
+            "format": "double"
+          },
+          "accountServiceName": {
+            "type": "string"
+          },
+          "tradeId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "origTradeId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "clOrdId": {
+            "type": "string",
+            "nullable": true
+          },
+          "accountId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "contractId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "orderId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "execId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "strategyPositionId": {
+            "type": "string",
+            "nullable": true
+          },
+          "signalGroupId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "positionEffect": {
+            "$ref": "#/components/schemas/NullableOfPositionEffect"
+          },
+          "side": {
+            "$ref": "#/components/schemas/Side"
+          },
+          "volume": {
+            "type": "number",
+            "format": "double"
+          },
+          "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "commission": {
+            "type": "number",
+            "format": "double"
+          },
+          "dt": {
+            "$ref": "#/components/schemas/Instant"
+          },
+          "executionRequestId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "externalTradeId": {
+            "type": "string",
+            "nullable": true
+          },
+          "commissions": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          "paymentCurrencyId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fxRate": {
+            "type": "number",
+            "format": "double"
+          },
+          "calculatedCcyLastQty": {
+            "type": "number",
+            "format": "double"
+          },
+          "parentPositionId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "isSynthetic": {
+            "type": "boolean"
+          }
+        }
+      },
+      "TradingClientConfig": {
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "executionServiceName": {
+            "type": "string"
+          },
+          "externalAccountId": {
+            "type": "string",
+            "nullable": true
+          },
+          "tradingClientClassName": {
+            "type": "string"
+          },
+          "tradingClientParamsSerialized": {
+            "type": "string",
+            "nullable": true
+          },
+          "tradingClientSecret": {
+            "type": "string"
+          },
+          "writePerformanceMetrics": {
+            "type": "boolean"
+          }
+        },
+        "nullable": true
+      },
+      "TradingSession": {
+        "type": "object",
+        "properties": {
+          "tradingSessionId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "exchangeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "exchange": {
+            "$ref": "#/components/schemas/Exchange"
+          },
+          "days": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TradingSessionInterval"
+            }
+          },
+          "is24X7": {
+            "type": "boolean"
+          },
+          "isRth": {
+            "type": "boolean"
+          }
+        }
+      },
+      "TradingSessionInterval": {
+        "type": "object",
+        "properties": {
+          "intervalId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tradingSessionId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "startDay": {
+            "$ref": "#/components/schemas/IsoDayOfWeek"
+          },
+          "start": {
+            "$ref": "#/components/schemas/LocalTime"
+          },
+          "endDay": {
+            "$ref": "#/components/schemas/IsoDayOfWeek"
+          },
+          "end": {
+            "$ref": "#/components/schemas/LocalTime"
+          }
+        }
+      },
+      "ValidateStrategyResult": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "strategy": {
+            "$ref": "#/components/schemas/StrategyViewBrief"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Accounts"
+    },
+    {
+      "name": "Infrastructure"
+    },
+    {
+      "name": "StaticData"
+    },
+    {
+      "name": "Strategies"
+    }
+  ]
+}

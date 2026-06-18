@@ -1,0 +1,18 @@
+@using UI.SharedComponents.Components.Accounts
+
+@page "/accounts/{accountId:int}/broker-subaccounts"
+
+@layout AccountBase
+
+<BrokerAccountsAssignments AccountId=@AccountId />
+
+@code {
+    [CascadingParameter] public AccountBase AccountBase { get; set; }
+    [Parameter] public int AccountId { get; set; }
+    
+    protected override void OnInitialized()
+    {
+        AccountBase!.Id = AccountId;
+        AccountBase!.Path = "broker-subaccounts";
+    }
+}

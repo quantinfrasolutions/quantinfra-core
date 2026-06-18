@@ -1,0 +1,189 @@
+@using Common.Backtesting
+@using Common.Strategies.Runner
+@using NodaTime.Text
+
+<RadzenTemplateForm TItem="TestExecutorOptions">
+    <RadzenStack JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Gap="1rem">
+        <RadzenRow>
+            <RadzenFieldset Text="Dates">
+                <RadzenStack>
+                    <RadzenRow>
+                        <RadzenColumn Size="6">
+                            <RadzenDatePicker TValue="DateTime" ShowTime="true" ShowSeconds="true" HourFormat="24" 
+                                              Value=@(Value.StartDt.ToDateTimeUtc())
+                                              ValueChanged=@(dt => Value.StartDt = dt.ParseInput()) />
+                        </RadzenColumn>
+                        <RadzenColumn Size="6">
+                            <RadzenDatePicker TValue="DateTime" ShowTime="true" ShowSeconds="true" HourFormat="24" 
+                                              Value=@(Value.EndDt.ToDateTimeUtc())
+                                              ValueChanged=@(dt => Value.EndDt = dt.ParseInput()) />
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenStack>
+            </RadzenFieldset>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFieldset Text="Hosted strategies runner">
+                    <RadzenStack JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Gap="1rem">
+                        <RadzenRow>
+                            <RadzenColumn Size="6">
+                                <div class="rz-p-12 rz-text-align-center">
+                                    <RadzenCheckBox @bind-Value=Value.ThrowOnZeroVolumeOrders Name="ThrowOnZeroVolumeOrders"/>
+                                    <RadzenLabel Text="Throw exception on zero volume orders" Component="ThrowOnZeroVolumeOrders" class="rz-ms-2"/>
+                                </div>
+                            </RadzenColumn>
+                            <RadzenColumn Size="6">
+                                <RadzenFormField Text="Size step fraction">
+                                    <RadzenNumeric @bind-Value=@Value.VirtualAccountSizeStepFraction Min="0" Step="1" ShowUpDown="false"/>
+                                </RadzenFormField>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn Size="6">
+                                <RadzenFormField Text="Request bar attempts">
+                                    <RadzenNumeric @bind-Value=@Value.RequestBarAttempts Min="1" Step="1" Max="10" ShowUpDown="false"/>
+                                </RadzenFormField>
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenStack>
+                </RadzenFieldset>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenFormField Text="Investment">
+                    <RadzenNumeric TValue="decimal" @bind-Value=@Value.Investment Min="0" ShowUpDown="false"/>
+                </RadzenFormField>
+                <RadzenFormField Text="End of day UTC offset">
+                    <RadzenTextBox Value=@DurationPattern.Roundtrip.Format(Value.MtmUtcOffset)
+                                   ValueChanged=@(e => Value.MtmUtcOffset = DurationPattern.Roundtrip.Parse(e).Value)/>
+                </RadzenFormField>
+                <RadzenFormField Text="Days in year">
+                    <RadzenNumeric TValue="int" @bind-Value=@Value.DaysInYear Min="1" Max="365" Step="1" ShowUpDown="false"/>
+                </RadzenFormField>
+                <RadzenFormField Text="Candles timeframe">
+                    <RadzenTextBox @bind-Value=@Value.CandlesTimeframe/>
+                </RadzenFormField>
+            </RadzenStack>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFieldset Text="Backtest options">
+                    <RadzenStack AlignItems="AlignItems.Start" JustifyContent="JustifyContent.Center">
+                        <RadzenRow>
+                            <RadzenColumn Size="5">
+                                <div class="rz-p-12 rz-text-align-center">
+                                    <RadzenCheckBox @bind-Value=@Value.CheckOrdersAtBarOpen Name="CheckOrdersAtBarOpen"/>
+                                    <RadzenLabel Text="Check orders at bar open" Component="CheckOrdersAtBarOpen" class="rz-ms-2"/>
+                                </div>
+                            </RadzenColumn>
+                            <RadzenColumn Size="5">
+                                <RadzenFormField Text="Bar open execution offset">
+                                    <RadzenTextBox Value=@DurationPattern.Roundtrip.Format(Value.OpenExecutionOffset)
+                                                   ValueChanged=@(e => Value.OpenExecutionOffset = DurationPattern.Roundtrip.Parse(e).Value)/>
+                                </RadzenFormField>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn Size="5">
+                                <div class="rz-p-12 rz-text-align-center">
+                                    <RadzenCheckBox @bind-Value=@Value.CheckOrdersAtBarClose Name="CheckOrdersAtBarClose"/>
+                                    <RadzenLabel Text="Check orders at bar close" Component="CheckOrdersAtBarClose" class="rz-ms-2"/>
+                                </div>
+                            </RadzenColumn>
+                            <RadzenColumn Size="5">
+                                <div class="rz-p-12 rz-text-align-center">
+                                    <RadzenCheckBox @bind-Value=@Value.LimitCloseCheckToMarketOrdersOnly Name="LimitCloseCheckToMarketOrdersOnly"/>
+                                    <RadzenLabel Text="Check only market orders at bar close" Component="LimitCloseCheckToMarketOrdersOnly" class="rz-ms-2"/>
+                                </div>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn Size="5">
+                                <div class="rz-p-12 rz-text-align-center">
+                                    <RadzenCheckBox @bind-Value=@Value.CheckPendingOrdersExecutionUsingHighLow Name="CheckPendingOrdersExecutionUsingHighLow"/>
+                                    <RadzenLabel Text="Check pending orders by High/Low" Component="CheckPendingOrdersExecutionUsingHighLow" class="rz-ms-2"/>
+                                </div>
+                            </RadzenColumn>
+                            <RadzenColumn Size="5">
+                                <RadzenFormField Text="Bar open execution offset">
+                                    <RadzenTextBox Value=@DurationPattern.Roundtrip.Format(Value.HighLowExecutionOffset)
+                                                   ValueChanged=@(e => Value.HighLowExecutionOffset = DurationPattern.Roundtrip.Parse(e).Value)/>
+                                </RadzenFormField>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn Size="5">
+                                <RadzenFormField Text="Stop orders execution">
+                                    <RadzenDropDown TValue="StopOrdersExecution" @bind-Value=@Value.StopOrdersExecution
+                                                    Data="@(Enum.GetValues(typeof(StopOrdersExecution)).Cast<Enum>())"/>
+                                </RadzenFormField>
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenStack>
+                </RadzenFieldset>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFieldset Text="Collect results">
+                    <RadzenStack>
+                        <RadzenRow>
+                            <RadzenColumn Size="12">
+                                <div class="rz-p-12 rz-text-align-center">
+                                    <RadzenCheckBox @bind-Value=@Value.RecordSharePrices Name="RecordSharePrices"/>
+                                    <RadzenLabel Text="Share prices" Component="RecordSharePrices" class="rz-ms-2"/>
+                                </div>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn Size="6">
+                                <div class="rz-p-12 rz-text-align-center">
+                                    <RadzenCheckBox @bind-Value=@Value.RecordTrades Name="RecordTrades"/>
+                                    <RadzenLabel Text="Trades" Component="RecordTrades" class="rz-ms-2"/>
+                                </div>
+                            </RadzenColumn>
+                            @if (Value.RecordTrades)
+                            {
+                                <RadzenColumn Size="6">
+                                    <RadzenFormField Variant="Variant.Text" Text="Average number of trades per day">
+                                        <RadzenNumeric @bind-Value=@Value.ExpectedNumberOfTradesPerDay ShowUpDown="false" Min="1" Step="1"/>
+                                    </RadzenFormField>
+                                </RadzenColumn>
+                            }
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn Size="12">
+                                <div class="rz-p-12 rz-text-align-center">
+                                    <RadzenCheckBox @bind-Value=@Value.RecordPositionCloses Name="RecordPositionCloses"/>
+                                    <RadzenLabel Text="Deals" Component="RecordPositionCloses" class="rz-ms-2"/>
+                                </div>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn Size="6">
+                                <div class="rz-p-12 rz-text-align-center">
+                                    <RadzenCheckBox @bind-Value=@Value.RecordEndOfDayPositions Name="RecordEndOfDayPositions"/>
+                                    <RadzenLabel Text="End of day reports" Component="RecordEndOfDayPositions" class="rz-ms-2"/>
+                                </div>
+                            </RadzenColumn>
+                            @if (Value.RecordTrades)
+                            {
+                                <RadzenColumn Size="6">
+                                    <RadzenFormField Variant="Variant.Text" Text="Average number of positions at EOD">
+                                        <RadzenNumeric @bind-Value=@Value.ExpectedNumberOfPositionsPerDay ShowUpDown="false" Min="1" Step="1"/>
+                                    </RadzenFormField>
+                                </RadzenColumn>
+                            }
+                        </RadzenRow>
+                    </RadzenStack>
+                </RadzenFieldset>
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenStack>
+</RadzenTemplateForm>
+
+@code {
+    [Parameter, EditorRequired] public TestExecutorOptions Value { get; set; }
+}

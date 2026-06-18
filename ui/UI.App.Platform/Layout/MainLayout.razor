@@ -1,0 +1,86 @@
+﻿@using Radzen
+@using Radzen.Blazor
+@inherits LayoutComponentBase
+
+@inject CookieThemeService CookieThemeService
+
+<HeadContent>
+    <RadzenTheme Theme="material" />
+</HeadContent>
+
+<RadzenLayout Style="grid-template-areas: 'rz-header' 'rz-sidebar rz-body'">
+    <RadzenHeader>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
+            <RadzenSidebarToggle Click="@(() => sidebar1Expanded = !sidebar1Expanded)" />
+            <RadzenLabel Text="Control Panel" />
+            <RadzenAppearanceToggle Variant="Variant.Text" />
+        </RadzenStack>
+    </RadzenHeader>
+    <RadzenSidebar @bind-Expanded="@sidebar1Expanded">
+        <RadzenPanelMenu Multiple="true">
+            @* <RadzenPanelMenuItem Text="Summary" Icon="dashboard" Path="test"/> *@
+            @* <RadzenPanelMenuItem Text="Optimization" Icon="group_work" Expanded="true"> *@
+            @*     <RadzenPanelMenuItem Text="Optimizations" Icon="assignment" Path="optimizations"/> *@
+            @*     <RadzenPanelMenuItem Text="Optimization batches" Icon="alarm" Path="optimization-batches"/> *@
+            @*     <RadzenPanelMenuItem Text="Optimization configs" Icon="contract" Path="optimization-configs"/> *@
+            @* </RadzenPanelMenuItem> *@
+            <RadzenPanelMenuItem Text="Strategies" Icon="widgets" Expanded="true">
+                <RadzenPanelMenuItem Text="All strategies" Icon="robot_2" Path="strategies"/>
+                <RadzenPanelMenuItem Text="Execution configuration" Icon="manufacturing" Path="execution-configuration"/>
+                <RadzenPanelMenuItem Text="Books" Icon="book" Path="books"/>
+            </RadzenPanelMenuItem>
+            <RadzenPanelMenuItem Text="Accounts" Icon="group" Expanded="true">
+                <RadzenPanelMenuItem Text="Accounts" Icon="person" Path="accounts"/>
+                @* <RadzenPanelMenuItem Text="Orders" Icon="request_quote" Path="orders"/> *@
+                @* <RadzenPanelMenuItem Text="Positions" Icon="browse_activity" Path="positions"/> *@
+                <RadzenPanelMenuItem Text="Trade history" Icon="history" Path="trade-history"/>
+                @* <RadzenPanelMenuItem Text="Execution policies" Icon="automation" Path="execution-policies"/> *@
+            </RadzenPanelMenuItem>
+            @* <RadzenPanelMenuItem Text="Services" Icon="health_metrics" Path="services"/> *@
+            <RadzenPanelMenuItem Text="IBKR" Expanded="false">
+                <RadzenPanelMenuItem Text="IBKR contract lookup" Icon="query_stats" Path="ibkr/search"/>
+                <RadzenPanelMenuItem Text="IBKR subscriptions" Icon="subscriptions" Path="ibkr/subscriptions"/>
+            </RadzenPanelMenuItem>
+            <RadzenPanelMenuItem Text="Binance" Expanded="false">
+                <RadzenPanelMenuItem Text="USDM Futures subscriptions" Icon="subscriptions" Path="binance/usdm/subscriptions"/>
+            </RadzenPanelMenuItem>
+            @* <RadzenPanelMenuItem Text="MDS" Expanded="true"> *@
+            @*     <RadzenPanelMenuItem Text="Active streams" Icon="timeline" Path="mds-active-streams"/> *@
+            @* </RadzenPanelMenuItem> *@
+            @* <RadzenPanelMenuItem Text="Strategies Service" Expanded="true"> *@
+            @*     <RadzenPanelMenuItem Text="Virtual executor orders" Icon="identity_aware_proxy" Path="strategies-service/virtual-executor"/> *@
+            @*     <RadzenPanelMenuItem Text="Last prices" Icon="price_change" Path="strategies-service/last-prices"/> *@
+            @*     <RadzenPanelMenuItem Text="Bars" Icon="candlestick_chart" Path="strategies-service/bars"/> *@
+            @* </RadzenPanelMenuItem> *@
+            <RadzenPanelMenuItem Text="Static data" Icon="database" Expanded="false">
+                <RadzenPanelMenuItem Text="Assets" Icon="inventory_2" Path="static-data/assets"/>
+                <RadzenPanelMenuItem Text="Currencies" Icon="universal_currency" Path="static-data/currencies"/>
+                <RadzenPanelMenuItem Text="Commissions" Icon="toll" Path="static-data/commissions"/>
+                <RadzenPanelMenuItem Text="Contracts" Icon="contract" Path="static-data/contracts"/>
+                <RadzenPanelMenuItem Text="Datafeeds" Icon="rss_feed" Path="static-data/datafeeds"/>
+                <RadzenPanelMenuItem Text="Exchanges" Icon="account_balance" Path="static-data/exchanges"/>
+                <RadzenPanelMenuItem Text="Brokers" Icon="business_center" Path="static-data/brokers"/>
+                <RadzenPanelMenuItem Text="Streams" Icon="cast_connected" Path="static-data/streams"/>
+            </RadzenPanelMenuItem>
+            <RadzenPanelMenuItem Text="Infrastructure" Icon="dns" Expanded="false">
+                <RadzenPanelMenuItem Text="Locations" Icon="globe" Path="infrastructure/locations"/>
+                <RadzenPanelMenuItem Text="Account service instances" Icon="group" Path="infrastructure/as"/>
+                <RadzenPanelMenuItem Text="Strategy service instances" Icon="robot_2" Path="infrastructure/ss"/>
+                <RadzenPanelMenuItem Text="Execution service instances" Icon="link" Path="infrastructure/es"/>
+            </RadzenPanelMenuItem>
+            @* <RadzenPanelMenuItem Text="Test" Icon="lab_panel" Path="test"/> *@
+        </RadzenPanelMenu>
+    </RadzenSidebar>
+    <RadzenBody>
+        <div class="rz-p-4">
+            @Body
+        </div>
+    </RadzenBody>
+</RadzenLayout>
+
+<RadzenComponents />
+
+
+@code {
+    bool sidebar1Expanded = true;    
+}

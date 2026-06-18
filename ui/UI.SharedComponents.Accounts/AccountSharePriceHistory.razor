@@ -1,0 +1,25 @@
+@using QuantInfra.Sdk.Accounting
+@using UI.Interfaces.Accounts
+@inject IUiAccountsRepository Repository
+
+@if (_dataLoaded)
+{
+    <SharePriceChart SingleAccount=@Data />
+}
+
+@code {
+    [Parameter, EditorRequired] public int AccountId { get; set; }
+    public IReadOnlyList<SharePriceHistory>? Data { get; private set; }
+
+    bool _dataLoaded;
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        
+        if (_dataLoaded) return;
+        var data = await Repository.GetSharePriceHistory(AccountId);
+        Data = data.ToList();
+        _dataLoaded = true;
+    }
+
+}

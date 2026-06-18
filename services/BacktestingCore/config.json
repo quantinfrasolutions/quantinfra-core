@@ -1,0 +1,1286 @@
+{
+  "strategies": [
+    //{
+    //  "StrategyClassName": "Strategies.MoMacdSltp",
+    //  "StrategyId": "1",
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Params": {
+    //    "Coefficient": "1.1",
+    //    "EmaPeriod": "15",
+    //    "MomentumPeriod": "10",
+    //    "Threshold": "0.015",
+    //    "Tp": "0.08",
+    //    "MMPeriod": "30",
+    //    "MMLevel": "8",
+    //    "MAType": "EMA",
+    //    "MMType": "AtrMoneyManagement"
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    {
+      "StrategyClassName": "Strategies.TrixProcStrategy",
+      "StrategyId": "2",
+      "RequiredBarStorages": {
+        "main": {
+          "Id": 10000,
+          "IdType": 2,
+          "AggregationType": "Time",
+          "Timeframe": "PT1M",
+          "OffsetMinutes": "0",
+          "Timezone": "America/New_York"
+        }
+      },
+      "Params": {
+        "LimitPriceOffsetPct": "0.001",
+        "TrixPeriod": "10",
+        "RocPeriod": "10",
+        "Threshold": "5",
+        "MMType": "FixMoneyManagement"
+      },
+      "Symbols": {
+        "main": 10000
+      }
+    },
+    //{
+    //  "StrategyClassName": "Strategies.AroonCMOStrategy",
+    //  "StrategyId": "3",
+    //  "Params": {
+    //    "AroonDown": "90",
+    //    "AroonUp": "10",
+    //    "CmoPeriod": "20",
+    //    "Coefficient": "1.8",
+    //    "Threshold": "10",
+    //    "Tp": "0.01",
+    //    "MMType": "FixMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.CmoRocStrategy",
+    //  "StrategyId": "4",
+    //  "Params": {
+    //    "CmoPeriod": "30",
+    //    "EmaPeriod": "60",
+    //    "RocPeriod": "45",
+    //    "Threshold": "10",
+    //    "DirectionType": "Short",
+    //    "MAType": "EMA",
+    //    "MMType": "FixMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.StochasticRocStrategy",
+    //  "StrategyId": "5",
+    //  "Params": {
+    //    "RocPeriod": "35",
+    //    "StochDPeriod": "30",
+    //    "StochKPeriod": "25",
+    //    "Threshold": "10",
+    //    "DirectionType": "Short",
+    //    "MMType": "FixMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.StochasticRocStrategy",
+    //  "StrategyId": "6",
+    //  "Params": {
+    //    "RocPeriod": "45",
+    //    "StochDPeriod": "35",
+    //    "StochKPeriod": "45",
+    //    "Threshold": "20",
+    //    "MMPeriod": "50",
+    //    "MMLevel": "20",
+    //    "MMType": "AtrMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.MoMacdMultishareV2",
+    //  "StrategyId": "7",
+    //  "Params": {
+    //    "Threshold": "10",
+    //    "MomentumPeriod": "30",
+    //    "EmaPeriod": "30",
+    //    "Sl": "0.01",
+    //    "MaxDivide": "1",
+    //    "Tp": "0.05",
+    //    "MMType": "FixMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.TemaCmfStrategyV2",
+    //  "StrategyId": "8",
+    //  "Params": {
+    //    "TemaSlowPeriod": "10",
+    //    "TemaFastPeriod": "20",
+    //    "CmfPeriod": "5",
+    //    "DirectionType": "Long"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.SmaParabolicMultishareV3",
+    //  "StrategyId": "9",
+    //  "Params": {
+    //    "Sl": "0.01",
+    //    "EmaPeriod": "30",
+    //    "Tp": "0.01",
+    //    "MaxDivide": "2",
+    //    "ParabolicStepUp": "0.02",
+    //    "ParabolicStepDown": "0.05",
+    //    "TrailingStopStep": "0.01"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.ExpDevBandsStrategy",
+    //  "StrategyId": "11",
+    //  "Params": {
+    //    "CommonPeriod": "10",
+    //    "Bars": "5"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.CmoRocMultishare",
+    //  "StrategyId": "12",
+    //  "Params": {
+    //    "Sl": "0.01",
+    //    "Tp": "0.01",
+    //    "CmoPeriod": "25",
+    //    "EmaPeriod": "25",
+    //    "RocPeriod": "5",
+    //    "Threshold": "10",
+    //    "MaxDivide": "3"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.SmaParabolicBars",
+    //  "StrategyId": "13",
+    //  "Params": {
+    //    "EmaPeriod": "25",
+    //    "ParabolicStepUp": "0.02",
+    //    "ParabolicStepDown": "0.1",
+    //    "Bars": "3"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.RsiEmaParabolicBars",
+    //  "StrategyId": "14",
+    //  "Params": {
+    //    "RsiPeriod": "10",
+    //    "EmaPeriod": "25",
+    //    "Level": "20",
+    //    "Bars": "3"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.RsiEmaParabolicMultishare",
+    //  "StrategyId": "15",
+    //  "Params": {
+    //    "RsiPeriod": "10",
+    //    "EmaPeriod": "25",
+    //    "ParabolicStepUp": "0.02",
+    //    "ParabolicStepDown": "0.1",
+    //    "Level": "20",
+    //    "MaxDivide": "1",
+    //    "TrailingStopStep": "0.01"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.AroonParabolicMultishare",
+    //  "StrategyId": "16",
+    //  "Params": {
+    //    "AroonUp": "10",
+    //    "AroonDown": "25",
+    //    "ParabolicStepUp": "0.02",
+    //    "ParabolicStepDown": "0.1",
+    //    "TrailingStopStep": "0.01",
+    //    "MaxDivide": "1"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.MomRocMultishare",
+    //  "StrategyId": "17",
+    //  "Params": {
+    //    "RocPeriod": "10",
+    //    "MomentumPeriod": "25",
+    //    "EmaPeriod": "20",
+    //    "Threshold": "1",
+    //    "Sl": "0.01",
+    //    "Tp": "0.01",
+    //    "MaxDivide": "1"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+
+    //{
+    //  "StrategyClassName": "Strategies.BbandsMomentumStrategyV2",
+    //  "StrategyId": "18",
+    //  "Params": {
+    //    "MomentumPeriod": "15",
+    //    "Bperiod": "30",
+    //    "StepD": "2",
+    //    "Threshold": "0.07"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.BbandsMomentumBarsStrategyV2",
+    //  "StrategyId": "19",
+    //  "Params": {
+    //    "MomentumPeriod": "15",
+    //    "Bperiod": "30",
+    //    "StepD": "2",
+    //    "Threshold": "0.07",
+    //    "BarsHeld": "3"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.SmaParabolicMultishareV2",
+    //  "StrategyId": "20",
+    //  "Params": {
+    //    "Sl": "0.01",
+    //    "EmaPeriod": "30",
+    //    "Tp": "0.01",
+    //    "MaxDivide": "2",
+    //    "ParabolicStepUp": "0.02",
+    //    "ParabolicStepDown": "0.05"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.SmaCciBars",
+    //  "StrategyId": "21",
+    //  "Params": {
+    //    "Bars": "5",
+    //    "SmaPeriod": "30",
+    //    "CCIPeriod": "15",
+    //    "Threshold": "300"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.TrixProcBuyBars",
+    //  "StrategyId": "22",
+    //  "Params": {
+    //    "Bars": "5",
+    //    "TrixPeriod": "30",
+    //    "RocPeriod": "15",
+    //    "Threshold": "3",
+    //    "DirectionType": "Long"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.TemaCmfMultishare",
+    //  "StrategyId": "23",
+    //  "Params": {
+    //    "TemaSlowPeriod": "100",
+    //    "TemaFastPeriod": "30",
+    //    "CmfPeriod": "5",
+    //    "Sl": "0.1",
+    //    "MaxDivide": "1",
+    //    "Tp": "0.1"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.SmaCCIMultishareV2",
+    //  "StrategyId": "24",
+    //  "Params": {
+    //    "SmaPeriod": "40",
+    //    "CCIPeriod": "30",
+    //    "Threshold": "300",
+    //    "Coefficient": "1",
+    //    "Sl": "0.1",
+    //    "MaxDivide": "1",
+    //    "TrailingStopStep": "0.1"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.AroonParabolicNew",
+    //  "StrategyId": "25",
+    //  "Params": {
+    //    "AroonUp": "10",
+    //    "AroonDown": "30",
+    //    "ParabolicStepUp": "0.01",
+    //    "ParabolicStepDown": "0.02"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.AroonCmoMultishare",
+    //  "StrategyId": "26",
+    //  "Params": {
+    //    "AroonDown": "80",
+    //    "AroonUp": "5",
+    //    "CmoPeriod": "5",
+    //    "Coefficient": "0.6",
+    //    "MaxDivide": "1",
+    //    "Threshold": "15",
+    //    "Tp": "0.06",
+    //    "MMType": "FixMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.MomentumRocBars",
+    //  "StrategyId": "27",
+    //  "Params": {
+    //    "Bars": "14",
+    //    "EmaPeriod": "40",
+    //    "MomentumPeriod": "50",
+    //    "RocPeriod": "39",
+    //    "Threshold": "5",
+    //    "MAType": "EMA",
+    //    "DirectionType": "Short",
+    //    "MMType": "FixMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.MomentumRocMAStrategy",
+    //  "StrategyId": "28",
+    //  "Params": {
+    //    "EmaPeriod": "40",
+    //    "MomentumPeriod": "25",
+    //    "RocPeriod": "20",
+    //    "Threshold": "1",
+    //    "MMPeriod": "70",
+    //    "MMLevel": "30",
+    //    "MAType": "EMA",
+    //    "MMType": "AtrMoneyManagement",
+    //    "DirectionType": "Short"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.RsiEmaParabolicStrategy",
+    //  "StrategyId": "29",
+    //  "Params": {
+    //    "EmaPeriod": "80",
+    //    "Level": "15",
+    //    "ParabolicStepUp": "0.13",
+    //    "ParabolicStepDown": "0.01",
+    //    "RsiPeriod": "5",
+    //    "MAType": "EMA",
+    //    "MMType": "FixMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.SmaParabolicStrategyV2",
+    //  "StrategyId": "30",
+    //  "Params": {
+    //    "EmaPeriod": "70",
+    //    "ParabolicStepDown": "0.06",
+    //    "ParabolicStepUp": "0.01",
+    //    "MAType": "EMA",
+    //    "MMType": "FixMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.MoMacdNew",
+    //  "StrategyId": "31",
+    //  "Params": {
+    //    "EmaPeriod": "32",
+    //    "MomentumPeriod": "13",
+    //    "Threshold": "0.025",
+    //    "MAType": "EMA",
+    //    "MMType": "FixMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.FractalMultishareStrategy",
+    //  "StrategyId": "32",
+    //  "Params": {
+    //    "Coefficient": "1",
+    //    "DownFractalPeriod": "2",
+    //    "MaxDivide": "1",
+    //    "Tp": "0.01",
+    //    "UpFractalPeriod": "2",
+    //    "MMType": "FixMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.AccelTrend",
+    //  "StrategyId": "33",
+    //  "Params": {
+    //    "Momentum": "25",
+    //    "Tp": "0.11",
+    //    "SmaPeriod": "70",
+    //    "Sl": "0.08",
+    //    "Threshold": "0.21",
+    //    "MAType": "EMA",
+    //    "MMType": "FixMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.SmaCciMultishareNew",
+    //  "StrategyId": "34",
+    //  "Params": {
+    //    "CCIPeriod": "20",
+    //    "Coefficient": "0.8",
+    //    "MaxDivide": "1",
+    //    "SmaPeriod": "90",
+    //    "Threshold": "700",
+    //    "Tp": "0.09",
+    //    "MAType": "EMA",
+    //    "MMType": "FixMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.AccelTrendMultishare",
+    //  "StrategyId": "35",
+    //  "Params": {
+    //    "MaxDivide": "1",
+    //    "Momentum": "49",
+    //    "Tp": "0.09",
+    //    "SmaPeriod": "120",
+    //    "Sl": "0.07",
+    //    "Threshold": "0.05",
+    //    "MAType": "EMA",
+    //    "MMType": "FixMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.ImpulseMultishareStrategy",
+    //  "StrategyId": "36",
+    //  "Params": {
+    //    "Coefficient": "1.4",
+    //    "EmaPeriod": "15",
+    //    "MacdLookback": "2",
+    //    "MacdPeriodFirst": "5",
+    //    "MacdPeriodSecond": "10",
+    //    "MaxDivide": "1",
+    //    "Tp": "0.01",
+    //    "MMType": "FixMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.FractalStrategy",
+    //  "StrategyId": "37",
+    //  "Params": {
+    //    "Coefficient": "1.0",
+    //    "DownFractalPeriod": "8",
+    //    "Tp": "0.09",
+    //    "UpFractalPeriod": "4",
+    //    "MMPeriod": "65",
+    //    "MMLevel": "8",
+    //    "MMType": "AtrMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.SmaCciNew",
+    //  "StrategyId": "38",
+    //  "Params": {
+    //    "CCIPeriod": "10",
+    //    "ParabolicStepUp": "0.03",
+    //    "ParabolicStepDown": "0.01",
+    //    "SmaPeriod": "17",
+    //    "Threshold": "500",
+    //    "MMPeriod": "30",
+    //    "MMLevel": "5",
+    //    "MAType": "EMA",
+    //    "MMType": "AtrMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.DonchianMultishare",
+    //  "StrategyId": "39",
+    //  "Params": {
+    //    "DonchianPeriod": "10",
+    //    "MaxDivide": "1",
+    //    "Sl": "0.09",
+    //    "Tp": "0.05",
+    //    "MMType": "FixMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.GendalfStrategy",
+    //  "StrategyId": "40",
+    //  "Params": {
+    //    "AveragePeriod": "10",
+    //    "BarsMidBody": "3",
+    //    "BarsMedianPeriod2": "3",
+    //    "BarsMidBody2": "4",
+    //    "BarsMidBody3": "3",
+    //    "BarsMedianPeriod": "5",
+    //    "BarsHeld": "5"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.TrixProcStrategy",
+    //  "StrategyId": "41",
+    //  "Params": {
+    //    "TrixPeriod": "30",
+    //    "RocPeriod": "15",
+    //    "Threshold": "3",
+    //    "DirectionType": "Short"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.VXX",
+    //  "StrategyId": "42",
+    //  "Params": {
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.StockShort",
+    //  "StrategyId": "43",
+    //  "Params": {
+    //    "Tp": "0.01",
+    //    "Sl": "0.01"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.AccelTrendTrailingMultishare",
+    //  "StrategyId": "44",
+    //  "Params": {
+    //    "MaxDivide": "1",
+    //    "Momentum": "49",
+    //    "TrailingStopStep": "0.01",
+    //    "SmaPeriod": "120",
+    //    "Sl": "0.07",
+    //    "Threshold": "0.05",
+    //    "MAType": "EMA",
+    //    "MMType": "FixMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.AroonCmoMultishareV2",
+    //  "StrategyId": "45",
+    //  "Params": {
+    //    "AroonDown": "80",
+    //    "AroonUp": "5",
+    //    "CmoPeriod": "5",
+    //    "Coefficient": "0.6",
+    //    "MaxDivide": "1",
+    //    "Threshold": "15",
+    //    "Tp": "0.06",
+    //    "MMType": "FixMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.DonchianMultishareV2",
+    //  "StrategyId": "46",
+    //  "Params": {
+    //    "DonchianPeriod": "10",
+    //    "MaxDivide": "1",
+    //    "Sl": "0.09",
+    //    "TrailingStopStep": "0.01",
+    //    "MMType": "FixMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.DonchianMultishareV3",
+    //  "StrategyId": "47",
+    //  "Params": {
+    //    "DonchianPeriod": "10",
+    //    "MaxDivide": "1",
+    //    "Sl": "0.09",
+    //    "TrailingStopStep": "0.001",
+    //    "EmaPeriod": "15",
+    //    "MomentumPeriod": "10",
+    //    "MAType": "EMA",
+    //    "MMType": "FixMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.FractalMultishareStrategyV2",
+    //  "StrategyId": "48",
+    //  "Params": {
+    //    "TrailingStopStep": "0.01",
+    //    "EmaPeriod": "15",
+    //    "MomentumPeriod": "10",
+    //    "MAType": "EMA",
+    //    "DownFractalPeriod": "2",
+    //    "MaxDivide": "1",
+    //    "Sl": "0.01",
+    //    "UpFractalPeriod": "2",
+    //    "MMType": "FixMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.ImpulseMultishareStrategyV2",
+    //  "StrategyId": "49",
+    //  "Params": {
+    //    "Coefficient": "1.4",
+    //    "EmaPeriod": "15",
+    //    "MacdLookback": "2",
+    //    "MacdPeriodFirst": "5",
+    //    "MacdPeriodSecond": "10",
+    //    "MaxDivide": "1",
+    //    "TrailingStopStep": "0.01",
+    //    "Sl": "0.01",
+    //    "MMType": "FixMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.MoMacdMultishareV3",
+    //  "StrategyId": "50",
+    //  "Params": {
+    //    "Threshold": "10",
+    //    "MomentumPeriod": "30",
+    //    "EmaPeriod": "30",
+    //    "Sl": "0.01",
+    //    "MaxDivide": "1",
+    //    "TrailingStopStep": "0.01",
+    //    "MMType": "FixMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.MomRocMultishareV2",
+    //  "StrategyId": "51",
+    //  "Params": {
+    //    "RocPeriod": "10",
+    //    "MomentumPeriod": "25",
+    //    "EmaPeriod": "20",
+    //    "Threshold": "1",
+    //    "Sl": "0.01",
+    //    "TrailingStopStep": "0.01",
+    //    "MaxDivide": "1"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.SmaCCIMultishareNewV2",
+    //  "StrategyId": "52",
+    //  "Params": {
+    //    "CCIPeriod": "10",
+    //    "Coefficient": "0.8",
+    //    "MaxDivide": "1",
+    //    "SmaPeriod": "10",
+    //    "Threshold": "10",
+    //    "Tp": "0.09",
+    //    "MAType": "EMA",
+    //    "MMType": "FixMoneyManagement"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.SmaCCIMultishareV3",
+    //  "StrategyId": "53",
+    //  "Params": {
+    //    "SmaPeriod": "10",
+    //    "CCIPeriod": "10",
+    //    "Threshold": "10",
+    //    "Sl": "0.01",
+    //    "MaxDivide": "1",
+    //    "TrailingStopStep": "0.01"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.TemaCmfTrailingMultishare",
+    //  "StrategyId": "54",
+    //  "Params": {
+    //    "TemaSlowPeriod": "50",
+    //    "TemaFastPeriod": "30",
+    //    "CmfPeriod": "5",
+    //    "Sl": "0.1",
+    //    "MaxDivide": "1",
+    //    "TrailingStopStep": "0.01"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.BbandsMomentumStrategyV3",
+    //  "StrategyId": "55",
+    //  "Params": {
+    //    "MomentumPeriod": "10",
+    //    "Bperiod": "10",
+    //    "StepD": "1",
+    //    "Threshold": "0.03",
+    //    "Sl": "0.01",
+    //    "TrailingStopStep": "0.01"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //},
+    //{
+    //  "StrategyClassName": "Strategies.CmoRocMultishareV2",
+    //  "StrategyId": "56",
+    //  "Params": {
+    //    "Sl": "0.01",
+    //    "TrailingStopStep": "0.01",
+    //    "CmoPeriod": "25",
+    //    "EmaPeriod": "25",
+    //    "RocPeriod": "5",
+    //    "Threshold": "10",
+    //    "MaxDivide": "3"
+    //  },
+    //  "RequiredBarStorages": {
+    //    "main": {
+    //      "StreamId": 10000,
+    //      "AggregationType": "Time",
+    //      "Timeframe": "PT1H",
+    //      "OffsetMinutes": "0"
+    //    }
+    //  },
+    //  "Symbols": {
+    //    "main": 10000
+    //  }
+    //}
+  ]
+}

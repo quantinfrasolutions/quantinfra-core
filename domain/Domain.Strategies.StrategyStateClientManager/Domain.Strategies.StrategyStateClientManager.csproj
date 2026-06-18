@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <RootNamespace>QuantInfra.Domain.Strategies.StrategyStateClientManager</RootNamespace>
+        <LangVersion>default</LangVersion>
+        <AssemblyName>QuantInfraDomain.Strategies.StrategyStateClientManager</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\common\Common.EventSourcing\Common.EventSourcing.csproj" />
+      <ProjectReference Include="..\..\common\Common.Infrastructure.Abstractions\Common.Infrastructure.Abstractions.csproj" />
+      <ProjectReference Include="..\Domain.Strategies\Domain.Strategies.csproj" />
+      <ProjectReference Include="..\events\Domain.Events.Strategies.AccountsService\Domain.Events.Strategies.AccountsService.csproj" />
+      <ProjectReference Include="..\queries\Domain.Queries.Strategies.AccountsService\Domain.Queries.Strategies.AccountsService.csproj" />
+      <ProjectReference Include="..\queries\Domain.Queries.Strategies\Domain.Queries.Strategies.csproj" />
+    </ItemGroup>
+
+</Project>

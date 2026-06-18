@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <LangVersion>default</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>QuantInfra.Common.StaticData.InMemory</AssemblyName>
+        <RootNamespace>QuantInfra.Common.StaticData.InMemory</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Common.StaticData.Abstractions\Common.StaticData.Abstractions.csproj" />
+    </ItemGroup>
+
+</Project>

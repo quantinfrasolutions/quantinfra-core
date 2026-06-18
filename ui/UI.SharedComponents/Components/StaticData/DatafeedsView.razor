@@ -1,0 +1,40 @@
+﻿@using QuantInfra.Common.Interfaces.Api
+@using QuantInfra.Common.Interfaces.Api.StaticData
+@using UI.Interfaces.StaticData
+@using QuantInfra.Sdk.StaticData
+@using UI.SharedComponents.Base
+
+@inject IUIDatafeedsRepository Repository
+
+<EditableView TItem="Datafeed"
+              TFilter="PagingFilter"
+              EmptyText="No datafeeds found"
+              SearchFunc=@Repository.GetDatafeeds
+              Filter=@Filter
+              AllowSelectRow=@AllowSelect
+              SelectionMode="DataGridSelectionMode.Single"
+              SelectAction=@OnRowSelected
+              Variant=@Variant>
+    <SearchForm />
+    <Columns>
+        <RadzenDataGridColumn TItem="Datafeed" Property=@nameof(Datafeed.DatafeedId) Width="100px" Title="Id" />
+        <RadzenDataGridColumn TItem="Datafeed" Property=@nameof(Datafeed.Name) Width="200px" Title="Name" />
+    </Columns>
+</EditableView>
+
+@code {
+    [Parameter] public BrokersFilter? Filter { get; set; }
+    [Parameter] public bool BriefView { get; set; }
+    [Parameter] public bool AllowSelect { get; set; }
+    [Parameter] public Action<Datafeed>? ValueChanged { get; set; }
+    [Parameter] public Variant Variant { get; set; } = Variant.Filled;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        Filter ??= new();
+    }
+
+    private void OnRowSelected(Datafeed c) => ValueChanged?.Invoke(c);
+
+}

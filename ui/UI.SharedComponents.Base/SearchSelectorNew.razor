@@ -1,0 +1,17 @@
+@inherits RadzenDropDown<TValue>
+@using Radzen.Blazor.Rendering
+@typeparam TValue
+
+<Popup class="my-popup" @ref=_popup>
+    Hello, it's me!
+</Popup>
+
+@code {
+    private Popup _popup;
+    
+    protected override async Task OpenPopup(string key = "ArrowDown", bool isFilter = false, bool isFromClick = false)
+    {
+        await base.OpenPopup(key, isFilter, isFromClick);
+    }
+
+}

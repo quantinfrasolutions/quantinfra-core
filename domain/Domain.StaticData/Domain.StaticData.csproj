@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>default</LangVersion>
+        <AssemblyName>QuantInfra.Domain.StaticData</AssemblyName>
+        <RootNamespace>QuantInfra.Domain.StaticData</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Common\Common.EventSourcing\Common.EventSourcing.csproj" />
+      <ProjectReference Include="..\..\Common\Common.StaticData.Abstractions\Common.StaticData.Abstractions.csproj" />
+      <ProjectReference Include="..\Commands\Domain.Commands.StaticData\Domain.Commands.StaticData.csproj" />
+      <ProjectReference Include="..\Queries\Domain.Queries.StaticData\Domain.Queries.StaticData.csproj" />
+    </ItemGroup>
+
+</Project>

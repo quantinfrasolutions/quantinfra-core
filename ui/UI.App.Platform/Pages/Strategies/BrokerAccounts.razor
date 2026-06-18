@@ -1,0 +1,15 @@
+@using UI.SharedComponents.Components.Strategies
+
+@page "/execution-configuration/broker-accounts"
+@layout ExecutionConfiguration
+
+<StrategyAccountsToBrokerAccountsSummary />
+
+@code {
+    [CascadingParameter] public ExecutionConfiguration ExecutionConfiguration { get; set; }
+
+    protected override void OnInitialized()
+    {
+        ExecutionConfiguration.Path = "broker-accounts";
+    }
+}

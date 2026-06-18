@@ -1,0 +1,79 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>QuantInfra.Databases.MarketDataHistory</AssemblyName>
+    <RootNamespace>QuantInfra.Databases.MarketDataHistory</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.6">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Models\" />
+    <None Remove="Models\CorporateEvents\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\CorporateEvents\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\Common.MarketData\Common.MarketData.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Migrations\Sql\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="Migrations\Sql\20240105124150_FuturesAndTradingSessions.sql" />
+    <Content Remove="Migrations\Sql\20240105124150_FuturesAndTradingSessions_Down.sql" />
+    <Content Remove="Migrations\Sql\20240105124150_FuturesAndTradingSessions_Down.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="Migrations\Sql\20240103170709_TimeBauIndexes.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Migrations\Sql\20240103170709_TimeBauIndexes_Down.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Migrations\Sql\20240105124150_FuturesAndTradingSessions.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Migrations\Sql\20240105124150_FuturesAndTradingSessions.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Migrations\Sql\20240105124150_FuturesAndTradingSessions_Down.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="Migrations\Sql\20240103170709_TimeBauIndexes.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Migrations\Sql\20240103170709_TimeBauIndexes_Down.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Migrations\Sql\20240103170709_TimeBauIndexes %28copy%29.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Migrations\Sql\20240108110739_IndexesAndFunctionsOptimization.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Migrations\Sql\20240108110739_IndexesAndFunctionsOptimization %28copy%29.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Migrations\Sql\20240108110739_IndexesAndFunctionsOptimization_Down.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,123 @@
+﻿@* @using UI.Interfaces.StaticData *@
+@* @inject IUIExchangesRepository Repository *@
+@* *@
+@* $1$ <UI.SharedComponents.Components.EditableView TItem="TradingSessionModel" #1# *@
+@* $1$                                              TKey="long" #1# *@
+@* $1$                                              EmptyText="No trading sessions" #1# *@
+@* $1$                                              RefreshAction="@Refresh" #1# *@
+@* $1$                                              CustomCreateAction="@(() => dialog.Show(ExchangeId))"> #1# *@
+@* $1$     <CustomButtons> #1# *@
+@* $1$         @if (AllowChangeSelected) #1# *@
+@* $1$         { #1# *@
+@* $1$             @if (!editMode) #1# *@
+@* $1$             { #1# *@
+@* $1$                 <RadzenButton Text="Edit" Click="@StartEdit" Disabled="@loading" /> #1# *@
+@* $1$             } #1# *@
+@* $1$             else #1# *@
+@* $1$             { #1# *@
+@* $1$                 <RadzenButton Text="Cancel" Variant="Variant.Text" ButtonStyle="ButtonStyle.Danger" Click="@CancelEdit" Disabled="@loading" /> #1# *@
+@* $1$                 <RadzenButton Text="Save" Variant="Variant.Text" ButtonStyle="ButtonStyle.Success" Disabled="@(loading || (added.Count == 0 && removed.Count == 0))" Click="@Save" /> #1# *@
+@* $1$             } #1# *@
+@* $1$         } #1# *@
+@* $1$     </CustomButtons> #1# *@
+@* $1$     <Columns> #1# *@
+@* $1$         @if (state != null) #1# *@
+@* $1$         { #1# *@
+@* $1$             <RadzenDataGridColumn TItem="TradingSessionModel" Sortable="false" Filterable="false" Width="40px"> #1# *@
+@* $1$                 <Template Context="ts"> #1# *@
+@* $1$                     <RadzenCheckBox TValue="bool" Value="@state.Contains(ts.Id)" Disabled="@(!editMode)" ValueChanged="@(s => ValueChanged(ts.Id, s))"/> #1# *@
+@* $1$                 </Template> #1# *@
+@* $1$             </RadzenDataGridColumn> #1# *@
+@* $1$         } #1# *@
+@* $1$         <RadzenDataGridColumn TItem="TradingSessionModel" Property="Id" Title="ID" Width="80px"/> #1# *@
+@* $1$         <RadzenDataGridColumn TItem="TradingSessionModel" Property="Name" Title="Name" MinWidth="120px"/> #1# *@
+@* $1$     </Columns> #1# *@
+@* $1$     <Template Context="tradingSession"> #1# *@
+@* $1$         <RadzenRow Gap="1rem" Style="margin: 1rem;"> #1# *@
+@* $1$             <RadzenColumn Size="12"> #1# *@
+@* $1$                 <TradingSessionForm Disabled="true" Value="tradingSession" /> #1# *@
+@* $1$             </RadzenColumn> #1# *@
+@* $1$         </RadzenRow> #1# *@
+@* $1$     </Template> #1# *@
+@* $1$ </UI.SharedComponents.Components.EditableView> #1# *@
+@* *@
+@* <CreateTradingSessionDialog @ref="dialog" /> *@
+@* *@
+@* @code { *@
+@*     bool editMode, loading; *@
+@*     HashSet<long>? state = null; *@
+@*     HashSet<long>? added = null; *@
+@*     HashSet<long>? removed = null; *@
+@*     IEnumerable<long>? originalState; *@
+@*      *@
+@*     [Parameter] public bool AllowCreate { get; set; } *@
+@*     [Parameter] public long ExchangeId { get; set; } *@
+@*     [Parameter] public long ContractId { get; set; } *@
+@* *@
+@*     [Parameter] *@
+@*     public IEnumerable<long>? EnabledIds *@
+@*     { *@
+@*         get => state; *@
+@*         set *@
+@*         { *@
+@*             state = value?.ToHashSet(); *@
+@*             originalState = value; *@
+@*         } *@
+@*     } *@
+@*     [Parameter] public bool AllowChangeSelected { get; set; } *@
+@* *@
+@*     CreateTradingSessionDialog dialog; *@
+@* *@
+@*     Task<Dictionary<long, TradingSessionModel>> Refresh(bool force) => *@
+@*         Repository.GetTradingSessions(ExchangeId, force); *@
+@* *@
+@*     void StartEdit() *@
+@*     { *@
+@*         editMode = true; *@
+@*         added = new(); *@
+@*         removed = new(); *@
+@*     } *@
+@* *@
+@*     void CancelEdit() *@
+@*     { *@
+@*         editMode = false; *@
+@*         EnabledIds = originalState; *@
+@*     } *@
+@* *@
+@*     void ValueChanged(long id, bool s) *@
+@*     { *@
+@*         if (s) *@
+@*         { *@
+@*             if (removed.Contains(id)) removed.Remove(id); *@
+@*             else added.Add(id); *@
+@*             state!.Add(id); *@
+@*         } *@
+@*         else *@
+@*         { *@
+@*             if (added.Contains(id)) added.Remove(id); *@
+@*             else removed.Add(id); *@
+@*             state!.Remove(id);   *@
+@*         } *@
+@*     } *@
+@* *@
+@*     async Task Save() *@
+@*     { *@
+@*         try *@
+@*         { *@
+@*             loading = true; *@
+@*             await Repository.UpdateContractTradingSessions(ContractId, added!, removed!); *@
+@*             EnabledIds = state; *@
+@*             loading = false; *@
+@*             CancelEdit(); *@
+@*         } *@
+@*         catch (Exception e) *@
+@*         { *@
+@*             Console.WriteLine(e); *@
+@*             throw; *@
+@*         } *@
+@*         finally *@
+@*         { *@
+@*             loading = false; *@
+@*         } *@
+@*     } *@
+@* } *@

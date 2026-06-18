@@ -1,0 +1,47 @@
+﻿@using QuantInfra.Sdk.Accounting
+@inject DialogService DialogService
+
+@if (RenderButton)
+{
+    <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" Text="Balance operation" Variant="Variant.Flat" Click=@Show />
+}
+
+@code {
+    dynamic dialog;
+
+    [Parameter]
+    public Func<Task>? OnCompleted { get; set; }
+
+    [Parameter]
+    public bool RenderButton { get; set; }
+
+    [Parameter]
+    public NewBalanceOperation Template { get; set; } = new();
+
+    [Parameter]
+    public bool ShowAccount { get; set; }
+
+    public async Task Show()
+    {
+        dialog = await DialogService.OpenAsync<NewBalanceOperationForm>(
+            "New balance operation",
+            new Dictionary<string, object>()
+            {
+                //{ "ShowButton", true },
+                { "Value", Template },
+                { "OnCompleted", Close },
+                { "ShowAccount", ShowAccount }
+            }
+        );
+    }
+
+    async Task Close()
+    {
+        DialogService.Close(dialog);
+        if (OnCompleted != null)
+        {
+            await OnCompleted.Invoke();
+        }
+    }
+}
+

@@ -1,0 +1,26 @@
+@inject DialogService DialogService
+
+<RadzenButton Text="@Text" ButtonStyle="ButtonStyle.Success" Variant="Variant.Text" Click=@OpenDialog />
+
+@code {
+    dynamic? _dialog;
+    
+    [Parameter] public string Text { get; set; } = "Subscribe";
+    [Parameter] public EventCallback OnCompleted { get; set; }
+    
+    private async Task OpenDialog()
+    {
+        _dialog = await DialogService.OpenAsync<SubscribeForm>("Subscribe",
+            new()
+            {
+                { "OnCompleted", EventCallback.Factory.Create(this, Close) }
+            },
+            new() { ShowClose = true, CloseDialogOnOverlayClick = true });
+    }
+
+    private async Task Close()
+    {
+        DialogService.Close(_dialog);
+        await OnCompleted.InvokeAsync();
+    }
+}

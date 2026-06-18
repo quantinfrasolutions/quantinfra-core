@@ -1,0 +1,45 @@
+﻿@* @using QuantInfra.Common.Accounts.Abstractions.Api *@
+@* @using UI.Interfaces.Accounts *@
+@* @using QuantInfra.Common.Accounts.Abstractions *@
+@* *@
+@* @inject IUIAccountsRepository Repository *@
+@* *@
+@* @if (AccountId != Guid.Empty) *@
+@* { *@
+@*     <EditableView TItem="AccountAllocationModel" *@
+@*                   TFilter="Guid" *@
+@*                   EmptyText="No allocations" *@
+@*                   SearchFunc=@Repository.GetAccountAllocations *@
+@*                   Filter=@AccountId *@
+@*                   Variant=@Variant *@
+@*                   RunSearchImmediately="true" *@
+@*                   SearchButtonText="Refresh"> *@
+@*         <SearchForm /> *@
+@*         <Columns> *@
+@*             <RadzenDataGridColumn TItem="AccountAllocationModel" Title="Account Id" Width="120px"> *@
+@*                 <Template Context="allocation"> *@
+@*                     <TooltipGuidViewer Id=@allocation.Account.AccountId/> *@
+@*                 </Template> *@
+@*             </RadzenDataGridColumn> *@
+@*             <RadzenDataGridColumn TItem="AccountAllocationModel" Title="Name" Width="220px"> *@
+@*                 <Template Context="allocation"> *@
+@*                     @if (allocation.Account.AccountId != AccountId) *@
+@*                     { *@
+@*                         <RadzenLink Text=@allocation.Account.Name Path=@($"/accounts/{allocation.Account.AccountId}")/> *@
+@*                     } *@
+@*                     else *@
+@*                     { *@
+@*                         <RadzenText TextStyle="TextStyle.Body2" Text="Own investment" /> *@
+@*                     } *@
+@*                 </Template> *@
+@*             </RadzenDataGridColumn> *@
+@*             <RadzenDataGridColumn TItem="AccountAllocationModel" Property="Account.AccountType" Title="Type" Width="220px"/> *@
+@*             <RadzenDataGridColumn TItem="AccountAllocationModel" Property=@nameof(AccountAllocationModel.Allocation) Title="Allocation" Width="220px"/> *@
+@*         </Columns> *@
+@*     </EditableView> *@
+@* } *@
+@* *@
+@* @code { *@
+@*     [Parameter, EditorRequired] public Guid AccountId { get; set; } *@
+@*     [Parameter] public Variant Variant { get; set; } = Variant.Filled; *@
+@* } *@

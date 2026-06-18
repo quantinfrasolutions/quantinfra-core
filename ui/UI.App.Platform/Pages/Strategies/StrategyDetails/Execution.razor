@@ -1,0 +1,50 @@
+@using UI.SharedComponents.Base
+@using UI.SharedComponents.Components
+@inherits LayoutComponentBase
+
+@page "/strategies/{StrategyId:int}/execution"
+
+@layout StrategyBase
+
+<NavigationTabsView BasePath=@($"/strategies/{StrategyId}/execution")
+                    Tabs=@_tabs
+                    SelectedTabPath=@Path
+                    DisplayAsList=@string.IsNullOrEmpty(Path)>
+    <ChildContent>
+        <CascadingValue Value=@this>
+            @Body
+        </CascadingValue>
+    </ChildContent>
+</NavigationTabsView>
+
+@code {
+
+    [Parameter] public int StrategyId { get; set; }
+    [CascadingParameter] public StrategyBase? StrategyBase { get; set; }
+
+    private string _path;
+    public string Path
+    {
+        get => _path;
+        set
+        {
+            _path = value;
+            StateHasChanged();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        StrategyBase.Path = "execution";
+        
+        if (string.IsNullOrEmpty(Path)) StrategyBase.Id = StrategyId; // otherwise, the child component will set the ID
+    }
+
+    private List<NavigationTabsItem> _tabs = new()
+    {
+        new() { Text = "Current exposure", Path = "current-exposure" },
+        new() { Text = "Execution stats", Path = "execution-stats" },
+    };
+
+    private int _strategyId;
+}

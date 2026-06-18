@@ -1,0 +1,15 @@
+@using UI.SharedComponents.Components.Strategies
+
+@page "/execution-configuration/execution"
+@layout ExecutionConfiguration
+
+<ExecutionView />
+
+@code {
+    [CascadingParameter] public ExecutionConfiguration ExecutionConfiguration { get; set; }
+
+    protected override void OnInitialized()
+    {
+        ExecutionConfiguration.Path = "execution";
+    }
+}

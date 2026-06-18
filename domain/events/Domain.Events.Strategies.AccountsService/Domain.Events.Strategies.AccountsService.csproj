@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <RootNamespace>QuantInfra.Domain.Events.Strategies.AccountsService</RootNamespace>
+        <LangVersion>default</LangVersion>
+        <AssemblyName>QuantInfra.Domain.Events.Strategies.AccountsService</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\common\Common.EventSourcing\Common.EventSourcing.csproj" />
+    </ItemGroup>
+
+</Project>

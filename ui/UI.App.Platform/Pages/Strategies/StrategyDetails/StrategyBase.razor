@@ -1,0 +1,66 @@
+@using UI.Interfaces.Strategies
+@using QuantInfra.Common.Interfaces.Api.Accounts
+@using QuantInfra.Common.Interfaces.Api.Strategies
+@using UI.App.Platform.Layout
+@using UI.SharedComponents.Base
+@using UI.SharedComponents.Components
+
+@inherits LayoutComponentBase
+
+@layout MainLayout
+
+@inject IUiStrategiesRepository Repository
+
+<PageTitle>Strategy @Strategy?.Name</PageTitle>
+
+<ItemNavigationTabsView TKey="int"
+                        TItem="StrategyViewBrief"
+                        Load=@Repository.GetStrategy
+                        Id=@Id
+                        BasePath=@($"/strategies/{Id}")
+                        Tabs=@_tabs
+                        SelectedTabPath=@Path
+                        ItemLoaded=@StrategyLoaded
+                        @ref=_nav>
+    <ChildContent>
+        <CascadingValue Value=@this>
+            @Body
+        </CascadingValue>
+    </ChildContent>
+</ItemNavigationTabsView>
+
+@code {
+
+    [Parameter]
+    public int Id
+    {
+        get => _id;
+        set
+        {
+            _id = value;
+            StateHasChanged();
+        }
+    }
+
+    [Parameter] public string Path { get; set; } = "summary";
+    [Parameter] public EventCallback<StrategyViewBrief> StrategyLoaded { get; set; }
+    
+    private ItemNavigationTabsView<int, StrategyViewBrief> _nav;
+    private int _id;
+    public StrategyViewBrief? Strategy => _nav.Item;
+
+    private List<AccountViewBrief>? _executionAccounts = null;
+    public IReadOnlyCollection<AccountViewBrief>? ExecutionAccounts => _executionAccounts;
+
+    public Task Reload() => _nav.LoadItem();
+    
+    private List<NavigationTabsItem> _tabs = new()
+    {
+        new() { Text = "Summary", Path = "summary" },
+        new() { Text = "Share Price", Path = "share-price" },
+        // new() { Text = "Execution", Path = "execution" },
+        new() { Text = "Trading", Path = "trading" },
+        new() { Text = "Reporting", Path = "reporting" },
+        new() { Text = "Funds and books", Path = "composition" }
+    };
+}

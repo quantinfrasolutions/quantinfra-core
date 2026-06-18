@@ -1,0 +1,42 @@
+@using UI.App.Platform.Layout
+@using UI.SharedComponents.Base
+@using UI.SharedComponents.Components
+@inherits LayoutComponentBase
+
+@layout MainLayout
+
+@page "/execution-configuration"
+
+<PageTitle>Execution configuration</PageTitle>
+
+<NavigationTabsView BasePath="/execution-configuration"
+                    Tabs=@_tabs
+                    SelectedTabPath=@Path
+                    DisplayAsList=@string.IsNullOrEmpty(Path)>
+    <ChildContent>
+        <CascadingValue Value=@this>
+            @Body
+        </CascadingValue>
+    </ChildContent>
+</NavigationTabsView>
+
+<ExecutionView />
+
+@code {
+    private string _path;
+    public string Path
+    {
+        get => _path;
+        set
+        {
+            _path = value;
+            StateHasChanged();
+        }
+    }
+    
+    private List<NavigationTabsItem> _tabs = new()
+    {
+        new() { Text = "Strategy execution", Path = "execution" },
+        new() { Text = "Broker accounts", Path = "broker-accounts" },
+    };
+}

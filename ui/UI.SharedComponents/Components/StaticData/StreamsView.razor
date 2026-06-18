@@ -1,0 +1,41 @@
+﻿@using QuantInfra.Common.Interfaces.Api.StaticData
+@using UI.Interfaces.StaticData
+@using UI.SharedComponents.Base
+
+@inject IUiStreamsRepository Repository
+
+<EditableView TItem="StreamListView"
+             TFilter="StreamsFilter"
+             EmptyText="No streams found"
+             SearchFunc="@Repository.GetStreams"
+             Filter="@Filter"
+             RunSearchImmediately="false"
+             Variant=@Variant
+             HideActionsColumn=@(!EnableActions)
+             AllowSelectRow=@AllowSelect
+             SelectionMode="DataGridSelectionMode.Single"
+             SelectAction=@ValueChanged>
+    <SearchForm>
+        <StreamsFilterForm @bind-Filter=@Filter />
+    </SearchForm>
+    <Columns>
+        <RadzenDataGridColumn TItem="StreamListView" Property=@nameof(StreamListView.StreamId) Width="100px" Title="Id" />
+        <RadzenDataGridColumn TItem="StreamListView" Property=@nameof(StreamListView.Ticker) Width="200px" Title="Id" />
+        <RadzenDataGridColumn TItem="StreamListView" Property=@nameof(StreamListView.ContractId) Width="80px" Title="Contract" />
+        <RadzenDataGridColumn TItem="StreamListView" Property=@nameof(StreamListView.ContractName) Width="120px" Title="" />
+        <RadzenDataGridColumn TItem="StreamListView" Property="ConstantStreamValue.Value" Width="120px" Title="Constant value" />
+        <RadzenDataGridColumn TItem="StreamListView" Property="ConstantStreamValue.CronExpression" Width="120px" Title="CV cron" />
+        <RadzenDataGridColumn TItem="StreamListView" Property=@nameof(StreamListView.DatafeedId) Width="80px" Title="Datafeed" />
+        <RadzenDataGridColumn TItem="StreamListView" Property=@nameof(StreamListView.DatafeedName) Width="120px" Title="" />
+    </Columns>
+</EditableView>
+
+@code {
+    [Parameter] public StreamsFilter Filter { get; set; } = new();
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public bool AllowEdit { get; set; }
+    [Parameter] public bool AllowSelect { get; set; }
+    [Parameter] public Variant Variant { get; set; } = Variant.Filled;
+    [Parameter] public bool EnableActions { get; set; } = true;
+    [Parameter] public EventCallback<StreamListView> ValueChanged { get; set; }
+}

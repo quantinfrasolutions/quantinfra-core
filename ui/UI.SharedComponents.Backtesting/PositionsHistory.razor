@@ -1,0 +1,45 @@
+@using Common.Trading.Positions
+@using UI.Interfaces
+@inject IExportService ExportService
+
+<RadzenDataGrid Data=@Data
+                EmptyText="No positions found"
+                AllowSorting="true"
+                AllowFiltering="true"
+                AllowVirtualization="true">
+    <HeaderTemplate>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="1rem;" Wrap="FlexWrap.Wrap" Style="width: 100%;">
+            <RadzenButton Icon="table_rows_narrow" Variant="Variant.Text" ButtonStyle="ButtonStyle.Light" Click="@(args => Export("excel"))" />
+            <RadzenButton Icon="csv" Variant="Variant.Text" ButtonStyle="ButtonStyle.Light" Click="@(args => Export("csv"))" />
+        </RadzenStack>
+    </HeaderTemplate>
+    <Columns>
+        <RadzenDataGridColumn Property=@nameof(Position.ContractId) Title="ContractId" Width="120px"/>
+        <RadzenDataGridColumn Property=@(nameof(Position.StrategyPositionId)) Title="StrategyPositionId" Width="100px"/>
+
+        <RadzenDataGridColumn Property=@(nameof(Position.OpenDt)) Title="OpenDt" Width="180px"/>
+        <RadzenDataGridColumn Property=@nameof(Position.SignedVolume) Title="Volume" Width="100px"/>
+        <RadzenDataGridColumn Property=@nameof(Position.TotalOpenPayments) Title="TotalOpenPayments" Width="100px"/>
+        <RadzenDataGridColumn Property=@nameof(Position.OpenPrice) Title="OpenPx" Width="100px"/>
+
+        <RadzenDataGridColumn Property=@(nameof(Position.CloseDt)) Title="CloseDt" Width="180px"/>
+        <RadzenDataGridColumn Property=@nameof(Position.ClosePrice) Title="OpenPx" Width="100px"/>
+        <RadzenDataGridColumn Property=@nameof(Position.RealizedPnL) Title="RealizedPnL" Width="100px"/>
+        <RadzenDataGridColumn Property=@nameof(Position.RealizedPnLInAccountCcy) Title="RealizedPnLAccount" Width="100px"/>
+
+        <RadzenDataGridColumn Property=@nameof(Position.Commission) Title="Commission" Width="100px"/>
+    </Columns>
+</RadzenDataGrid>
+
+@code
+{
+    [Parameter, EditorRequired] public IReadOnlyCollection<Position> Data { get; set; }
+
+    private Task Export(string type) => type switch
+    {
+        "csv" => ExportService.ToCsv(Data.AsQueryable(), "positions-history"),
+        "excel" => ExportService.ToExcel(Data.AsQueryable(), "positions-history"),
+        _ => Task.CompletedTask
+    };
+}
+

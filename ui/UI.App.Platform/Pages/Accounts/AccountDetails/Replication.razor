@@ -1,0 +1,47 @@
+@using UI.SharedComponents.Base
+@using UI.SharedComponents.Components
+@inherits LayoutComponentBase
+
+@page "/accounts/{AccountId:int}/replication"
+
+@layout AccountBase
+
+<NavigationTabsView BasePath=@($"/accounts/{AccountBase?.Account?.AccountId}/replication")
+                    Tabs=@_tabs
+                    SelectedTabPath=@Path
+                    DisplayAsList=@string.IsNullOrEmpty(Path)>
+    <ChildContent>
+        <CascadingValue Value=@this>
+            @Body
+        </CascadingValue>
+    </ChildContent>
+</NavigationTabsView>
+
+@code {
+    [Parameter] public int AccountId { get; set; }
+    [CascadingParameter] public AccountBase? AccountBase { get; set; }
+
+    private string _path;
+    public string Path
+    {
+        get => _path;
+        set
+        {
+            _path = value;
+            StateHasChanged();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        AccountBase.Path = "replication";
+        
+        if (string.IsNullOrEmpty(Path)) AccountBase.Id = AccountId; // otherwise, the child component will set the ID
+    }
+
+    private List<NavigationTabsItem> _tabs = new()
+    {
+        new() { Text = "Target positions", Path = "target-positions" },
+        new() { Text = "Active execution requests", Path = "active-execution-requests" },
+    };
+}

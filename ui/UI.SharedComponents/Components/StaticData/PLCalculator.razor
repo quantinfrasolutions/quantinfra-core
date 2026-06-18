@@ -1,0 +1,68 @@
+@* @using Common.Trading *@
+@* @using Common.StaticData.Abstractions *@
+@* <RadzenTemplateForm TItem="CalculationResult" Data="@_value"> *@
+@*     <RadzenRow Gap="1rem"> *@
+@*         <RadzenFormField Variant="Variant.Text" Text="Quantity"> *@
+@*             <RadzenNumeric @bind-Value="_value.Volume" /> *@
+@*         </RadzenFormField> *@
+@*     </RadzenRow> *@
+@*     <RadzenRow Gap="1rem"> *@
+@*         <RadzenFormField Variant="Variant.Text" Text="OpenPx"> *@
+@*             <RadzenNumeric @bind-Value="_value.OpenPx" /> *@
+@*         </RadzenFormField> *@
+@*     </RadzenRow> *@
+@*     <RadzenRow Gap="1rem"> *@
+@*         <RadzenFormField Variant="Variant.Text" Text="ClosePx"> *@
+@*             <RadzenNumeric @bind-Value="_value.ClosePx" /> *@
+@*         </RadzenFormField> *@
+@*     </RadzenRow> *@
+@*     <RadzenRow Gap="1rem"> *@
+@*         <RadzenFormField Variant="Variant.Text" Text="Value at open"> *@
+@*             <RadzenNumeric Value="@_calculator.GetValueInSettlementCcy(_value.OpenPx, _value.Volume)" Disabled="true" /> *@
+@*         </RadzenFormField> *@
+@*     </RadzenRow> *@
+@*     <RadzenRow Gap="1rem"> *@
+@*         <RadzenFormField Variant="Variant.Text" Text="Value at close"> *@
+@*             <RadzenNumeric Value="@(_value.ClosePx.HasValue ? _calculator.GetValueInSettlementCcy(_value.ClosePx.Value, _value.Volume) : 0)" Disabled="true" /> *@
+@*         </RadzenFormField> *@
+@*     </RadzenRow> *@
+@*     <RadzenRow Gap="1rem"> *@
+@*         <RadzenFormField Variant="Variant.Text" Text="PnL"> *@
+@*             <RadzenNumeric Value="@(_value.ClosePx.HasValue ? _calculator.GetPL(_value.OpenPx, Math.Abs(_value.Volume), _value.ClosePx.Value, _value.Volume.FromSign()) : 0)" Disabled="true" /> *@
+@*         </RadzenFormField> *@
+@*     </RadzenRow> *@
+@* </RadzenTemplateForm> *@
+@* *@
+@* @code { *@
+@*     IPLCalculator _calculator; *@
+@*     CalculationResult _value = new(); *@
+@*     private ContractDefinition _contract; *@
+@* *@
+@*     [Parameter] *@
+@*     public ContractDefinition Contract *@
+@*     { *@
+@*         get => _contract; *@
+@*         set *@
+@*         { *@
+@*             _contract = value; *@
+@*             _calculator = _contract.PLCalculatorType switch *@
+@*             { *@
+@*                 PLCalculatorType.Default => new DefaultPLCalculator(_contract.Precision, 2), *@
+@*                 PLCalculatorType.DefaultFutures => new DefaultFuturesContractPLCalculator(_contract.TickSize, _contract.TickValue, _contract.PriceQuotation, *@
+@*                     _contract.Precision, 2), *@
+@*                 _ => throw new NotSupportedException() *@
+@*             }; *@
+@*         } *@
+@*     } *@
+@* *@
+@*     class CalculationResult *@
+@*     { *@
+@*         public decimal OpenPx { get; set; } *@
+@*         public decimal? ClosePx { get; set; } *@
+@*         public decimal Volume { get; set; } *@
+@*          *@
+@*         public decimal ValueAtOpen { get; set; } *@
+@*         public decimal ValueAtClose { get; set; } *@
+@*         public decimal PnL { get; set; } *@
+@*     } *@
+@* } *@

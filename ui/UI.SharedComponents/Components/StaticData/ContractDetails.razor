@@ -1,0 +1,53 @@
+@* @using Common.StaticData *@
+@* @using QuantInfra.Common.StaticData.Abstractions.Api *@
+@* @using UI.Interfaces.StaticData *@
+@* *@
+@* @inject IUIContractsRepository Repository *@
+@* *@
+@* <ItemView TItem="ContractListView" *@
+@*           TKey="int" *@
+@*           Id="@ContractId" *@
+@*           Title="@($"Contract {contract?.Ticker}")" *@
+@*           @bind-Value="contract" *@
+@*           RetrieveItem="@Repository.GetContract"> *@
+@*     <TabsContent> *@
+@*         <RadzenTabsItem Text="Details"> *@
+@*             <RadzenRow> *@
+@*                 <RadzenColumn Size="12"> *@
+@*                     <RadzenCard Style="max-width: 600px;"> *@
+@*                         @if (contract != null) *@
+@*                         { *@
+@*                             <ContractForm Contract="@contract" Disabled="true" HideCommissionsSelector="true" HideTradingSessions="true"/> *@
+@*                         } *@
+@*                     </RadzenCard> *@
+@*                 </RadzenColumn> *@
+@*                 <RadzenColumn Size="12"> *@
+@*                     <RadzenCard Style="max-width: 200px;"> *@
+@*                         @if (contract != null) *@
+@*                         { *@
+@*                             <PLCalculator Contract="@contract" /> *@
+@*                         } *@
+@*                     </RadzenCard> *@
+@*                 </RadzenColumn> *@
+@*             </RadzenRow> *@
+@*         </RadzenTabsItem> *@
+@*         <RadzenTabsItem Text="Trading sessions"> *@
+@*             $1$ <TradingSessionsView ExchangeId="@(contract?.Template.ExchangeId ?? 0)" EnabledIds="@contract?.Template.TradingSessionIds" AllowChangeSelected="true" ContractId="@(contract?.ContractId ?? 0)" /> #1# *@
+@*         </RadzenTabsItem> *@
+@*         <RadzenTabsItem Text="Commissions"> *@
+@*             $1$ <CommissionsView ExchangeId="@(contract?.Template.ExchangeId ?? 0)" BrokerId="@(contract?.Template.BrokerId ?? 0)" ContractId="@(contract?.ContractId ?? 0)" #1# *@
+@*             $1$                                          EnabledIds="@contract?.Template.CommissionIds" AllowChangeSelected="true" DisplaySelected="true" DisplaySummary="true" /> #1# *@
+@*         </RadzenTabsItem> *@
+@*         <RadzenTabsItem Text="Streams"></RadzenTabsItem> *@
+@*         $1$  TODO @if (contract?.Template.SecurityType == SecurityType.Futures) #1# *@
+@*         $1$ { #1# *@
+@*         $1$     <RadzenTabsItem Text="Child contracts"></RadzenTabsItem> #1# *@
+@*         $1$ } #1# *@
+@*     </TabsContent> *@
+@* </ItemView> *@
+@* *@
+@* @code { *@
+@*     ContractListView? contract = null; *@
+@*      *@
+@*     [Parameter] [EditorRequired] public long ContractId { get; set; } *@
+@* } *@

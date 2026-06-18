@@ -1,0 +1,21 @@
+@* @using UI.SharedComponents.Components.Accounts *@
+@* *@
+@* @page "/accounts/{AccountId:int}/replication/active-execution-requests" *@
+@* *@
+@* @layout Replication *@
+@* *@
+@* <ExecutionRequestsView HideFilter="true" *@
+@*                        Filter=@(new() { AccountId = AccountId, IsActive = true }) /> *@
+@* *@
+@* @code { *@
+@*     [Parameter] public int AccountId { get; set; } *@
+@*      *@
+@*     [CascadingParameter] public AccountBase? AccountBase { get; set; } *@
+@*     [CascadingParameter] public Replication Replication { get; set; } *@
+@* *@
+@*     protected override void OnInitialized() *@
+@*     { *@
+@*         AccountBase.Id = AccountId; *@
+@*         Replication.Path = "active-execution-requests"; *@
+@*     } *@
+@* } *@

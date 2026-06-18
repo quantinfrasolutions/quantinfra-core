@@ -1,0 +1,59 @@
+﻿@using QuantInfra.Common.Interfaces.Api.StaticData
+@using UI.Interfaces.StaticData
+@using UI.SharedComponents.Base
+
+@inject IUiContractsRepository Repository
+
+<EditableView TItem="ContractTemplateListView"
+             TFilter="ContractTemplatesFilter"
+             EmptyText="No contract templates found"
+             SearchFunc="@Repository.GetContractTemplates"
+             Filter="@Filter"
+             RunSearchImmediately="false"
+             Variant=@Variant
+             HideActionsColumn=@(!EnableActions)
+             AllowSelectRow=@AllowSelect
+             SelectionMode="DataGridSelectionMode.Single"
+             SelectAction=@ValueChanged>
+    <SearchForm>
+        <ContractTemplateFilterForm @bind-Filter=@Filter />
+    </SearchForm>
+    <Columns>
+        <RadzenDataGridColumn Frozen="true" TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.TemplateId) Width="100px" Title="Id" />
+        <RadzenDataGridColumn Frozen="true" TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.Name) Width="200px" Title="Template name" />
+        <RadzenDataGridColumn TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.Description) Width="200px" Title="Description" />
+        <RadzenDataGridColumn TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.SecurityType) Width="100px" Title="Type" />
+        <RadzenDataGridColumn TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.PlCalculatorType) Width="100px" Title="PLCalc" />
+        <RadzenDataGridColumn TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.MinSize) Width="100px" Title="MinSize" />
+        <RadzenDataGridColumn TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.MinSizeMoney) Width="100px" Title="MinSizeMoney" />
+        <RadzenDataGridColumn TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.MaxSize) Width="100px" Title="MaxSize" />
+        <RadzenDataGridColumn TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.MaxSizeMoney) Width="100px" Title="MaxSizeMoney" />
+        <RadzenDataGridColumn TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.SizeIncrement) Width="100px" Title="SizeIncrement" />
+        <RadzenDataGridColumn TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.TickSize) Width="100px" Title="TickSize" />
+        <RadzenDataGridColumn TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.TickValue) Width="100px" Title="TickValue" />
+        <RadzenDataGridColumn TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.PriceQuotation) Width="100px" Title="PriceQuotation" />
+        <RadzenDataGridColumn TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.SettlementCurrencyId) Width="100px" Title="SettlCcy" />
+        <RadzenDataGridColumn TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.SettlementCurrencyName) Width="100px" Title="" />
+        <RadzenDataGridColumn TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.BaseCurrencyId) Width="100px" Title="BaseCcy" />
+        <RadzenDataGridColumn TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.BaseCurrencyName) Width="100px" Title="" />
+        <RadzenDataGridColumn TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.QuoteCurrencyId) Width="100px" Title="QuoteCcy" />
+        <RadzenDataGridColumn TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.QuoteCurrencyName) Width="100px" Title="" />
+        <RadzenDataGridColumn TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.DefaultDatafeedId) Width="100px" Title="Datafeed" />
+        <RadzenDataGridColumn TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.DefaultDatafeedName) Width="100px" Title="" />
+        <RadzenDataGridColumn TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.ExchangeId) Width="100px" Title="Exchange" />
+        <RadzenDataGridColumn TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.ExchangeName) Width="100px" Title="" />
+        <RadzenDataGridColumn TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.BrokerId) Width="100px" Title="Broker" />
+        <RadzenDataGridColumn TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.BrokerName) Width="100px" Title="" />
+        <RadzenDataGridColumn TItem="ContractTemplateListView" Property=@nameof(ContractTemplateListView.DaysInYear) Width="100px" Title="DaysInYear" />
+    </Columns>
+</EditableView>
+
+@code {
+    [Parameter] public ContractTemplatesFilter Filter { get; set; } = new();
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public bool AllowEdit { get; set; }
+    [Parameter] public bool AllowSelect { get; set; }
+    [Parameter] public Variant Variant { get; set; } = Variant.Filled;
+    [Parameter] public bool EnableActions { get; set; } = true;
+    [Parameter] public EventCallback<ContractTemplateListView> ValueChanged { get; set; }
+}

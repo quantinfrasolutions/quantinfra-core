@@ -1,0 +1,139 @@
+@using NodaTime
+@using QuantInfra.Common.Interfaces.Api.Accounts
+@using QuantInfra.Sdk.Accounts
+@using Radzen
+@using UI.SharedComponents.Components.Accounts
+
+@if (_tradeFilter != null && _orderFilter != null)
+{
+    <RadzenStack Gap="1rem">
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenCard>
+                    <RadzenButton Text="Refresh" Variant="Variant.Text" 
+                                  ButtonStyle="ButtonStyle.Primary" Click=@Refresh IsBusy=@_isLoading/>
+                </RadzenCard>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenAccordion Multiple="true">
+                <Items>
+                    <RadzenAccordionItem Text="Positions" Icon="browse_activity" @bind-Selected=@_positionsExpanded>
+                        <ActivePositionsView AccountId=@AccountId
+                                             HideFilter="true"
+                                             HideAccount="true"
+                                             RunSearchImmediately="true"
+                                             Variant="Variant.Flat"
+                                             AutoRefresh="false"
+                                             ReloadRequested=@Refresh
+                                             HideRefreshButton="true"
+                                             @ref=_positions />
+                    </RadzenAccordionItem>
+                    <RadzenAccordionItem Text="Orders" Icon="request_quote" @bind-Selected=@_ordersExpanded>
+                        <ActiveOrdersView AccountId=@AccountId
+                                          ShowFilter="false"
+                                          HideAccountFilter="true"
+                                          ShowAccountColumn=@(AccountType == AccountType.BrokerAccount)
+                                          ShowBrokerAccountColumn=@(AccountType == AccountType.StrategySubAccount || AccountType == AccountType.ExecutableSubAccount)
+                                          RunSearchImmediately="true"
+                                          AllowNewOrder="true"
+                                          Variant="Variant.Flat"
+                                          AutoRefresh="false"
+                                          ReloadRequested=@Refresh
+                                          HideRefreshButton="true"
+                                          @ref=_orders />
+                    </RadzenAccordionItem>
+                    <RadzenAccordionItem Text="Balances" Icon="account_balance_wallet" @bind-Selected=@_balancesExpanded>
+                        <AccountBalancesView AccountId=@AccountId
+                                             RunSearchImmediately="true"
+                                             HideRefreshButton="true"
+                                             Variant="Variant.Flat"
+                                             @ref=_balances />
+                    </RadzenAccordionItem>
+                    <RadzenAccordionItem Text="Recent activity" Icon="history" @bind-Selected=@_historyExpanded>
+                        <RadzenStack>
+                            <RadzenRow>
+                                <RadzenColumn Size="6">
+                                    @if (_tradeFilter != null)
+                                    {
+                                        <RadzenText TextStyle="TextStyle.Caption" Text="Trades"/>
+                                        <UI.SharedComponents.Components.Accounts.TradesHistory Filter=@_tradeFilter
+                                                                                               Columns=@(new List<string>() { "Dt", "ClOrdId", "OrderId", "Contract", "Side", "Volume", "Price" })
+                                                                                               HideRefreshButton="true"
+                                                                                               ShowFilter="false"
+                                                                                               RunSearchImmediately="true"
+                                                                                               Variant="Variant.Flat"
+                                                                                               AllowSorting="true"
+                                                                                               DefaultOrderByDescending="Dt"
+                                                                                               @ref=_trades/>
+                                    }
+                                </RadzenColumn>
+                                <RadzenColumn Size="6">
+                                    @if (_orderFilter != null)
+                                    {
+                                        <RadzenText TextStyle="TextStyle.Caption" Text="Orders"/>
+                                        <UI.SharedComponents.Components.Accounts.OrdersHistory Filter=@_orderFilter
+                                                                                               Columns=@(new List<string>() { "ClOrdId", "OrderId", "TransactTime", "Contract", "OrdType", "Side", "OrdQty", "Price", "StopPx", "OrdStatus", "LeavesQty", "RejectReason", "RejectText" })
+                                                                                               HideRefreshButton="true"
+                                                                                               HideFilter="true"
+                                                                                               RunSearchImmediately="true"
+                                                                                               Variant="Variant.Flat"
+                                                                                               DefaultOrderByDescending="TransactTime"
+                                                                                               @ref=_ordersHistory/>
+                                    }
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenStack>
+                    </RadzenAccordionItem>
+                </Items>
+            </RadzenAccordion>
+        </RadzenRow>
+    </RadzenStack>
+}
+
+@code {
+    [Parameter, EditorRequired] public int AccountId { get; set; }
+    [Parameter, EditorRequired] public AccountType AccountType { get; set; }
+    
+    private bool _positionsExpanded = true, _ordersExpanded = true, _balancesExpanded = true, _historyExpanded = false;
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        
+        var now = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromMinutes(5));
+        _tradeFilter = new() { AccountId = AccountId, FromDt = now, };
+        _orderFilter = new() { AccountId = AccountId, FromDt = now, };
+    }
+
+    private bool _isLoading;
+    private ActivePositionsView _positions;
+    private ActiveOrdersView _orders;
+    private TradeFilter? _tradeFilter;
+    private OrderFilter? _orderFilter;
+    private TradesHistory _trades;
+    private OrdersHistory _ordersHistory;
+    private AccountBalancesView _balances;
+
+    private async Task Refresh()
+    {
+        var now = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromMinutes(5));
+        _tradeFilter!.FromDt = now;
+        _orderFilter!.FromDt = now;
+        try
+        {
+            _isLoading = true;
+            await Task.WhenAll(
+                Task.Run(_orders.Refresh),
+                Task.Run(_positions.Refresh),
+                Task.Run(_trades.Refresh),
+                Task.Run(_ordersHistory.Refresh),
+                Task.Run(_balances.Refresh)
+            );
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}

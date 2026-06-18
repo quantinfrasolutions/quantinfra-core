@@ -1,0 +1,121 @@
+﻿@typeparam TItem
+@typeparam TFilter where TFilter: class, new()
+@using Microsoft.Extensions.Logging
+@typeparam TFilterApi
+
+@inject ILogger Logger 
+
+<RadzenStack Gap="1rem">
+    <RadzenCard>
+        <RadzenStack Gap="1rem">
+            <RadzenTemplateForm TItem="TFilter" Submit=@RunSearch InvalidSubmit=@OnInvalidSubmit Data="@Filter" class="search-form">
+                @SearchForm
+                @if (CustomCreateAction != null)
+                {
+                    <RadzenButton ButtonStyle="ButtonStyle.Success"
+                                  Icon="add_circle_outline"
+                                  Text="Add"
+                                  Click="@CustomCreateAction"
+                                  Disabled=@Loading
+                                  Variant="Variant.Flat" />
+                }
+                @if (CustomButtons != null)
+                {
+                    @CustomButtons
+                }
+            </RadzenTemplateForm>
+        </RadzenStack>        
+    </RadzenCard>
+
+    @if (DataRetrieved)
+    { 
+        <RadzenCard>
+            <RadzenDataGrid 
+                            IsLoading="@Loading"
+                            Data="@Data"
+                            TItem="TItem"
+                            EmptyText="@(DataRetrieved ? EmptyText : runSearchText)"                        
+                            AllowSorting="true"                        
+                            Density="Density.Compact"
+                            CellRender="@CellRender"
+                            AllowColumnPicking="true">
+                <Columns>
+                    @Columns
+                    @if (SelectAction != null )
+                    {
+                        <RadzenDataGridColumn TItem="TItem" Sortable="false" Filterable="false" MinWidth="100px">
+                            <Template Context="item">
+                                @if (SelectAction != null )
+                                {
+                                <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="search" Variant="Variant.Text" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => OnSelectRow(item))" @onclick:stopPropagation="true" />
+                                }
+                            </Template>
+                        </RadzenDataGridColumn>
+                    }
+                    @if (LookIntoHref != null)
+                    {
+                        <RadzenDataGridColumn TItem="TItem" Sortable="false" Filterable="false" MinWidth="100px">
+                            <Template Context="item">
+                                <RadzenLink Path="@LookIntoHref(item)">
+                                    <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Info" Text="Details" />
+                                </RadzenLink>
+                            </Template>
+                        </RadzenDataGridColumn>
+                    }
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenCard>
+    }
+</RadzenStack>
+
+@code {
+    [Parameter] [EditorRequired] public RenderFragment SearchForm { get; set; }
+    [Parameter] public RenderFragment? CustomButtons { get; set; }
+    [Parameter] public Func<TFilterApi, Task<IEnumerable<TItem>>> SearchFunc { get; set; }
+    [Parameter] public Func<TFilter, TFilterApi> FilterTransform { get; set; }
+    [Parameter] public TFilter Filter { get; set; } = new();
+    [Parameter] public RenderFragment Columns { get; set; }
+    [Parameter] public Action<DataGridCellRenderEventArgs<TItem>> CellRender { get; set; }
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public bool Loading { get; set; }
+    [Parameter] public EventCallback<bool> LoadingChanged { get; set; }
+    [Parameter] public Action<TItem>? SelectAction { get; set; }
+    [Parameter] public string EmptyText { get; set; } = "No data found";
+    [Parameter] public Func<Task>? CustomCreateAction { get; set; }
+    [Parameter] public Func<TItem, string>? LookIntoHref { get; set; }
+    private const string runSearchText = "Run search";
+   
+
+    public List<TItem>? Data { get; set; }
+    bool DataRetrieved { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        if (RunSearchImmediately) await RunSearch();
+    }
+
+    public async Task RunSearch()
+    {
+        Data = null;
+        Loading = true;
+        try
+        {
+            Data = (await SearchFunc(FilterTransform(Filter))).ToList();
+            DataRetrieved = true;
+        }
+        finally
+        {
+            Loading = false;
+        }
+    }
+    async Task OnSelectRow(TItem i)
+    {
+        SelectAction(i);
+    }
+    
+    void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
+    {
+        Logger.LogWarning(args.ToString());
+    }
+}

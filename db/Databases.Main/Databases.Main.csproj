@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>QuantInfra.Databases.Main</RootNamespace>
+        <AssemblyName>QuantInfra.Databases.Main</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.8" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.8" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.8" />
+      <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.3.1" />
+      <PackageReference Include="Npgsql" Version="9.0.3" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime" Version="9.0.4" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Common\Common.Accounts.Abstractions\Common.Accounts.Abstractions.csproj" />
+      <ProjectReference Include="..\..\common\Common.EventSourcing\Common.EventSourcing.csproj" />
+      <ProjectReference Include="..\..\common\Common.Infrastructure.Abstractions\Common.Infrastructure.Abstractions.csproj" />
+      <ProjectReference Include="..\..\common\Common.StaticData.Abstractions\Common.StaticData.Abstractions.csproj" />
+      <ProjectReference Include="..\..\Common\Common.Strategies\Common.Strategies.csproj" />
+      <ProjectReference Include="..\..\common\Common.Trading.Infrastructure\Common.Trading.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\domain\events\Domain.Events.Accounts.AccountsService\Domain.Events.Accounts.AccountsService.csproj" />
+      <ProjectReference Include="..\..\domain\events\Domain.Events.Accounts.Management\Domain.Events.Accounts.Management.csproj" />
+      <ProjectReference Include="..\..\domain\events\Domain.Events.Persistence\Domain.Events.Persistence.csproj" />
+      <ProjectReference Include="..\..\domain\events\Domain.Events.Strategies.Management\Domain.Events.Strategies.Management.csproj" />
+      <ProjectReference Include="..\..\services\AccountsCore.State\AccountsCore.State.csproj" />
+      <ProjectReference Include="..\..\connectors\Connectors.Abstractions.Package\Connectors.Abstractions.Package.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Migrations\Sql\" />
+    </ItemGroup>
+
+</Project>

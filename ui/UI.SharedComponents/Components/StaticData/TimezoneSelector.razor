@@ -1,0 +1,14 @@
+<RadzenFormField Variant="Variant.Text" Text="Time zone">
+    <RadzenDropDown Value="@Value"
+                    ValueChanged="@ValueChanged"
+                    Data="@NodaTime.DateTimeZoneProviders.Tzdb.Ids" 
+                    TValue="string" 
+                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+                    FilterOperator="StringFilterOperator.Contains" 
+                    AllowFiltering="true" />
+</RadzenFormField>
+
+@code {
+    [Parameter] public string Value { get; set; } = "UTC";
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+}

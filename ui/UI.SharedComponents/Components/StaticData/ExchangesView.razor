@@ -1,0 +1,36 @@
+﻿@using QuantInfra.Common.Interfaces.Api
+@using QuantInfra.Sdk.StaticData
+@using UI.Interfaces.StaticData
+@using UI.SharedComponents.Base
+
+@inject IUiExchangesRepository Repository
+
+<EditableView TItem="Exchange"
+             TFilter="PagingFilter"
+             EmptyText="No exchanges found"
+             SearchFunc="@Repository.GetExchanges"
+             Filter="@Filter"
+             RunSearchImmediately="false"
+             LookIntoHref=@(e => $"/static-data/exchanges/{e.ExchangeId}")
+             Variant=@Variant
+             HideActionsColumn=@(!EnableActions)
+             AllowSelectRow=@AllowSelect
+             SelectionMode="DataGridSelectionMode.Single"
+             SelectAction=@ValueChanged>
+    <SearchForm />
+    <Columns>
+        <RadzenDataGridColumn TItem="Exchange" Property=@nameof(Exchange.ExchangeId) Width="100px" Title="Id" />
+        <RadzenDataGridColumn TItem="Exchange" Property=@nameof(Exchange.Name) Width="200px" Title="Name" />
+        <RadzenDataGridColumn TItem="Exchange" Property=@nameof(Exchange.TimezoneName) Width="200px" Title="Timezone" />
+    </Columns>
+</EditableView>
+
+@code {
+    [Parameter] public PagingFilter Filter { get; set; } = new();
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public bool AllowEdit { get; set; }
+    [Parameter] public bool AllowSelect { get; set; }
+    [Parameter] public Variant Variant { get; set; } = Variant.Filled;
+    [Parameter] public bool EnableActions { get; set; } = true;
+    [Parameter] public EventCallback<Exchange> ValueChanged { get; set; }
+}

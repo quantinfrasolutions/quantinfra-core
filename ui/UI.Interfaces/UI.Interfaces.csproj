@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>10</LangVersion>
+        <TargetFramework>net9.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\common\Common.Infrastructure.Abstractions\Common.Infrastructure.Abstractions.csproj" />
+      <ProjectReference Include="..\..\common\Common.Interfaces.Api\Common.Interfaces.Api.csproj" />
+      <ProjectReference Include="..\..\common\Common.Strategies.Abstractions\Common.Strategies.Abstractions.csproj" />
+    </ItemGroup>
+
+</Project>

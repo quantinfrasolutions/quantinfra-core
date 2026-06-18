@@ -1,0 +1,44 @@
+@using Common.Trading
+@using UI.Interfaces
+@inject IExportService ExportService
+
+<RadzenDataGrid Data=@Data
+                EmptyText="No trades found"
+                AllowSorting="true"
+                AllowFiltering="true"
+                AllowVirtualization="true">
+    <HeaderTemplate>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="1rem;" Wrap="FlexWrap.Wrap" Style="width: 100%;">
+            <RadzenButton Icon="table_rows_narrow" Variant="Variant.Text" ButtonStyle="ButtonStyle.Light" Click="@(args => Export("excel"))" />
+            <RadzenButton Icon="csv" Variant="Variant.Text" ButtonStyle="ButtonStyle.Light" Click="@(args => Export("csv"))" />
+        </RadzenStack>
+    </HeaderTemplate>
+    <Columns>
+        <RadzenDataGridColumn TItem="Trade" Title="TradeId" Property=@nameof(Trade.TradeId) Width="100px" Frozen="true"/>
+        <RadzenDataGridColumn TItem="Trade" Property=@nameof(Trade.Dt) Title="Dt" Width="180px"/>
+        <RadzenDataGridColumn TItem="Trade" Property=@nameof(Trade.ClOrdId) Title="ClOrdId" Width="120px"/>
+        <RadzenDataGridColumn TItem="Trade" Property=@nameof(Trade.ContractId) Title="ContractId" Width="120px"/>
+        <RadzenDataGridColumn TItem="Trade" Property=@nameof(Trade.OrderId) Title="OrderId" Width="120px"/>
+        <RadzenDataGridColumn TItem="Trade" Property=@(nameof(Trade.StrategyPositionId)) Title="StrategyPositionId" Width="100px"/>
+        <RadzenDataGridColumn TItem="Trade" Property=@nameof(Trade.Side) Title="Side" Width="100px"/>
+        <RadzenDataGridColumn TItem="Trade" Property=@nameof(Trade.Volume) Title="Volume" Width="100px"/>
+        <RadzenDataGridColumn TItem="Trade" Property=@nameof(Trade.Price) Title="Price" Width="100px"/>
+        <RadzenDataGridColumn TItem="Trade" Property=@nameof(Trade.CalculatedCcyLastQty) Title="CalculatedCcyLastQty" Width="100px"/>
+        <RadzenDataGridColumn TItem="Trade" Property=@nameof(Trade.FxRate) Title="FxRate" Width="100px"/>
+        <RadzenDataGridColumn TItem="Trade" Property=@nameof(Trade.Commission) Title="Commission" Width="100px"/>
+        <RadzenDataGridColumn TItem="Trade" Property=@nameof(Trade.PositionEffect) Title="PositionEffect" Width="100px"/>
+    </Columns>
+</RadzenDataGrid>
+
+@code
+{
+    [Parameter, EditorRequired] public IReadOnlyCollection<Trade> Data { get; set; }
+    
+    private Task Export(string type) => type switch
+    {
+        "csv" => ExportService.ToCsv(Data.AsQueryable(), "trades"),
+        "excel" => ExportService.ToExcel(Data.AsQueryable(), "trades"),
+        _ => Task.CompletedTask
+    };
+}
+

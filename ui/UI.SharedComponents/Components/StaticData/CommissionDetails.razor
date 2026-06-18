@@ -1,0 +1,49 @@
+@* @using UI.Interfaces.StaticData *@
+@* @using Common.StaticData *@
+@* @using QuantInfra.Common.StaticData.Abstractions *@
+@* @using QuantInfra.Common.StaticData.Abstractions.Api *@
+@* *@
+@* @inject IUICommissionsRepository CommissionsRepository *@
+@* @inject IUIContractsRepository ContractsRepository *@
+@* *@
+@* <ItemView TItem="CommissionStructureView" *@
+@*           TKey="int" *@
+@*           Title="@("Commission " + _commission?.Name)" *@
+@*           Id="@CommissionStructureId" *@
+@*           RetrieveItem="@CommissionsRepository.GetCommission" *@
+@*           @bind-Value="_commission"> *@
+@*     <SummaryContent> *@
+@*         <RadzenStack Orientation="Orientation.Vertical"> *@
+@*             <RadzenFormField Variant="Variant.Text" Text="Type"> *@
+@*                 <RadzenTextBox Value="@_commission?.CommissionStructureType.ToString()" Disabled="true"/> *@
+@*             </RadzenFormField> *@
+@*             @if (_commission?.CommissionStructureType == CommissionStructureType.Broker) *@
+@*             { *@
+@*                 <RadzenFormField Variant="Variant.Text" Text="Broker"> *@
+@*                     <RadzenTextBox Value="@($"{_commission?.BrokerId}: {_commission?.BrokerName}")" Disabled="true"/> *@
+@*                 </RadzenFormField> *@
+@*             } *@
+@*             @if (_commission?.CommissionStructureType == CommissionStructureType.Exchange) *@
+@*             { *@
+@*                 <RadzenFormField Variant="Variant.Text" Text="Exchange"> *@
+@*                     <RadzenTextBox Value="@($"{_commission?.ExchangeId}: {_commission?.ExchangeName}")" Disabled="true"/> *@
+@*                 </RadzenFormField> *@
+@*             } *@
+@*             <RadzenFormField Variant="Variant.Text" Text="Fixed per share"> *@
+@*                 <RadzenNumeric Value="@_commission?.FixedPerShare" Disabled="true"/> *@
+@*             </RadzenFormField> *@
+@*             <RadzenFormField Variant="Variant.Text" Text="Floating"> *@
+@*                 <RadzenNumeric Value="@_commission?.Floating" Disabled="true"/> *@
+@*             </RadzenFormField> *@
+@*         </RadzenStack> *@
+@*     </SummaryContent> *@
+@*     <Content> *@
+@*         <ContractsView CommissionId="@CommissionStructureId" /> *@
+@*     </Content> *@
+@* </ItemView> *@
+@* *@
+@* @code { *@
+@*     CommissionStructureView? _commission; *@
+@*      *@
+@*     [Parameter] public int CommissionStructureId { get; set; } *@
+@* } *@

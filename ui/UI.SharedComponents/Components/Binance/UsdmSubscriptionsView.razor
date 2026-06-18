@@ -1,0 +1,67 @@
+@* @using Services *@
+@* @using global::Binance.Common *@
+@* @using QuantInfra.Common.Interfaces.Api *@
+@* *@
+@* @inject ServiceWrapper Wrapper *@
+@* *@
+@* <EditableView TItem="BinanceUsdmMarketDataSubscriptionView" *@
+@*               TFilter="PagingFilter" *@
+@*               EmptyText="No active subscriptions" *@
+@*               SearchButtonText="Refresh" *@
+@*               SearchFunc=@(_ => Wrapper.ApiClient.GetBinanceUsdmActiveSubscriptionsAsync()) *@
+@*               Filter=@_filter *@
+@*               RunSearchImmediately="true"> *@
+@*     <SearchForm></SearchForm> *@
+@*     <CreateButton> *@
+@*         <SubscribeDialog /> *@
+@*     </CreateButton> *@
+@*     <Columns> *@
+@*         <RadzenDataGridColumn TItem="BinanceUsdmMarketDataSubscriptionView" *@
+@*                               Property="Data.Id" *@
+@*                               Title="Request ID" *@
+@*                               Width="270px"> *@
+@*             <Template Context="data"> *@
+@*                 @if (data.Data == null && data.AltData == null) // child subscription, case: exists in memory, not in db *@
+@*                 { *@
+@*                     <span style="overflow: visible;"> *@
+@*                         <RadzenText TextStyle="TextStyle.Body1">Subscription doesn't exist in database'</RadzenText> *@
+@*                     </span> *@
+@*                 } *@
+@*                 else if (data.AltData != null) *@
+@*                 { *@
+@*                     <span style='color: var(--rz-danger-light)'>@data.Data.SubscriptionId</span> *@
+@*                     <RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="Data mismatch"/> *@
+@*                 } *@
+@*                 else *@
+@*                 { *@
+@*                     <span>@data.Data.SubscriptionId</span> *@
+@*                 } *@
+@*             </Template> *@
+@*         </RadzenDataGridColumn> *@
+@*         <RadzenDataGridColumn TItem="BinanceUsdmMarketDataSubscriptionView" *@
+@*                               Property="Data.Symbol" *@
+@*                               Title="Symbol" *@
+@*                               Width="100px"/> *@
+@*         <RadzenDataGridColumn TItem="BinanceUsdmMarketDataSubscriptionView" *@
+@*                               Property="Data.SubscriptionType" *@
+@*                               Title="Type" *@
+@*                               Width="100px"/> *@
+@*         <RadzenDataGridColumn TItem="BinanceUsdmMarketDataSubscriptionView" Title="Stream ID" Width="140px"> *@
+@*             <Template Context="s"> *@
+@*                 <IdNameView Id="@s.Data?.StreamId" Name="@s.Data?.StreamName" RoutePrefix="static-data/streams" /> *@
+@*             </Template> *@
+@*         </RadzenDataGridColumn> *@
+@*         <RadzenDataGridColumn TItem="BinanceUsdmMarketDataSubscriptionView" *@
+@*                               Property="Data.LastBar.CloseDt" *@
+@*                               Title="Last bar ts" *@
+@*                               Width="180px"/> *@
+@*         <RadzenDataGridColumn TItem="BinanceUsdmMarketDataSubscriptionView" *@
+@*                               Property="Data.LastBar.Close" *@
+@*                               Title="Last price" *@
+@*                               Width="100px"/> *@
+@*     </Columns> *@
+@* </EditableView> *@
+@* *@
+@* @code { *@
+@*     PagingFilter _filter = new(); *@
+@* } *@

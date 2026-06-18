@@ -1,0 +1,60 @@
+﻿@* @using Services *@
+@* @using QuantInfra.Common.MarketData.Abstractions *@
+@* @using BinanceUsdmMarketDataSubscriptionRequest = global::Binance.Common.BinanceUsdmMarketDataSubscriptionRequest *@
+@* *@
+@* @inject NotificationService notificationService *@
+@* @inject ServiceWrapper wrapper *@
+@* *@
+@* <RadzenTemplateForm TItem="BinanceUsdmMarketDataSubscriptionRequest" Data=@SubscriptionRequest Submit=@CreateSubscription> *@
+@*     <RadzenStack Gap="1rem"> *@
+@*         <RadzenFormField Text="Symbol" Variant="@Variant.Text" Style="min-width: 180px;"> *@
+@*             <RadzenTextBox Name="Symbol" @bind-Value="@SubscriptionRequest.Symbol" Disabled="@Disabled" />                 *@
+@*         </RadzenFormField> *@
+@*         <RadzenFormField Text="Type" Variant="Variant.Text" Style="min-width: 180px;"> *@
+@*             <RadzenDropDown TValue="SubscriptionDataType"  *@
+@*                             @bind-Value=@SubscriptionRequest.SubscriptionType  *@
+@*                             Data="@(Enum.GetValues(typeof(SubscriptionDataType)).Cast<Enum>())" *@
+@*                             Disabled="@(_isLoading || Disabled)"/> *@
+@*         </RadzenFormField> *@
+@*         <RadzenFormField Variant="Variant.Text" Text="Stream"> *@
+@*             <UI.SharedComponents.Components.StaticData.StreamsSelector @bind-Value=@SubscriptionRequest.StreamId Required="false" /> *@
+@*         </RadzenFormField> *@
+@*         <RadzenRow> *@
+@*             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" JustifyContent="JustifyContent.Center"> *@
+@*                 <RadzenButton ButtonType="ButtonType.Submit" Text="Create subscription" ButtonStyle="ButtonStyle.Primary"/> *@
+@*             </RadzenStack> *@
+@*         </RadzenRow> *@
+@*     </RadzenStack> *@
+@* </RadzenTemplateForm> *@
+@* *@
+@* @code { *@
+@*     // ReSharper disable once CSharpWarnings::CS8618 *@
+@*     [Parameter] public BinanceUsdmMarketDataSubscriptionRequest SubscriptionRequest { get; set; } *@
+@*     [Parameter] public EventCallback OnCompleted { get; set; } *@
+@*     [Parameter] public bool ShowButton { get; set; } = true; *@
+@*     [Parameter] public bool Disabled { get; set; } *@
+@* *@
+@*     protected override async Task OnParametersSetAsync() *@
+@*     { *@
+@*         await base.OnParametersSetAsync(); *@
+@*         SubscriptionRequest ??= new(); *@
+@*     } *@
+@* *@
+@*     bool _isLoading; *@
+@* *@
+@* *@
+@*     private async Task CreateSubscription() *@
+@*     { *@
+@*         try *@
+@*         { *@
+@*             _isLoading = true; *@
+@*             await wrapper.ApiClient.SubscribeBinanceUsdmAsync(SubscriptionRequest); *@
+@*             notificationService.Notify(NotificationSeverity.Success, "Subscription created"); *@
+@*             await OnCompleted.InvokeAsync(); *@
+@*         } *@
+@*         finally *@
+@*         { *@
+@*             _isLoading = false; *@
+@*         } *@
+@*     } *@
+@* } *@

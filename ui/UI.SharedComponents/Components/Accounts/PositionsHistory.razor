@@ -1,0 +1,71 @@
+@using QuantInfra.Common.Interfaces.Api.Accounts
+@using UI.Interfaces.Accounts
+@using UI.SharedComponents.Base
+
+@inject IUiAccountsRepository Repository
+
+
+@if (Filter != null)
+{
+    <EditableView TItem="PositionView"
+                  TFilter="PositionHistoryFilter"
+                  EmptyText="No trades found"
+                  SearchFunc=@Repository.GetPositionsHistory
+                  Filter=@Filter
+                  HideRefreshButton=@HideRefreshButton
+                  RunSearchImmediately=@RunSearchImmediately
+                  Variant=@Variant
+                  AllowSorting=@AllowSorting
+                  DefaultOrderBy=@DefaultOrderBy
+                  DefaultOrderByDescending=@DefaultOrderByDescending>
+        <SearchForm>
+            @if (ShowFilter)
+            {
+                <PositionHistoryFilterForm @bind-Filter=@Filter HideAccountSelector=@(!HideAccount)/>
+            }
+        </SearchForm>
+        <Columns>
+            @if (!HideAccount)
+            {
+                <RadzenDataGridColumn TItem="PositionView" Title="AccountId" Property=@nameof(PositionView.AccountId) Width="120px" />
+                <RadzenDataGridColumn TItem="PositionView" Title="Account Name" Property="AccountName" Width="120px" />
+            }
+            <RadzenDataGridColumn TItem="PositionView" Title="Contract" Property=@nameof(PositionView.ContractId) Width="120px" />
+            <RadzenDataGridColumn TItem="PositionView" Property="StrategyPositionId" Title="StrategyPositionId" Width="120px"/>
+            <RadzenDataGridColumn TItem="PositionView" Title="Ticker" Property=@nameof(PositionView.ContractName) Width="120px" />
+            <RadzenDataGridColumn TItem="PositionView" Property="Volume" Title="Volume" Width="120px"/>
+            <RadzenDataGridColumn TItem="PositionView" Property="Side" Title="Side" Width="80px"/>
+            <RadzenDataGridColumn TItem="PositionView" Property="OpenDt" Title="OpenDt" Width="200px"/>
+            <RadzenDataGridColumn TItem="PositionView" Property="OpenPrice" Title="OpenPrice" Width="100px"/>
+            <RadzenDataGridColumn TItem="PositionView" Property=@(nameof(PositionView.TotalOpenPayments)) Title="OpenPayment" Width="100px"/>
+            <RadzenDataGridColumn TItem="PositionView" Property="CloseDt" Title="CloseDt" Width="200px"/>
+            <RadzenDataGridColumn TItem="PositionView" Property="ClosePrice" Title="ClosePrice" Width="100px"/>
+            <RadzenDataGridColumn TItem="PositionView" Property=@(nameof(PositionView.Type)) Title="Type" Width="100px"/>
+            <RadzenDataGridColumn TItem="PositionView" Property=@(nameof(PositionView.Commission)) Title="Commission" Width="100px"/>
+            <RadzenDataGridColumn TItem="PositionView" Property=@(nameof(PositionView.RealizedPnL)) Title="RPnL" Width="100px"/>
+            <RadzenDataGridColumn TItem="PositionView" Property=@(nameof(PositionView.RealizedPnLInAccountCcy)) Title="RPnL AccCcy" Width="100px"/>
+            <RadzenDataGridColumn TItem="PositionView" Property="HistoryOpenDt" Title="HistoryOpenDt" Width="200px"/>
+            <RadzenDataGridColumn TItem="PositionView" Property="SettlPrice" Title="SettlPrice" Width="100px"/>
+            <RadzenDataGridColumn TItem="PositionView" Property=@nameof(PositionView.OpenTradeId) Title="PositionId" Width="250px"/>
+        </Columns>
+    </EditableView>
+}
+
+@code
+{
+    [Parameter] public PositionHistoryFilter? Filter { get; set; }
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public bool HideAccount { get; set; }
+    [Parameter] public bool ShowFilter { get; set; } = true;
+    [Parameter] public bool HideRefreshButton { get; set; }
+    [Parameter] public Variant Variant { get; set; } = Variant.Filled;
+    [Parameter] public bool AllowSorting { get; set; }
+    [Parameter] public string? DefaultOrderBy { get; set; }
+    [Parameter] public string? DefaultOrderByDescending { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        Filter ??= new();
+    }
+}

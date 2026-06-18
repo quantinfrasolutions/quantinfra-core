@@ -1,0 +1,63 @@
+@* @using Radzen.Blazor.Rendering *@
+@* *@
+@* @typeparam TValue where TValue : struct *@
+@* *@
+@* <style type="text/css"> *@
+@*     .my-popup { *@
+@*         display: none; *@
+@*         position: absolute; *@
+@*         overflow: hidden; *@
+@*         /*height: 360px;*/ *@
+@*         width: 600px; *@
+@*         border: var(--rz-panel-border); *@
+@*         background-color: var(--rz-panel-background-color); *@
+@*         box-shadow: var(--rz-panel-shadow); *@
+@*         border-radius: var(--rz-border-radius) *@
+@*     } *@
+@*  </style> *@
+@* *@
+@* <RadzenFormField Text=@Text Variant="Variant.Text"> *@
+@*     <ChildContent> *@
+@*         <RadzenTextBox Value=@(SomethingSelected ? IdNameView.GetLabel(Value, Label) : string.Empty) Disabled="true" Name="Value" /> *@
+@*     </ChildContent> *@
+@*     <End> *@
+@*         @if (!Required && SomethingSelected) *@
+@*         { *@
+@*             <RadzenButton Icon="close" Variant="Variant.Text" Click=@Clean/> *@
+@*         } *@
+@*         <RadzenButton Icon="find_in_page" Variant="Variant.Text" Click=@ShowSearch @ref=_button /> *@
+@*     </End> *@
+@*     @if (Required) *@
+@*     { *@
+@*         <RadzenRequiredValidator Component="Value" Text=@($"{Text} is required") Style="position: absolute"/> *@
+@*     } *@
+@* </RadzenFormField> *@
+@* *@
+@* <Popup @ref=popup class="my-popup"> *@
+@*     @SearchContent *@
+@* </Popup> *@
+@* *@
+@* @code { *@
+@*     [Parameter] public TValue? Value { get; set; } *@
+@*     [Parameter] public string? Label { get; set; } *@
+@*     [Parameter] public EventCallback ValueReset { get; set; } *@
+@*     [Parameter, EditorRequired] public bool SomethingSelected { get; set; } *@
+@*     [Parameter, EditorRequired] public RenderFragment SearchContent { get; set; } *@
+@*     [Parameter] public string Text { get; set; } *@
+@*     [Parameter] public bool Required { get; set; } = true; *@
+@* *@
+@*     private RadzenButton _button; *@
+@*     private Popup popup; *@
+@*      *@
+@*     public void Close() => Task.Run(() => popup.ToggleAsync(_button.Element)); *@
+@* *@
+@*     public void ForceUpdate() => StateHasChanged(); *@
+@* *@
+@*     private Task ShowSearch() => popup.ToggleAsync(_button.Element); *@
+@* *@
+@*     private async Task Clean() *@
+@*     { *@
+@*         if (Required) throw new InvalidOperationException("Cannot clean item for a required component"); *@
+@*         await ValueReset.InvokeAsync(); *@
+@*     } *@
+@* } *@

@@ -1,0 +1,79 @@
+﻿@* @using Common.StaticData *@
+@* @using QuantInfra.Common.StaticData.Abstractions.Api *@
+@* *@
+@* <RadzenStack Gap="1rem"> *@
+@*     <RadzenTemplateForm TItem="ContractListView" *@
+@*                         Data="@Contract" *@
+@*                         Submit="@OnSubmit" *@
+@*                         InvalidSubmit=@OnInvalidSubmit *@
+@*                                                 @ref="form"> *@
+@*         <RadzenStack Orientation="Orientation.Vertical"> *@
+@*             <RadzenFormField Text="Contract ID" Variant="Variant.Text"> *@
+@*                 $1$ <RadzenNumeric @bind-Value="@Contract.ContractId" Disabled="true" /> #1# *@
+@*             </RadzenFormField> *@
+@*             <RadzenFormField Text="Ticker" Variant="Variant.Text"> *@
+@*                 <RadzenTextBox Name="Ticker" @bind-Value="@Contract.Ticker" Disabled="isLoading || Disabled" /> *@
+@*                 <RadzenRequiredValidator Component="Ticker" Text="Ticker is required" Style="position: absolute" /> *@
+@*             </RadzenFormField> *@
+@*             @if (Disabled) *@
+@*             { *@
+@*                 <RadzenFormField Text="Asset" Variant="Variant.Text"> *@
+@*                     $1$ <RadzenTextBox Value="@($"{Contract.Template}: {Contract?.AssetName}")" Disabled="true" /> #1# *@
+@*                 </RadzenFormField> *@
+@*             } *@
+@*             else *@
+@*             { *@
+@*                 $1$ <AssetsSelector ValueChanged="@AssetChanged" #1# *@
+@*                 $1$                 Disabled="isLoading || Disabled"/> #1# *@
+@*             } *@
+@*             @if (!Disabled) *@
+@*             { *@
+@*                 <RadzenRow Gap="1rem"> *@
+@*                     <div class="rz-text-align-center"> *@
+@*                         <RadzenCheckBox @bind-Value=@CreateNewContractTemplate Name="cb" Disabled="@Disabled"/> *@
+@*                         <RadzenLabel Text="Create new contract template" Component="cb" Style="margin-left: 8px; vertical-align: middle;"/> *@
+@*                     </div> *@
+@*                 </RadzenRow> *@
+@* *@
+@*                 @if (!CreateNewContractTemplate) *@
+@*                 { *@
+@*                     // TODO: Selector *@
+@*                 } *@
+@*             } *@
+@*             @if (Disabled || CreateNewContractTemplate) *@
+@*             { *@
+@*                 $1$ <ContractTemplateForm Model="@Contract.Template" Disabled="@Disabled"/> #1# *@
+@*             } *@
+@*             @if (ShowButton) *@
+@*             { *@
+@*                 <RadzenColumn Size="3"> *@
+@*                     <RadzenButton ButtonType="ButtonType.Submit" Text="Create" Disabled="isLoading || Disabled" /> *@
+@*                 </RadzenColumn> *@
+@*             } *@
+@*         </RadzenStack> *@
+@*     </RadzenTemplateForm> *@
+@* </RadzenStack> *@
+@* *@
+@* @code { *@
+@* *@
+@*     [Parameter] public ContractListView Contract { get; set; } = new(); *@
+@*     [Parameter] public bool Disabled { get; set; } = false; *@
+@*     [Parameter] public string? CurrencyName { get; set; } = null; *@
+@*     [Parameter] public bool ShowButton { get; set; } *@
+@*     [Parameter] public Func<Task> Submit { get; set; } *@
+@*     [Parameter] public bool HideCommissionsSelector { get; set; } *@
+@*     [Parameter] public bool HideTradingSessions { get; set; } *@
+@*     [Parameter] public bool CreateNewContractTemplate { get; set; } = true; *@
+@* *@
+@*     bool isLoading = false; *@
+@*     RadzenTemplateForm<ContractListView> form; *@
+@* *@
+@* *@
+@*     async Task OnSubmit() => await Submit(); *@
+@* *@
+@*     void OnInvalidSubmit() *@
+@*     { } *@
+@* *@
+@*     // void AssetChanged(long id) => Contract.AssetId = id; *@
+@* *@
+@* } *@

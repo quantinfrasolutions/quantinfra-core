@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>default</LangVersion>
+        <AssemblyName>QuantInfra.Connectors.Binance.Common</AssemblyName>
+        <RootNamespace>QuantInfra.Connectors.Binance.Common</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Connectors.Common\Connectors.Common.csproj" />
+    </ItemGroup>
+
+</Project>

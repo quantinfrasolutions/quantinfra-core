@@ -1,0 +1,142 @@
+@using QuantInfra.Common.Interfaces.Api
+
+<RadzenStack Gap="1rem">
+    @if (Editable && AllowAddDeleteItems)
+    {
+        <RadzenRow>
+            <RadzenButton ButtonStyle="ButtonStyle.Success" Variant="Variant.Text" Icon="add" Click=@InsertRow Disabled="@(_newSymbol != null)" />
+        </RadzenRow>
+    }
+    <RadzenDataGrid TItem="Item"
+                    Data=@_data
+                    Density="Density.Compact"
+                    EditMode="DataGridEditMode.Single"
+                    @ref="bsGrid">
+
+        <Columns>
+            <RadzenDataGridColumn TItem="Item" Title="Name" Property="Key">
+                <EditTemplate Context="bs">
+                    <RadzenFormField Variant="Variant.Text" Text="Name">
+                        <RadzenTextBox @bind-Value=@bs.Key Disabled="@(bs != _newSymbol)" />
+                    </RadzenFormField>
+                </EditTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Item" Title="Id">
+                <Template Context="bs">
+                    <IdNameView Id=@bs.Id Name=@bs.Name />
+                </Template>
+                <EditTemplate Context="bs">
+                    <UI.SharedComponents.Components.StaticData.ContractsSelector @bind-Value=@bs.Id @bind-Label=@bs.Name />
+                </EditTemplate>
+            </RadzenDataGridColumn>
+            @if (Editable)
+            {
+                <RadzenDataGridColumn TItem="Item">
+                    <Template Context="bs">
+                        <RadzenButton ButtonStyle="ButtonStyle.Primary" Variant="Variant.Text" Icon="edit" Click=@(_ => EditRow(bs)) Disabled="@_isEditing"/>
+                        @if (AllowAddDeleteItems)
+                        {
+                            <RadzenButton ButtonStyle="ButtonStyle.Secondary" Variant="Variant.Text" Icon="delete" Click=@(_ => DeleteRow(bs)) Disabled="@_isEditing"/>
+                        }
+                    </Template>
+                    <EditTemplate Context="bs">
+                        <RadzenButton ButtonStyle="ButtonStyle.Primary" Variant="Variant.Text" Icon="check" Click=@(_ => ConfirmEdit(bs)) Disabled="@(bs == _newSymbol && (string.IsNullOrEmpty(bs.Key) || Symbols.ContainsKey(bs.Key) || bs.Id == 0))" />
+                        <RadzenButton ButtonStyle="ButtonStyle.Secondary" Variant="Variant.Text" Icon="close" Click=@(_ => CancelEdit())/>
+                    </EditTemplate>
+                </RadzenDataGridColumn>
+            }
+        </Columns>
+    </RadzenDataGrid>
+</RadzenStack>
+
+@code {
+
+    private Dictionary<string, BriefView<long>> _symbols;
+    [Parameter, EditorRequired]
+    public Dictionary<string, BriefView<long>> Symbols
+    {
+        get => _symbols;
+        set
+        {
+            _symbols = value;
+            ResetData();
+        }
+    }
+
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public bool Editable { get; set; }
+    [Parameter] public bool AllowAddDeleteItems { get; set; }
+
+    RadzenDataGrid<Item> bsGrid;
+    private bool _isInEditMode;
+    List<Item> _data = new();
+
+    Item? _newSymbol = null;
+    bool _isEditing;
+   
+
+    async Task InsertRow()
+    {
+        if (!bsGrid.IsValid) return;
+
+        _newSymbol = new Item { Key = "main" };
+        await bsGrid.InsertRow(_newSymbol);
+        _isEditing = true;
+    }
+    
+    private Task EditRow(Item bs)
+    {
+        return bsGrid.EditRow(bs);
+    }
+
+    private void ConfirmEdit(Item bs)
+    {
+        if (bs == _newSymbol)
+        {
+            _newSymbol = null;
+            Symbols.Add(bs.Key, new BriefView<long>(bs.Id, bs.Name));
+            bsGrid.CancelEditRow(bs);
+            ResetData();
+        }
+        else
+        {
+            Symbols[bs.Key] = new BriefView<long>(bs.Id, bs.Name);
+            bsGrid.CancelEditRow(bs);
+            ResetData();
+        }
+
+        _isEditing = false;
+    }
+    
+    private void CancelEdit()
+    {
+        _isEditing = false;
+        ResetData();
+    }
+
+    private void DeleteRow(Item bs)
+    {
+        if (bs == _newSymbol)
+        {
+            _newSymbol = null;
+            bsGrid.CancelEditRow(bs);
+        }
+        else
+        {
+            Symbols.Remove(bs.Key);
+            ResetData();
+        }
+    }
+
+    private void ResetData()
+    {
+        _data = Symbols.Select(kv => new Item { Key = kv.Key, Id = kv.Value.Id, Name = kv.Value.Name }).ToList();
+    }
+
+    class Item
+    {
+        public string Key { get; set; }
+        public long Id { get; set; }
+        public string Name { get; set; }
+    }
+}

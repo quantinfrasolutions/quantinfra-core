@@ -1,0 +1,92 @@
+﻿@* @using UI.Interfaces.Strategies *@
+@* @using Microsoft.Extensions.Logging *@
+@* @using Common.Interfaces.Api *@
+@* @using UI.SharedComponents.Base *@
+@* @using UI.SharedComponents.Components.Books *@
+@* *@
+@* @inject IUIStrategiesRepository repository *@
+@* @inject NotificationService notificationService *@
+@* @inject ILogger logger  *@
+@* *@
+@* <RadzenButton ButtonStyle="ButtonStyle.Info" *@
+@*               Click="@AddToBook" *@
+@*               Disabled="@(isLoading || Disabled)" *@
+@*               Variant="Variant.Flat" *@
+@*               Text="Assign to book" /> *@
+@* @if (Strategies?.Any(s => !s.IsActive) == true) *@
+@* { *@
+@*     <RadzenButton ButtonStyle="ButtonStyle.Success" *@
+@*                   Click="@Start" *@
+@*                   Disabled="@(isLoading || Disabled)" *@
+@*                   Variant="Variant.Text" *@
+@*                   Text="Start" /> *@
+@* } *@
+@* @if (Strategies?.Any(s => s.IsActive) == true) *@
+@* { *@
+@*     <RadzenButton ButtonStyle="ButtonStyle.Danger" *@
+@*                   Click="@Stop" *@
+@*                   Disabled="@(isLoading || Disabled)" *@
+@*                   Variant="Variant.Flat" *@
+@*                   Text="Stop" /> *@
+@* } *@
+@* <MultipleActionDialog TItem="Common.Interfaces.Api.ResultModel" *@
+@*                                                      @ref="dialog" /> *@
+@* *@
+@* <BookSelectorDialog @ref="bookSelector" /> *@
+@* *@
+@* @code { *@
+@* *@
+@*     bool isLoading; *@
+@*     MultipleActionDialog<ResultModel> dialog; *@
+@*     BookSelectorDialog bookSelector; *@
+@*     long bookId; *@
+@* *@
+@*     [Parameter] [EditorRequired] public IList<EditableStrategyModel> Strategies { get; set; } *@
+@*     [Parameter] public bool Disabled { get; set; } *@
+@*     [Parameter] public Func<Task>? OnCompleted { get; set; } *@
+@* *@
+@* *@
+@*     async Task AddToBook() *@
+@*     { *@
+@*         throw new NotImplementedException(); *@
+@*         // var bookId = await bookSelector.Show(); *@
+@*         // await dialog.Run( *@
+@*         //     "Adding strategies to book", *@
+@*         //     Strategies.Select(s => new ExecutableTask<ResultModel>( *@
+@*         //         async () => await repository.UpdateBook( *@
+@*         //             bookId, *@
+@*         //             new AddUpdateBookComponentRequest *@
+@*         //             { *@
+@*         //                 StrategyId = s.StrategyId, *@
+@*         //                 Action = UpdateBookAction.Add                             *@
+@*         //             } *@
+@*         //         ), *@
+@*         //         rm => (rm.IsSuccess, rm.IsSuccess ? "OK" : rm.ErrorMessage!), *@
+@*         //         $"Adding strategy {s.StrategyId}" *@
+@*         //     )).ToList() *@
+@*         // ); *@
+@*     } *@
+@* *@
+@*     async Task Start() *@
+@*     { *@
+@*         await dialog.Run( *@
+@*             "Starting strategies", *@
+@*             Strategies.Select(s => new ExecutableTask( *@
+@*                 async () => await repository.StartStrategy(s.StrategyId), *@
+@*                 $"Starting strategy {s.StrategyId}" *@
+@*             )).ToList() *@
+@*         ); *@
+@*     } *@
+@* *@
+@*     async Task Stop() *@
+@*     { *@
+@*         await dialog.Run( *@
+@*             "Starting strategies", *@
+@*             Strategies.Select(s => new ExecutableTask( *@
+@*                 async () => await repository.StopStrategy(s.StrategyId, false), *@
+@*                 $"Stopping strategy {s.StrategyId}" *@
+@*             )).ToList() *@
+@*         ); *@
+@*     } *@
+@* *@
+@* } *@

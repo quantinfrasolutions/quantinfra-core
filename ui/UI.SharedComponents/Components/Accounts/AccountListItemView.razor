@@ -1,0 +1,113 @@
+@using QuantInfra.Common.Interfaces.Api.Accounts
+@using QuantInfra.Sdk.Accounting
+@using QuantInfra.Sdk.Accounts
+@using UI.Interfaces.Accounts
+@using UI.SharedComponents.Base
+
+@inject IUiAccountsRepository Repository
+
+<RadzenStack Orientation="Orientation.Vertical" Gap="1rem" AlignItems="AlignItems.Stretch">
+    <RadzenRow>
+        <RadzenFormField Variant="Variant.Text" Text="ID">
+            <RadzenTextBox Disabled="true" Value=@Account.AccountId.ToString()/>
+        </RadzenFormField>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenFormField Variant="Variant.Text" Text="Name">
+            <RadzenTextBox Disabled="true" Value=@Account.Name/>
+        </RadzenFormField>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenFormField Variant="Variant.Text" Text="Type">
+            <RadzenTextBox Disabled="true" Value=@Account.AccountType.ToString()/>
+        </RadzenFormField>
+    </RadzenRow>
+    @if (Account.AccountType == AccountType.VirtualAccount || Account.AccountType == AccountType.StrategySubAccount)
+    {
+        <RadzenRow>
+            <RadzenFormField Variant="Variant.Text" Text="Strategy">
+                <RadzenLink Text=@Account.StrategyName Path=@($"/strategies/{Account.StrategyId}") />
+            </RadzenFormField>
+        </RadzenRow>
+    }
+    <RadzenRow>
+        <RadzenFormField Variant="Variant.Text" Text="Currency">
+            <RadzenTextBox Disabled="true" Value=@IdNameView.GetLabel(Account.CurrencyId, Account.CurrencyName)/>
+        </RadzenFormField>
+    </RadzenRow>
+    @if (Account.AccountType == AccountType.BrokerAccount)
+    {
+        <RadzenRow>
+            <RadzenFormField Variant="Variant.Text" Text="Broker">
+                <RadzenTextBox Disabled="true" Value=@IdNameView.GetLabel(Account.BrokerId, Account.BrokerName)/>
+            </RadzenFormField>
+        </RadzenRow>
+    }
+    <RadzenRow>
+        <RadzenFormField Variant="Variant.Text" Text="Position accounting">
+            <RadzenTextBox Disabled="true" Value=@Account.PositionAccounting.ToString()/>
+        </RadzenFormField>
+    </RadzenRow>
+    <RadzenRow>
+        <div>
+            <RadzenCheckBox Disabled="true" Value=@Account.EnableSharePriceTracking Name="EnableMtm"/>
+            <RadzenLabel Text="Enable share price calculation" Component="EnableMtm" Style="margin-left: 8px; vertical-align: middle;"/>
+        </div>
+    </RadzenRow>
+    @if (Account.EnableSharePriceTracking)
+    {
+        <RadzenRow>
+            <div>
+                <RadzenCheckBox Disabled="true" Value=@Account.IncludeUnrealizedPnLToMtm Name="IncludeUnrealizedPnLToMtm"/>
+                <RadzenLabel Text="Include unrealized PnL to daily returns" Component="IncludeUnrealizedPnLToMtm" Style="margin-left: 8px; vertical-align: middle;"/>
+            </div>
+        </RadzenRow>
+    }
+    @if (LoadInvestment)
+    {
+        <RadzenRow>
+            <RadzenFormField Variant="Variant.Text" Text="Investment">
+                <ChildContent>
+                    <RadzenNumeric Disabled="true" Value=@_investment ShowUpDown="false"/>
+                </ChildContent>
+                <End>
+                    @if (_investmentLoading)
+                    {
+                        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Primary" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate"  />
+                    }
+                </End>
+            </RadzenFormField>
+        </RadzenRow>
+    }
+</RadzenStack>
+
+@code {
+    [Parameter, EditorRequired] public AccountListModel Account { get; set; }
+    [Parameter] public bool LoadInvestment { get; set; }
+
+    private bool _investmentLoading, _investmentLoaded;
+    private decimal _investment;
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        if (LoadInvestment && !_investmentLoaded)
+        {
+            _investmentLoading = true;
+
+            try
+            {
+                var response = await Repository.GetSharePriceHistory(new SharePriceHistoryFilter 
+                    { AccountId = Account.AccountId, SortDescending = true, Limit = 1, ChangeType = SharePriceHistoryChangeType.BalanceOperation }
+                );
+                _investment = response.SingleOrDefault()?.Investment ?? 0m;
+                _investmentLoaded = true;
+            }
+            finally
+            {
+                _investmentLoading = false;
+            }
+        }
+    }
+
+}

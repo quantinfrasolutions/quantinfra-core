@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>QuantInfra.Common.ServiceBase</RootNamespace>
+        <LangVersion>default</LangVersion>
+        <AssemblyName>QuantInfra.Common.ServiceBase</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Disruptor" Version="6.0.1" />
+      <PackageReference Include="NodaTime" Version="3.2.2" />
+      <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.3.1" />
+      <PackageReference Include="System.Text.Json" Version="9.0.6" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Common.EventSourcing\Common.EventSourcing.csproj" />
+      <ProjectReference Include="..\Common.Messaging\Common.Messaging.csproj" />
+      <ProjectReference Include="..\Common.Metrics\Common.Metrics.csproj" />
+    </ItemGroup>
+
+</Project>

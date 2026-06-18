@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>default</LangVersion>
+        <Configurations>Debug;Release;Debug-FAST;Release-FAST</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <RootNamespace>QuantInfra.Domain.VirtualExecution</RootNamespace>
+        <AssemblyName>QuantInfra.Domain.VirtualExecution</AssemblyName>
+        <TargetFramework>net9.0</TargetFramework>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug-FAST' ">
+      <DefineConstants>TRACE;FAST;</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release-FAST' ">
+      <DefineConstants>TRACE;FAST;</DefineConstants>
+    </PropertyGroup>
+    
+
+    <ItemGroup>
+      <PackageReference Include="NodaTime" Version="3.2.2" />
+    </ItemGroup>
+    
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\common\Common.EventSourcing\Common.EventSourcing.csproj" />
+      <ProjectReference Include="..\events\Domain.Events.Accounts.AccountsService\Domain.Events.Accounts.AccountsService.csproj" />
+      <ProjectReference Include="..\queries\Domain.Queries.Accounts.AccountsService\Domain.Queries.Accounts.AccountsService.csproj" />
+      <ProjectReference Include="..\queries\Domain.Queries.StaticData\Domain.Queries.StaticData.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,186 @@
+﻿@* @using UI.Interfaces.Strategies *@
+@* @using UI.Interfaces.StaticData *@
+@* *@
+@* @inject NotificationService notificationService *@
+@* @inject IUIStreamsRepository Repository *@
+@* *@
+@* <RadzenStack Gap="1rem"> *@
+@*     <RadzenTemplateForm *@
+@*                         TItem="Common.Interfaces.Api.StaticData.StreamView" *@
+@*                         Data="@Stream" *@
+@*                         Submit="@OnSubmit" *@
+@*                         InvalidSubmit=@OnInvalidSubmit *@
+@*                         @ref="form"> *@
+@*         <RadzenStack Orientation="Orientation.Vertical"> *@
+@*             <RadzenFormField Text="Stream Id" Variant="Variant.Text"> *@
+@*                 <RadzenNumeric Value="@Stream.StreamId" Disabled="true" /> *@
+@*                 <RadzenRequiredValidator Component="Ticker" Text="Ticker is required" Style="position: absolute" /> *@
+@*             </RadzenFormField> *@
+@*             <RadzenFormField Text="Ticker" Variant="Variant.Text"> *@
+@*                 <RadzenTextBox Name="Ticker" @bind-Value="@Stream.Ticker" Disabled="verified || isLoading || (Disabled.HasValue && Disabled.Value)" /> *@
+@*                 <RadzenRequiredValidator Component="Ticker" Text="Ticker is required" Style="position: absolute" /> *@
+@*             </RadzenFormField> *@
+@*             <CurrenciesSelector ValueChanged="@(args => Stream.CurrencyId = args)" Disabled="verified || isLoading || (Disabled.HasValue && Disabled.Value)" /> *@
+@*             <ExchangesSelector ValueChanged="@(args => Stream.ExchangeId = args)" *@
+@*                                Disabled="verified || isLoading || (Disabled.HasValue && Disabled.Value)" /> *@
+@*             @if (Stream.ExchangeId.HasValue) *@
+@*             { *@
+@*                 <TradingSessionsSelector ExchangeId="@Stream.ExchangeId.Value" *@
+@*                                          Value="@Stream.TradingSessionIds" *@
+@*                                          ValueChanged="@(args => Stream.TradingSessionIds = args?.ToArray() ?? new long[0])" /> *@
+@*             } *@
+@*             <DatafeedsSelector ValueChanged="@(args => Stream.DatafeedId = args ?? 0)" Disabled="verified || isLoading || (Disabled.HasValue && Disabled.Value)" /> *@
+@*             <RadzenFormField Text="Description" Variant="Variant.Text"> *@
+@*                 <RadzenTextBox Name="Description" @bind-Value="@Stream.Description" Disabled="verified || isLoading || (Disabled.HasValue && Disabled.Value)" /> *@
+@*             </RadzenFormField> *@
+@*             <RadzenFormField Text="Volume BAU" Variant="Variant.Text"> *@
+@*                 <RadzenNumeric Name="VolumeBAU" @bind-Value="@Stream.VolumeBAU" Disabled="verified || isLoading || (Disabled.HasValue && Disabled.Value)" /> *@
+@*                 <RadzenRequiredValidator Component="VolumeBAU" Text="Volume BAU is required (set to 0 to avoid volume aggregation)" Style="position: absolute" /> *@
+@*             </RadzenFormField> *@
+@*             <ContractsSelector Value="@Stream.ContractId" *@
+@*                                ValueChanged="@((args) => Stream.ContractId = args)" *@
+@*                                Disabled="verified || isLoading || (Disabled.HasValue && Disabled.Value)" /> *@
+@*             <div> *@
+@*                 <RadzenCheckBox @bind-Value="@Stream.Enabled" Name="Enabled" Disabled="verified || isLoading || (Disabled.HasValue && Disabled.Value)" /> *@
+@*                 <RadzenLabel Text="Enable" Component="Enabled" Style="margin-left: 8px; vertical-align: middle;" /> *@
+@*             </div> *@
+@*             @if (!verified) *@
+@*             { *@
+@*                 <RadzenButton ButtonStyle="ButtonStyle.Primary" *@
+@*                               Click="@CheckExistingStreams" *@
+@*                               Disabled="isLoading || (Disabled.HasValue && Disabled.Value)" *@
+@*                               Variant="Variant.Flat" *@
+@*                               Text="Verify" /> *@
+@*             } *@
+@*             else *@
+@*             { *@
+@*                 <RadzenButton ButtonStyle="ButtonStyle.Warning" *@
+@*                               Click="@Reset" *@
+@*                               Disabled="isLoading || (Disabled.HasValue && Disabled.Value)" *@
+@*                               Variant="Variant.Flat" *@
+@*                               Text="Reset" /> *@
+@*             } *@
+@*             $1$ TODO: ContractId, DollarValueBAU #1# *@
+@*             @if (ShowButton) *@
+@*             { *@
+@*                 <RadzenColumn Size="3"> *@
+@*                     <RadzenButton ButtonType="ButtonType.Submit" Text="Create" Disabled="!verified || isLoading || (Disabled.HasValue && Disabled.Value) || Stream.StreamId != 0" /> *@
+@*                 </RadzenColumn> *@
+@*             } *@
+@*         </RadzenStack> *@
+@*     </RadzenTemplateForm> *@
+@* </RadzenStack> *@
+@* *@
+@* @code { *@
+@*     [Parameter] *@
+@*     public string? Ticker { get; set; } *@
+@*     [Parameter] *@
+@*     public string? ExchangeName { get; set; } *@
+@*     [Parameter] *@
+@*     public long? DatafeedId { get; set; } *@
+@*     [Parameter] *@
+@*     public string? CurrencyName { get; set; } *@
+@*     [Parameter] *@
+@*     public bool ShowButton { get; set; } = false; *@
+@*     [Parameter] *@
+@*     public bool? Disabled { get; set; } = false; *@
+@*     [Parameter] *@
+@*     public Func<Task>? OnCompleted { get; set; } *@
+@*     [Parameter] *@
+@*     public EventCallback<bool> VerifiedChanged { get; set; } *@
+@* *@
+@*     RadzenTemplateForm<StreamView> form; *@
+@*     bool isLoading = false; *@
+@*     bool verified = false; *@
+@* *@
+@* *@
+@*     public StreamView Stream { get; set; } = new (); *@
+@* *@
+@*     protected override async Task OnInitializedAsync() *@
+@*     { *@
+@*         Stream.Ticker = Ticker; *@
+@*     } *@
+@* *@
+@*     protected async Task CheckExistingStreams() *@
+@*     { *@
+@*         try *@
+@*         { *@
+@*             isLoading = true; *@
+@*             var streams = await Repository.GetStreams(true); *@
+@* *@
+@*             var stream = streams.Values *@
+@*                 .Where(s => *@
+@*                     s.Ticker == Stream.Ticker *@
+@*                     && s.ExchangeId == Stream.ExchangeId *@
+@*                     && s.DatafeedId == Stream.DatafeedId *@
+@*                     && s.CurrencyId == Stream.CurrencyId) *@
+@*                 .FirstOrDefault(); *@
+@* *@
+@*             if (stream != null) *@
+@*             { *@
+@*                 Stream.StreamId = stream.StreamId; *@
+@*                 Stream.Description = stream.Description; *@
+@*                 Stream.Enabled = stream.Enabled; *@
+@*                 Stream.VolumeBAU = stream.VolumeBAU; *@
+@*                 notificationService.Notify(NotificationSeverity.Info, "Existing stream found"); *@
+@*             } *@
+@* *@
+@*             verified = true; *@
+@*             await VerifiedChanged.InvokeAsync(true); *@
+@*         } *@
+@*         catch { } *@
+@*         finally *@
+@*         { *@
+@*             isLoading = false; *@
+@*         } *@
+@*     } *@
+@* *@
+@*     protected async Task Reset() *@
+@*     { *@
+@*         Stream.StreamId = 0; *@
+@*         Stream.Enabled = false; *@
+@*         Stream.VolumeBAU = 0; *@
+@*         Stream.Description = null; *@
+@*         verified = false; *@
+@*         await VerifiedChanged.InvokeAsync(false); *@
+@*     } *@
+@* *@
+@* *@
+@*     public async Task CreateStream() *@
+@*     { *@
+@*         try *@
+@*         { *@
+@*             isLoading = true; *@
+@* *@
+@*             if (!verified) *@
+@*             { *@
+@*                 throw new Exception("Click verify first"); *@
+@*             } *@
+@* *@
+@*             if (Stream.StreamId != 0) *@
+@*             { *@
+@*                 isLoading = false; *@
+@*                 return; *@
+@*             } *@
+@* *@
+@*             await Repository.CreateStream(Stream); *@
+@* *@
+@*             if (OnCompleted != null) *@
+@*             { *@
+@*                 await OnCompleted.Invoke(); *@
+@*             } *@
+@*         } *@
+@*         catch (Exception ex) *@
+@*         { *@
+@*             notificationService.Notify(NotificationSeverity.Error, ex.Message); *@
+@*         } *@
+@*         finally *@
+@*         { *@
+@*             isLoading = false; *@
+@*         } *@
+@*     } *@
+@* *@
+@*     async Task OnSubmit(Common.Interfaces.Api.StaticData.StreamView view) => await CreateStream(); *@
+@*     void OnInvalidSubmit(FormInvalidSubmitEventArgs args) { } *@
+@* } *@
+@* *@

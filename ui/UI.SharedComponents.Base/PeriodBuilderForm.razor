@@ -1,0 +1,54 @@
+@using NodaTime
+@using NodaTime.Text
+<RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenFormField Variant="Variant.Text" Text="Minutes">
+            <RadzenNumeric TValue="long" Value="@_builder.Minutes" ValueChanged="@MinutesChanged" />
+        </RadzenFormField>
+        <RadzenFormField Variant="Variant.Text" Text="Hours">
+            <RadzenNumeric TValue="long" Value="@_builder.Hours" ValueChanged="@HoursChanges" />
+        </RadzenFormField>
+        <RadzenFormField Variant="Variant.Text" Text="Days">
+            <RadzenNumeric TValue="int" Value="@_builder.Days" ValueChanged="@DaysChanged" />
+        </RadzenFormField>
+        <RadzenText TextStyle="TextStyle.Caption">@PeriodPattern.Roundtrip.Format(Value)</RadzenText>
+        <RadzenButton ButtonStyle="ButtonStyle.Primary" Click="@Complete" Text="Done" />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    NodaTime.PeriodBuilder _builder;
+
+    [Parameter]
+    public Period Value
+    {
+        get => _builder.Build();
+        set
+        {
+            _builder = new NodaTime.PeriodBuilder(value);
+        }
+    }
+    
+    [Parameter] public Action<Period> ValueChanged { get; set; }
+
+    [Parameter]
+    public Action? Complete { get; set; }
+
+    async Task MinutesChanged(long minutes)
+    {
+        _builder.Minutes = minutes;
+        ValueChanged(Value);
+    }
+    
+    void HoursChanges(long hours)
+    {
+        _builder.Hours = hours;
+        ValueChanged(Value);
+    }
+    
+    void DaysChanged(int days)
+    {
+        _builder.Days = days;
+        ValueChanged(Value);
+    }
+}

@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>QuantInfra.Tests.Mocks</RootNamespace>
+        <LangVersion>default</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="NodaTime" Version="3.2.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\common\Common.EventSourcing\Common.EventSourcing.csproj" />
+      <ProjectReference Include="..\..\common\Common.Infrastructure.Abstractions\Common.Infrastructure.Abstractions.csproj" />
+      <ProjectReference Include="..\..\common\Common.MarketData.Abstractions\Common.MarketData.Abstractions.csproj" />
+      <ProjectReference Include="..\..\common\Common.Strategies.Abstractions\Common.Strategies.Abstractions.csproj" />
+      <ProjectReference Include="..\..\domain\Domain.Accounts.Base\Domain.Accounts.Base.csproj" />
+    </ItemGroup>
+
+</Project>

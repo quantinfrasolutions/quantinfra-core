@@ -1,0 +1,134 @@
+﻿@* @using Common.StaticData *@
+@* *@
+@* <RadzenStack Gap="1rem"> *@
+@*     <RadzenTemplateForm TItem="ContractTemplateModel" *@
+@*                         Data="@Model" *@
+@*                         Submit="@OnSubmit" *@
+@*                         InvalidSubmit=@OnInvalidSubmit *@
+@*                                                 @ref="form"> *@
+@*         <RadzenStack Orientation="Orientation.Vertical"> *@
+@*             <RadzenFormField Text="Name" Variant="Variant.Text"> *@
+@*                 <RadzenTextBox Name="Name" @bind-Value="@Model.Name" Disabled="isLoading || Disabled" /> *@
+@*                 <RadzenRequiredValidator Component="Name" Text="Name is required" Style="position: absolute" /> *@
+@*             </RadzenFormField> *@
+@*             <RadzenFormField Text="Security type" Variant="Variant.Text"> *@
+@*                 <RadzenDropDown Name="SecType" *@
+@*                                 AllowClear="true" *@
+@*                                 @bind-Value="@Model.SecurityType" *@
+@*                                 Data="@(Enum.GetValues(typeof(SecurityType)).Cast<Enum>())" *@
+@*                                 Disabled="@Disabled" /> *@
+@*             </RadzenFormField> *@
+@*             @if (Disabled) *@
+@*             { *@
+@*                 <RadzenFormField Text="Asset" Variant="Variant.Text"> *@
+@*                     <RadzenTextBox Value="@($"{Model?.AssetId}: {Model?.AssetName}")" Disabled="true" /> *@
+@*                 </RadzenFormField> *@
+@*             } *@
+@*             else *@
+@*             { *@
+@*                 <AssetsSelector ValueChanged="@AssetChanged" *@
+@*                                 Disabled="isLoading || Disabled"/> *@
+@*             } *@
+@*             @if (Disabled) *@
+@*             { *@
+@*                 <RadzenFormField Text="Settlement currency" Variant="Variant.Text"> *@
+@*                     <RadzenTextBox Value="@($"{Model?.SettlementCurrencyId}: {Model?.SettlementCurrencyName}")" Disabled="true" /> *@
+@*                 </RadzenFormField> *@
+@*             } *@
+@*             else *@
+@*             { *@
+@*                 <CurrenciesSelector ValueChanged="@SettlementCurrencyChanged" *@
+@*                                     Disabled="isLoading || Disabled" *@
+@*                                     Text="Settlement currency"/> *@
+@*             } *@
+@*              *@
+@*              *@
+@*             <RadzenFormField Text="Min size" Variant="Variant.Text"> *@
+@*                 <RadzenNumeric Name="MinSize" @bind-Value="@Model.MinSize" Disabled="isLoading || Disabled" /> *@
+@*                 <RadzenRequiredValidator Component="MinSize" Text="MinSize is required" Style="position: absolute" /> *@
+@*             </RadzenFormField> *@
+@*             <RadzenFormField Text="Size increment" Variant="Variant.Text"> *@
+@*                 <RadzenNumeric Name="SizeIncrement" @bind-Value="@Model.SizeIncrement" Disabled="isLoading || Disabled" /> *@
+@*                 <RadzenRequiredValidator Component="SizeIncrement" Text="SizeIncrement is required" Style="position: absolute" /> *@
+@*             </RadzenFormField> *@
+@*             <RadzenFormField Text="Tick size" Variant="Variant.Text"> *@
+@*                 <RadzenNumeric Name="TickSize" @bind-Value="@Model.TickSize" Disabled="isLoading || Disabled" /> *@
+@*                 <RadzenRequiredValidator Component="TickSize" Text="TickSize is required" Style="position: absolute" /> *@
+@*             </RadzenFormField> *@
+@*             <RadzenFormField Text="Tick value" Variant="Variant.Text"> *@
+@*                 <RadzenNumeric Name="TickValue" @bind-Value="@Model.TickValue" Disabled="isLoading || Disabled" /> *@
+@*                 <RadzenRequiredValidator Component="TickValue" Text="Tick value is required" Style="position: absolute" /> *@
+@*             </RadzenFormField> *@
+@*             <RadzenFormField Text="Price quotation" Variant="Variant.Text"> *@
+@*                 <RadzenNumeric Name="PriceQuotation" @bind-Value="@Model.PriceQuotation" Disabled="isLoading || Disabled" /> *@
+@*                 <RadzenRequiredValidator Component="PriceQuotation" Text="Price quotation is required" Style="position: absolute" /> *@
+@*             </RadzenFormField> *@
+@*             <RadzenFormField Text="Days in year" Variant="Variant.Text"> *@
+@*                 <RadzenNumeric Name="DaysInYear" @bind-Value="@Model.DaysInYear" Disabled="isLoading || Disabled" /> *@
+@*                 <RadzenRequiredValidator Component="DaysInYear" Text="Days in year is required" Style="position: absolute" /> *@
+@*             </RadzenFormField> *@
+@*             @if (Disabled) *@
+@*             { *@
+@*                 <RadzenFormField Text="Broker" Variant="Variant.Text"> *@
+@*                     <RadzenTextBox Value="@($"{Model?.BrokerId}: {Model?.BrokerName}")" Disabled="true" /> *@
+@*                 </RadzenFormField> *@
+@*             } *@
+@*             else *@
+@*             { *@
+@*                 <BrokersSelector Value="@Model?.BrokerId" *@
+@*                                  ValueChanged="@(args => Model.BrokerId = args ?? 0)"/> *@
+@*             } *@
+@*             @if (Disabled) *@
+@*             { *@
+@*                 <RadzenFormField Text="Exchange" Variant="Variant.Text"> *@
+@*                     <RadzenTextBox Value="@($"{Model?.ExchangeId}: {Model?.ExchangeName}")" Disabled="true" /> *@
+@*                 </RadzenFormField> *@
+@*             } *@
+@*             else *@
+@*             { *@
+@*                 <ExchangesSelector Value="@Model?.ExchangeId" *@
+@*                                    ValueChanged="@(args => Model.ExchangeId = args ?? 0)"/> *@
+@*             } *@
+@*             @if (!HideTradingSessions && Model?.ExchangeId != 0) *@
+@*             { *@
+@*                 <TradingSessionsSelector ExchangeId="@Model.ExchangeId" *@
+@*                                          Value="@Model?.TradingSessionIds" *@
+@*                                          ValueChanged="@(args => Model.TradingSessionIds = args?.ToArray() ?? new long[0])" />                     *@
+@*             } *@
+@*             @if (!HideCommissionsSelector) *@
+@*             { *@
+@*                 <CommissionSelector ValueChanged="@CommissionChanged" ExchangeId="@Model.ExchangeId" BrokerId="@Model.BrokerId" /> *@
+@*             } *@
+@*             @if (ShowButton) *@
+@*             { *@
+@*                 <RadzenColumn Size="3"> *@
+@*                     <RadzenButton ButtonType="ButtonType.Submit" Text="Create" Disabled="isLoading || Disabled" /> *@
+@*                 </RadzenColumn> *@
+@*             } *@
+@*         </RadzenStack> *@
+@*     </RadzenTemplateForm> *@
+@* </RadzenStack> *@
+@* *@
+@* @code { *@
+@* *@
+@*     [Parameter] public ContractTemplateModel Model { get; set; } = new(); *@
+@*     [Parameter] public bool Disabled { get; set; } = false; *@
+@*     [Parameter] public string? CurrencyName { get; set; } = null; *@
+@*     [Parameter] public bool ShowButton { get; set; } *@
+@*     [Parameter] public Func<Task> Submit { get; set; } *@
+@*     [Parameter] public bool HideCommissionsSelector { get; set; } *@
+@*     [Parameter] public bool HideTradingSessions { get; set; } *@
+@* *@
+@*     bool isLoading = false; *@
+@*     RadzenTemplateForm<ContractTemplateModel> form; *@
+@* *@
+@*     async Task OnSubmit() => await Submit(); *@
+@* *@
+@*     void OnInvalidSubmit() *@
+@*     { } *@
+@* *@
+@*     void SettlementCurrencyChanged(long? id) => Model.SettlementCurrencyId = id ?? 0; *@
+@*     void AssetChanged(long id) => Model.AssetId = id; *@
+@*     void CommissionChanged(IEnumerable<long> ids) => Model.CommissionIds = ids.ToArray(); *@
+@* *@
+@* } *@

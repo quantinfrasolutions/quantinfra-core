@@ -1,0 +1,130 @@
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@using NodaTime
+@using NodaTime.Serialization.SystemTextJson
+@using QuantInfra.Common.Interfaces.Api.Strategies
+@using UI.Interfaces.Strategies
+
+@inject IUiStrategiesRepository Repository
+
+<RadzenAccordion Multiple="false">
+    <Items>
+        <RadzenAccordionItem Text="Insert config" @bind-Selected=@_jsonSelected>
+            <RadzenStack>
+                <RadzenRow>
+                    <RadzenFormField Variant="Variant.Text" Text="JSON" Style="width: 100%;">
+                        <RadzenTextArea Rows="30" Style="width: 100%;" @bind-Value=@_content @bind-Value:after="ParseStrategyConfigJson"/>
+                    </RadzenFormField>
+                </RadzenRow>
+                @if (_parseError != null)
+                {
+                    <RadzenRow>
+                        <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
+                            @_parseError
+                        </RadzenAlert>
+                    </RadzenRow>
+                }
+                else if (_request != null)
+                {
+                    <RadzenRow>
+                        <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter">
+                            OK
+                        </RadzenAlert>
+                    </RadzenRow>
+                }
+            </RadzenStack>
+        </RadzenAccordionItem>
+        <RadzenAccordionItem Text="Validate" Disabled=@(_request == null) @bind-Selected=@_validateSelected>
+            <RadzenStack Gap="1rem">
+                
+                <RadzenRow>
+                    <ValidateStrategyRequest Request=@_request OnValidated=@(success => _canCreateStrategy = success) @ref=@_validate />
+                </RadzenRow>
+                
+                @if (_createError != null)
+                {
+                    <RadzenRow>
+                        <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
+                            @_createError
+                        </RadzenAlert>
+                    </RadzenRow>
+                }
+                <RadzenRow AlignItems="AlignItems.End" JustifyContent="JustifyContent.End">
+                    <RadzenButton Variant="Variant.Flat" ButtonType="ButtonType.Submit"
+                                  ButtonStyle="ButtonStyle.Primary" Text="Create" IsBusy=@_isLoading
+                                  Disabled=@(!_canCreateStrategy) Click=@CreateStrategy />
+                </RadzenRow>
+                
+            </RadzenStack>
+        </RadzenAccordionItem>
+    </Items>
+</RadzenAccordion>
+
+
+@code {
+    CreateStrategyRequest? _request;
+    string? _parseError = null;
+    string _content;
+    private bool _jsonSelected = true, _validateSelected;
+    private bool _canCreateStrategy = true;
+    private bool _isLoading = false;
+    private string? _createError = null;
+    private ValidateStrategyRequest _validate;
+
+    [Parameter] public EventCallback OnCompleted { get; set; }
+
+    private static Lazy<JsonSerializerOptions> _jsonSerializerOptions = new Lazy<JsonSerializerOptions>(() =>
+    {
+        var options = new JsonSerializerOptions()
+        {
+            AllowTrailingCommas = true,
+            NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals | JsonNumberHandling.AllowReadingFromString,
+        };
+        options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+        options.Converters.Add(new JsonStringEnumConverter());
+        return options;
+    });
+
+    private async Task ParseStrategyConfigJson()
+    {
+        if (string.IsNullOrEmpty(_content)) return;
+        _request = null;
+        _parseError = null;
+        _canCreateStrategy = false;
+        _createError = null;
+        try
+        {
+            _request = JsonSerializer.Deserialize<CreateStrategyRequest>(_content, _jsonSerializerOptions.Value);
+            _jsonSelected = false;
+            _validateSelected = true;
+        }
+        catch (Exception e)
+        {
+            _parseError = e.Message;
+            return;
+        }
+
+        _canCreateStrategy = await _validate.Validate(_request!);
+    }
+
+    private async Task CreateStrategy()
+    {
+        if (!_canCreateStrategy || _request == null) return;
+        _isLoading = true;
+        _createError = null;
+
+        try
+        {
+            await Repository.CreateStrategy(_request);
+            await OnCompleted.InvokeAsync();
+        }
+        catch (Exception e)
+        {
+            _createError = e.Message;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}

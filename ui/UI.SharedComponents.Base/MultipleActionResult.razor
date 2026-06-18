@@ -1,0 +1,83 @@
+﻿@using UI.SharedComponents.Components
+@typeparam TItem
+
+<RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Primary"
+                               Value="@(Tasks.Count(t => t.Status == Status.Done))"
+                               Max="@Tasks.Count"
+                               ShowValue="false" />
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenDataGrid Data="@Tasks"
+                        TItem="ExecutableTask"
+                        Density="Density.Compact"
+                        ExpandMode="DataGridExpandMode.Multiple"
+                        RowRender="@RowRender"
+                        class="headerless">
+            <Columns>
+                <RadzenDataGridColumn TItem="ExecutableTask"
+                                      Property="Description" />
+                <RadzenDataGridColumn TItem="ExecutableTask">
+                    <Template Context="task">
+                        @if (task.Status != Status.Done)
+                        {
+                            @task.Status
+                        }
+                        else if (task.IsSuccess)
+                        {
+                            <span>OK</span>
+                        }
+                        else
+                        {
+                            <span>@task.Message</span>
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+            <Template Context="task">
+                <RadzenRow Gap="1rem">
+                    <RadzenColumn Size="12">
+                        <RadzenText TextStyle="TextStyle.Body2" Style="white-space: break-spaces;">
+                            @task.Message
+                        </RadzenText>
+                    </RadzenColumn>
+                </RadzenRow>
+            </Template>
+        </RadzenDataGrid>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenButton ButtonStyle="ButtonStyle.Primary"
+                      Variant="Variant.Flat"
+                      Text="Acknowledge"
+                      Disabled="@Value"
+                      Click="@OnCompleted" />
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    [Parameter] public List<ExecutableTask> Tasks { get; set; }
+    [Parameter] public Func<Task>? OnCompleted { get; set; }
+    [Parameter] public bool Value { get; set; }
+    [Parameter] public Action<bool>? ValueChanged { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        Value = true;
+        ValueChanged?.Invoke(Value);
+        await Task.WhenAll(
+            Tasks.Select(t => t.Execute())
+        );            
+        Value = false;
+        ValueChanged?.Invoke(Value);
+    }
+
+    void RowRender(RowRenderEventArgs<ExecutableTask> args)
+    {
+        args.Expandable = args.Data.Status == Status.Done && !args.Data.IsSuccess;
+    }
+
+}

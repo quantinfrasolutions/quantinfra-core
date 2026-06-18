@@ -1,0 +1,137 @@
+@using Common.Backtesting
+@using UI.SharedComponents.Backtesting.Abstractions
+@inject IWorkspaceSession WorkspaceSession
+
+@inherits UI.SharedComponents.Base.ViewModelComponent<CreateNewTestViewModel>
+
+@if (ViewModel?.NewTestModel is not null)
+{
+    <RadzenStack Gap="1rem">
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenAccordion Style="width: 100%;">
+                    <Items>
+                        <RadzenAccordionItem Text="Select action">
+                            <RadzenStack>
+                                <RadzenRow>
+                                    <RadzenFormField Variant="Variant.Flat" Text="Action">
+                                        <RadzenDropDown TValue="string" Data="@ViewModel.Actions" @bind-Value=@ViewModel.NewTestModel.Action Disabled=@((ViewModel.Actions?.Count ?? 0) == 0)/>
+                                    </RadzenFormField>
+                                </RadzenRow>
+                            </RadzenStack>
+                        </RadzenAccordionItem>
+                        <RadzenAccordionItem Text="Configure parameters">
+                            <TestExecutorOptionsForm Value=@ViewModel.NewTestModel.TestExecutorOptions/>
+                        </RadzenAccordionItem>
+                        <RadzenAccordionItem Text="Add strategies">
+                            <RadzenStack>
+                                <RadzenRow>
+                                    <RadzenTextArea ValueChanged=@ViewModel.ParseStrategyConfigJson Style="width: 100%; height: 30rem;"/>
+                                </RadzenRow>
+                                @if (ViewModel.StrategyParsingError != null)
+                                {
+                                    <RadzenRow>
+                                        <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
+                                            @ViewModel.StrategyParsingError
+                                        </RadzenAlert>
+                                    </RadzenRow>
+                                }
+                                else if (ViewModel.NewTestModel.Strategies.Count > 0)
+                                {
+                                    <RadzenRow>
+                                        <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter">
+                                            OK
+                                        </RadzenAlert>
+                                    </RadzenRow>
+                                }
+                            </RadzenStack>
+                        </RadzenAccordionItem>
+                        <RadzenAccordionItem Text="Run">
+                            <RadzenStack>
+                                <RadzenRow>
+                                    <RadzenColumn>
+                                        <RadzenStack Orientation="Orientation.Horizontal">
+                                            <RadzenButton Text="Validate market data" ButtonStyle="ButtonStyle.Primary" Click="@ViewModel.ValidateMarketData" Variant="Variant.Text" Disabled=@(ViewModel.IsLoading || ViewModel.IsRunning)/>
+                                            <RadzenButton Text="Run" ButtonStyle="ButtonStyle.Success" Click="@ViewModel.RunTest" Variant="Variant.Text" Disabled=@(!ViewModel.CanRun || ViewModel.IsLoading || ViewModel.IsRunning)/>
+                                            <RadzenButton Text="Save options" ButtonStyle="ButtonStyle.Secondary" Click="@ViewModel.SaveTestOptions" Variant="Variant.Text" Disabled=@ViewModel.IsLoading />
+                                        </RadzenStack>
+                                    </RadzenColumn>
+                                </RadzenRow>
+                                @if (ViewModel.MdReqs is not null)
+                                {
+                                    <RadzenDataGrid TItem="RequiredMarketDataUnit" Data=@ViewModel.MdReqs AllowSorting="true">
+                                        <Columns>
+                                            <RadzenDataGridColumn Title="ContractId" Property=@nameof(RequiredMarketDataUnit.ContractId) Width="150px"/>
+                                            <RadzenDataGridColumn Title="Ticker" Property=@nameof(RequiredMarketDataUnit.Ticker) Width="150px"/>
+                                            <RadzenDataGridColumn Title="StreamId" Property=@nameof(RequiredMarketDataUnit.StreamId) Width="150px"/>
+                                            <RadzenDataGridColumn Title="Stream name" Property=@nameof(RequiredMarketDataUnit.StreamTicker) Width="150px"/>
+                                            <RadzenDataGridColumn Title="OK?" Property=@nameof(RequiredMarketDataUnit.IsOk) Width="100px"/>
+                                            <RadzenDataGridColumn Title="Message" Property=@nameof(RequiredMarketDataUnit.Message) MinWidth="200px"/>
+                                        </Columns>
+                                    </RadzenDataGrid>
+                                }
+                            </RadzenStack>
+                        </RadzenAccordionItem>
+                    </Items>
+                </RadzenAccordion>
+            </RadzenColumn>
+        </RadzenRow>
+        @if (ViewModel.IsRunning)
+        {
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenStack>
+                        <RadzenRow>
+                            <span>Status: </span>
+                            @if (ViewModel.Status is not null)
+                            {
+                                <span>@ViewModel.Status.Status</span>
+                            }
+                        </RadzenRow>
+                        <RadzenRow>
+                            <span>Completed: </span>
+                            @if (ViewModel.Status is not null)
+                            {
+                                <span>@(Math.Round(ViewModel.Status.CurrentProgress * 100))%</span>
+                            }
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenButton Text="Cancel" Variant="Variant.Text" ButtonStyle="ButtonStyle.Danger" Click=@ViewModel.CancelRun></RadzenButton>
+                        </RadzenRow>
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+        }
+        @if (ViewModel.RunError is not null)
+        {
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
+                        @ViewModel.RunError
+                    </RadzenAlert>
+                </RadzenColumn>
+            </RadzenRow>
+        }
+        @if (ViewModel.Results is not null)
+        {
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <TestResultsView Data=@ViewModel.Results Options=@ViewModel.NewTestModel.TestExecutorOptions/>
+                </RadzenColumn>
+            </RadzenRow>
+        }
+    </RadzenStack>
+}
+
+@code {
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        ViewModel.Component = this;
+        ViewModel.Session = WorkspaceSession;
+        await ViewModel.LoadActions();
+        ViewModel.TryLoadLastRunConfig();
+    }
+
+    internal void Update() => StateHasChanged();
+}

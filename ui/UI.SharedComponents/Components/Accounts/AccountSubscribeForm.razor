@@ -1,0 +1,53 @@
+﻿@* @using Microsoft.Extensions.Logging *@
+@* @using UI.Interfaces.Accounts *@
+@* @using Common.Interfaces.Api.Accounts *@
+@* *@
+@* @inject IUIAccountsRepository Repository *@
+@* @inject NotificationService notificationService *@
+@* @inject ILogger logger  *@
+@* *@
+@* <RadzenStack Gap="1rem"> *@
+@*     <RadzenTemplateForm *@
+@*         TItem="CreateAccountSubscriptionRequest" *@
+@*         Data="@Subscription" *@
+@*         Submit="@OnSubmit" *@
+@*         InvalidSubmit=@OnInvalidSubmit> *@
+@*         <RadzenStack Orientation="Orientation.Vertical"> *@
+@*             <UI.SharedComponents.Components.Books.BookSelector @bind-Value="Subscription.BookId" /> *@
+@*             <RadzenFormField Text="Replication factor" Variant="Variant.Text"> *@
+@*                 <RadzenNumeric @bind-Value="Subscription.ReplicationFactor" Name="rf" /> *@
+@*                 <RadzenRequiredValidator Component="rf" Text="RF is required" Style="position: absolute" /> *@
+@*             </RadzenFormField>             *@
+@*             <RadzenColumn Size="3"> *@
+@*                 <RadzenButton ButtonType="ButtonType.Submit" Text="Create" Disabled="@isLoading" /> *@
+@*             </RadzenColumn> *@
+@*         </RadzenStack> *@
+@*     </RadzenTemplateForm> *@
+@* </RadzenStack> *@
+@* *@
+@* @code { *@
+@* *@
+@*     [Parameter] [EditorRequired] public Guid AccountId { get; set; }         *@
+@*     [Parameter] public Func<Task>? OnCompleted { get; set; } *@
+@*          *@
+@*     bool isLoading = false;         *@
+@* *@
+@* *@
+@*     public CreateAccountSubscriptionRequest Subscription { get; set; } = new(); *@
+@* *@
+@*     async Task OnSubmit(CreateAccountSubscriptionRequest model) *@
+@*     { *@
+@*         try *@
+@*         { *@
+@*             isLoading = true; *@
+@*             await Repository.CreateSubscription(AccountId, model); *@
+@*             OnCompleted?.Invoke(); *@
+@*         } *@
+@*         finally *@
+@*         { *@
+@*             isLoading = false; *@
+@*         } *@
+@*     } *@
+@*     void OnInvalidSubmit(FormInvalidSubmitEventArgs args) { } *@
+@* *@
+@* } *@

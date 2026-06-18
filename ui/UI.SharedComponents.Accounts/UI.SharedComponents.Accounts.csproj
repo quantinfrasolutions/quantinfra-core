@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+
+    <ItemGroup>
+        <SupportedPlatform Include="browser"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.12"/>
+        <PackageReference Include="Vizor.ECharts" Version="*" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\UI.Interfaces\UI.Interfaces.csproj" />
+      <ProjectReference Include="..\UI.SharedComponents.Base\UI.SharedComponents.Base.csproj" />
+      <ProjectReference Include="..\UI.SharedComponents\UI.SharedComponents.csproj" />
+    </ItemGroup>
+
+</Project>

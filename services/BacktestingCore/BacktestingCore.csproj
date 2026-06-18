@@ -1,0 +1,111 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Configurations>Debug;Release;Release-FAST;Release-FAST-PROFILE;Debug-FAST;Debug-FAST-PROFILE;Release-PROFILE</Configurations>
+    <AssemblyName>BacktestingCore</AssemblyName>
+    <RootNamespace>BacktestingCore</RootNamespace>
+    <LangVersion>default</LangVersion>
+    <Platforms>AnyCPU</Platforms>
+    <Nullable>enable</Nullable>
+    <TargetFramework>net9.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' " />
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release-FAST|AnyCPU' ">
+    <IntermediateOutputPath>obj\Release\net7.0</IntermediateOutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>portable</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release-FAST\net7.0</OutputPath>
+    <DefineConstants>TRACE;RELEASE;FAST;RELEASE_FAST;NET;NET7_0;NETCOREAPP</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>1701;1702</NoWarn>
+    <NoStdLib>true</NoStdLib>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release-FAST-PROFILE|AnyCPU' ">
+    <IntermediateOutputPath>obj\Release\net7.0</IntermediateOutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE;RELEASE;FAST;PROFILE;RELEASE_FAST_PROFILE;NET;NET7_0;NETCOREAPP</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks></AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug-FAST|AnyCPU' ">
+    <IntermediateOutputPath>obj\Debug\net7.0</IntermediateOutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>portable</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug-FAST\net7.0</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NET;NET7_0;NETCOREAPP;FAST</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>1701;1702</NoWarn>
+    <NoStdLib>true</NoStdLib>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug-FAST-PROFILE|AnyCPU' ">
+    <IntermediateOutputPath>obj\Debug\net7.0</IntermediateOutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>false</Optimize>
+    <DefineConstants>TRACE;DEBUG;NET;NET7_0;NETCOREAPP;FAST;PROFILE</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release-PROFILE' ">
+    <IntermediateOutputPath>obj\Release\net7.0</IntermediateOutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE;RELEASE;PROFILE;NET;NETCOREAPP</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks />
+  </PropertyGroup>
+  <ItemGroup>
+    <None Update="config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="prod-strategies.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+   <ItemGroup>
+    <Content Include="Configs\*.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="staticData.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="appSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="optimize-config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Analysis\" />
+    <Folder Include="Executor\EventHandlers\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="NLog.Extensions.Logging" Version="6.0.1" />
+    <PackageReference Include="System.ComponentModel.Composition" Version="9.0.6" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\Common.Backtesting\Common.Backtesting.csproj" />
+    <ProjectReference Include="..\..\Common\Common.EventSourcing\Common.EventSourcing.csproj" />
+    <ProjectReference Include="..\..\Common\Domain.VirtualExecution\Domain.VirtualExecution.csproj" />
+    <ProjectReference Include="..\..\Domain\Commands\Accounts\Domain.Commands.Accounts.AccountsService\Domain.Commands.Accounts.AccountsService.csproj" />
+    <ProjectReference Include="..\..\Domain\Domain.Accounts.Base\Domain.Accounts.Base.csproj" />
+    <ProjectReference Include="..\..\Domain\Domain.HostedStrategies\Domain.HostedStrategies.csproj" />
+    <ProjectReference Include="..\..\Domain\Domain.MarketData\Domain.MarketData.csproj" />
+    <ProjectReference Include="..\..\Domain\Domain.Queries.Accounts.AccountsService\Domain.Queries.Accounts.AccountsService.csproj" />
+    <ProjectReference Include="..\..\Domain\Domain.StaticData\Domain.StaticData.csproj" />
+    <ProjectReference Include="..\..\Domain\Events\Accounts\Domain.Events.Accounts.AccountsService\Domain.Events.Accounts.AccountsService.csproj" />
+    <ProjectReference Include="..\..\Domain\Events\Accounts\Domain.Events.Accounts.Management\Domain.Events.Accounts.Management.csproj" />
+    <ProjectReference Include="..\..\Domain\Events\Domain.Events.Strategies.Management\Domain.Events.Strategies.Management.csproj" />
+    <ProjectReference Include="..\..\Domain\Queries\Domain.Queries.StaticData\Domain.Queries.StaticData.csproj" />
+    <ProjectReference Include="..\..\Domain\Queries\Strategies\Domain.Queries.Strategies\Domain.Queries.Strategies.csproj" />
+  </ItemGroup>
+</Project>

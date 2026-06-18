@@ -1,0 +1,45 @@
+﻿@using UI.SharedComponents.Components
+@typeparam TItem
+@inject DialogService DialogService
+
+@code {
+
+    dynamic dialog;
+
+    [Parameter] public string Title { get; set; }
+    [Parameter] public IEnumerable<ExecutableTask>? Tasks { get; set; }
+    [Parameter] public Func<Task>? OnCompleted { get; set; }
+        
+    public Task Run() => Run(Title, Tasks);
+
+    public async Task Run(string title, IEnumerable<ExecutableTask>? tasks)
+    {
+        if (tasks?.Count() > 0)
+        {
+            dialog = await DialogService.OpenAsync<MultipleActionResult<TItem>>(
+                title,
+                new Dictionary<string, object>()
+                {
+                    { "Tasks", tasks },
+                    { "OnCompleted", Close }
+                },
+                new DialogOptions
+                {
+                    CloseDialogOnEsc = false,
+                    CloseDialogOnOverlayClick = false,
+                    ShowClose = false
+                }
+            );
+        }
+    }
+
+    async Task Close()
+    {
+        DialogService.Close(dialog);            
+        if (OnCompleted != null)
+        {
+            await OnCompleted.Invoke();
+        }
+    }
+
+}

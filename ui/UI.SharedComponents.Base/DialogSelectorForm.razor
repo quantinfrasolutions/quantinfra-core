@@ -1,0 +1,27 @@
+﻿@typeparam TItem
+@typeparam TSelector where TSelector : ComponentBase, UI.SharedComponents.Components.ISelector<TItem>
+@inject DialogService DialogService
+
+<RadzenStack Orientation="Orientation.Vertical">
+    <RadzenRow Gap="1rem">        
+        <DynamicComponent Type="@typeof(TSelector)"
+                          @ref="selector" />
+    </RadzenRow>
+    <RadzenRow Gap="1rem">
+        <RadzenButton ButtonStyle="ButtonStyle.Primary"
+                      Variant="Variant.Flat"
+                      Text="Confirm"
+                      Click="@Close"
+                      />
+    </RadzenRow>
+</RadzenStack>
+
+@code
+{
+    DynamicComponent selector;    
+
+    void Close()
+    {        
+        DialogService.Close(((TSelector)selector.Instance).Value);
+    }
+}

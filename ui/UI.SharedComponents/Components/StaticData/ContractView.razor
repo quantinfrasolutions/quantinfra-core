@@ -1,0 +1,8 @@
+﻿@using QuantInfra.Common.Interfaces.Api.StaticData
+
+<span>@Contract.ContractId: @Contract.Ticker</span>
+
+@code {
+    [Parameter] public ContractListView Contract { get; set; }
+}
+

@@ -1,0 +1,43 @@
+﻿@using QuantInfra.Common.Interfaces.Api.StaticData
+@using UI.Interfaces.StaticData
+@using QuantInfra.Sdk.StaticData
+@using UI.SharedComponents.Base
+
+@inject IUiBrokersRepository Repository
+
+<EditableView TItem="Broker"
+              TFilter="BrokersFilter"
+              EmptyText="No brokers found"
+              SearchFunc=@Repository.GetBrokers
+              Filter=@Filter
+              AllowSelectRow=@AllowSelect
+              SelectionMode="DataGridSelectionMode.Single"
+              SelectAction=@OnRowSelected
+              Variant=@Variant>
+    <SearchForm />
+    <Columns>
+        <RadzenDataGridColumn TItem="Broker" Property="BrokerId" Width="100px" Title="Id" />
+        <RadzenDataGridColumn TItem="Broker" Property="Name" Width="200px" Title="Name" />
+        @if (!BriefView)
+        {
+            <RadzenDataGridColumn TItem="Broker" Property="BrokerType" Width="100px" Title="Decimals"/>
+        }
+    </Columns>
+</EditableView>
+
+@code {
+    [Parameter] public BrokersFilter? Filter { get; set; }
+    [Parameter] public bool BriefView { get; set; }
+    [Parameter] public bool AllowSelect { get; set; }
+    [Parameter] public Action<Broker>? ValueChanged { get; set; }
+    [Parameter] public Variant Variant { get; set; } = Variant.Filled;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        Filter ??= new();
+    }
+
+    private void OnRowSelected(Broker c) => ValueChanged?.Invoke(c);
+
+}

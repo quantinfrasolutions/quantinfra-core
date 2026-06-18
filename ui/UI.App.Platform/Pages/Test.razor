@@ -1,0 +1,18 @@
+@using QuantInfra.Sdk.Accounts
+@using Radzen.Blazor
+@using UI.SharedComponents.Components.Accounts
+
+@page "/Test"
+<h3>Test</h3>
+
+<RadzenStack Gap="1rem">
+   <AccountsSelector TValue="Guid" Required="true" @bind-Value=@_requiredValue AccountType="AccountType.BrokerAccount" />
+   <span>@_requiredValue</span>
+   <AccountsSelector TValue="Guid?" Required="false" @bind-Value=@_optionalValue />
+   <span>@_optionalValue?.ToString()</span>
+</RadzenStack>
+
+@code {
+   private Guid _requiredValue;
+   private Guid? _optionalValue = Guid.Parse("28365a71-71f5-481e-aee3-7d0a1fe57ff6");
+}

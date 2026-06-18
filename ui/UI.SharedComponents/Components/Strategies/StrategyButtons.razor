@@ -1,0 +1,77 @@
+﻿@using QuantInfra.Common.Interfaces.Api.Strategies
+@using QuantInfra.Sdk.Strategies
+@using UI.Interfaces.Strategies
+
+@inject IUiStrategiesRepository Repository
+@inject NotificationService NotificationService
+
+@if (ShowInfo)
+{
+    <RadzenLink Path="@("/strategies/" + Strategy.StrategyId)">
+        <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Info" Text="Details" />
+    </RadzenLink>
+}
+@if (!Strategy.Status.IsActive())
+{
+    <RadzenButton ButtonStyle="ButtonStyle.Success"
+                  Click="@Start"
+                  Disabled="@(_isLoading || Disabled)"
+                  Variant="Variant.Text"
+                  Text="Start" />
+}
+else
+{
+    <RadzenButton ButtonStyle="ButtonStyle.Danger"
+                  Click="@Stop"
+                  Disabled="@(_isLoading || Disabled)"
+                  Variant="Variant.Text"
+                  Text="Stop" />
+}
+
+@code {
+    [Parameter, EditorRequired] public StrategyViewBrief Strategy { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public Func<Task>? OnCompleted { get; set; }
+    [Parameter] public bool ShowInfo { get; set; } = true;
+
+    bool _isLoading;
+
+    async Task Start()
+    {
+        try
+        {
+            _isLoading = true;
+            await Repository.StartStrategy(Strategy.StrategyId);
+            NotificationService.Notify(NotificationSeverity.Success, $"Strategy {Strategy.StrategyId} started");
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, ex.Message);
+            //console.Log(ex.Message);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    async Task Stop()
+    {
+        try
+        {
+            _isLoading = true;
+            await Repository.StopStrategy(Strategy.StrategyId, false);
+            NotificationService.Notify(NotificationSeverity.Success, $"Strategy {Strategy.StrategyId} stopped");
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, ex.Message);
+            //console.Log(ex.Message);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}
+

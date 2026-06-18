@@ -1,0 +1,65 @@
+@using QuantInfra.Common.Interfaces.Api.Accounts
+@using UI.Interfaces.Accounts
+@using UI.SharedComponents.Base
+
+@inject IUiAccountsRepository Repository
+
+@if (Filter != null)
+{
+    <EditableView TItem="QuantInfra.Sdk.Accounting.SharePriceHistory"
+                  TFilter="SharePriceHistoryFilter"
+                  EmptyText="No share price records found"
+                  SearchFunc=@Repository.GetSharePriceHistory
+                  Filter=@Filter
+                  HideRefreshButton=@HideRefreshButton
+                  RunSearchImmediately=@RunSearchImmediately
+                  Variant=@Variant
+                  AllowSorting=@AllowSorting
+                  DefaultOrderBy=@DefaultOrderBy
+                  DefaultOrderByDescending=@DefaultOrderByDescending
+                  @ref=_view>
+        <SearchForm>
+            @if (ShowFilter)
+            {
+                <SharePriceFilterForm @bind-Filter=@Filter HideAccountSelector=@SingleAccount/>
+            }
+        </SearchForm>
+        <Columns>
+            @if (!SingleAccount)
+            {
+                <RadzenDataGridColumn TItem="QuantInfra.Sdk.Accounting.SharePriceHistory" Title="AccountId" Property=@nameof(QuantInfra.Sdk.Accounting.SharePriceHistory.AccountId) Width="100px"/>
+            }
+            <RadzenDataGridColumn TItem="QuantInfra.Sdk.Accounting.SharePriceHistory" Title="Dt" Property=@nameof(QuantInfra.Sdk.Accounting.SharePriceHistory.Dt) Width="160px"/>
+            <RadzenDataGridColumn TItem="QuantInfra.Sdk.Accounting.SharePriceHistory" Title="Share count" Property=@nameof(QuantInfra.Sdk.Accounting.SharePriceHistory.ShareCount) Width="100px"/>
+            <RadzenDataGridColumn TItem="QuantInfra.Sdk.Accounting.SharePriceHistory" Title="Share price" Property=@nameof(QuantInfra.Sdk.Accounting.SharePriceHistory.SharePrice) Width="100px"/>
+            <RadzenDataGridColumn TItem="QuantInfra.Sdk.Accounting.SharePriceHistory" Title="Daily return" Property=@nameof(QuantInfra.Sdk.Accounting.SharePriceHistory.DailyReturn) Width="100px"/>
+            <RadzenDataGridColumn TItem="QuantInfra.Sdk.Accounting.SharePriceHistory" Title="HWM" Property=@nameof(QuantInfra.Sdk.Accounting.SharePriceHistory.HWM) Width="100px"/>
+            <RadzenDataGridColumn TItem="QuantInfra.Sdk.Accounting.SharePriceHistory" Title="Investment" Property=@nameof(QuantInfra.Sdk.Accounting.SharePriceHistory.Investment) Width="100px"/>
+            <RadzenDataGridColumn TItem="QuantInfra.Sdk.Accounting.SharePriceHistory" Title="Type" Property=@nameof(QuantInfra.Sdk.Accounting.SharePriceHistory.Type) Width="100px"/>
+        </Columns>
+    </EditableView>
+}
+
+@code
+{
+    [Parameter] public SharePriceHistoryFilter? Filter { get; set; }
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public bool SingleAccount { get; set; }
+    [Parameter] public List<string>? Columns { get; set; }
+    [Parameter] public bool ShowFilter { get; set; } = true;
+    [Parameter] public bool HideRefreshButton { get; set; }
+    [Parameter] public Variant Variant { get; set; } = Variant.Filled;
+    [Parameter] public bool AllowSorting { get; set; }
+    [Parameter] public string? DefaultOrderBy { get; set; }
+    [Parameter] public string? DefaultOrderByDescending { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        Filter ??= new();
+    }
+
+    private EditableView<QuantInfra.Sdk.Accounting.SharePriceHistory, SharePriceHistoryFilter> _view;
+    public Task Refresh() => _view.RunSearch();
+}
+

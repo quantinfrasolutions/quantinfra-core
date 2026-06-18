@@ -1,0 +1,30 @@
+﻿@inject DialogService DialogService
+
+<RadzenButton Text="Assign" ButtonStyle="ButtonStyle.Success" Icon="add" Variant="Variant.Text" Click=@Show />
+
+@code {
+    [Parameter, EditorRequired] public int AccountId { get; set; }
+    [Parameter] public EventCallback AssignmentChanged { get; set; }
+    
+    dynamic? _dialog;
+
+    public void Show()
+    {
+        DialogService.Open<AssignBrokerAccountForm>(
+            "Assign broker account", 
+            new Dictionary<string, object>()
+            {
+                { "AccountId", AccountId },
+                { "OnCompleted", new EventCallback(this, Close) }
+            }
+        );
+    }
+    
+
+    private async Task Close()
+    {
+        DialogService.Close(_dialog);
+        await AssignmentChanged.InvokeAsync();
+    }
+}
+

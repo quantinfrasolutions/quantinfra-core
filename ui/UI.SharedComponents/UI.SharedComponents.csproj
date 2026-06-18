@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TargetFramework>net9.0</TargetFramework>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\UI.Interfaces\UI.Interfaces.csproj" />
+    <ProjectReference Include="..\UI.SharedComponents.Base\UI.SharedComponents.Base.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Components\Accounts\Fund\AssignSsaDialog.razor" />
+    <UpToDateCheckInput Remove="Components\Accounts\Fund\AssignSsaForm.razor" />
+    <UpToDateCheckInput Remove="Components\Accounts\Fund\FundAccountTradesFilterForm.razor" />
+    <UpToDateCheckInput Remove="Components\Accounts\Fund\FundAccountTradesHistory.razor" />
+    <UpToDateCheckInput Remove="Components\Accounts\Fund\StrategySubaccountsView.razor" />
+    <UpToDateCheckInput Remove="Components\Books\BookCompositionView.razor" />
+    <UpToDateCheckInput Remove="Components\Books\BookDistributionView.razor" />
+    <UpToDateCheckInput Remove="Components\Books\BookForm.razor" />
+    <UpToDateCheckInput Remove="Components\Books\BookSelectorDialog.razor" />
+    <UpToDateCheckInput Remove="Components\Books\BooksSelector.razor" />
+    <UpToDateCheckInput Remove="Components\Books\BooksView.razor" />
+    <UpToDateCheckInput Remove="Components\Books\CompositionBuilder.razor" />
+    <UpToDateCheckInput Remove="Components\Books\CorrelationMatrix.razor" />
+    <UpToDateCheckInput Remove="Components\Books\CreateBookDialog.razor" />
+    <UpToDateCheckInput Remove="Components\Books\CreateBookForm.razor" />
+  </ItemGroup>
+  
+
+</Project>

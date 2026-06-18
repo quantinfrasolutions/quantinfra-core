@@ -1,0 +1,268 @@
+﻿@using Microsoft.Extensions.Logging
+@using QuantInfra.Common.Interfaces.Api
+
+@typeparam TItem
+@typeparam TFilter
+
+@inject NotificationService NotificationService
+@inject ILogger<EditableView<TItem, TFilter>> Logger
+@inject DialogService DialogService
+
+
+<RadzenStack Gap="@(Variant == Variant.Flat ? "0" : "1rem")" Orientation="Orientation.Vertical">
+    @if (HeaderTemplate != null || (SearchForm != null && !HideFilter) 
+        || (CreateButton != null && !HideAddUpdateDeleteButtons) || CustomButtons != null || !HideRefreshButton
+    )
+    {
+        <RadzenCard Variant=@Variant class="editable-view-card">
+            @if (HeaderTemplate != null)
+            {
+                <RadzenRow Gap="1rem">
+                    @HeaderTemplate
+                </RadzenRow>
+            }
+            @if ((@SearchForm != null && !HideFilter) || (@CreateButton != null && !HideAddUpdateDeleteButtons) || CustomButtons != null
+                 || !HideRefreshButton)
+            {
+                <RadzenTemplateForm TItem="TFilter" Submit=@(() => RunSearch()) InvalidSubmit=@OnInvalidSubmit Data=@Filter class="search-form">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+                        @if (!HideRefreshButton)
+                        {
+                            @if (!HideFilter)
+                            {
+                                @SearchForm
+                            }
+
+                            <RadzenButton Text="@SearchButtonText" Variant="Variant.Text" ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Disabled="@IsLoading"/>
+                        }
+                        @if (CreateButton != null && !HideAddUpdateDeleteButtons)
+                        {
+                            @CreateButton
+                        }
+                        else if (CreateAction != null && !HideAddUpdateDeleteButtons)
+                        {
+                            <RadzenButton ButtonStyle="ButtonStyle.Success" Text="Create" Variant="Variant.Text" Click=@Create />
+                        }
+                        @if (CustomButtons != null)
+                        {
+                            @CustomButtons
+                        }
+                    </RadzenStack>
+                </RadzenTemplateForm>
+            }
+        </RadzenCard>
+    }
+
+    @if (_showDataGrid)
+    {
+        <RadzenCard Variant=@Variant class="editable-view-card">
+            <RadzenStack>
+                <RadzenDataGrid @ref="Grid"
+                                IsLoading="@IsLoading"
+                                Data="@Values"
+                                TItem="TItem"
+                                EmptyText=@EmptyText
+                                EditMode="DataGridEditMode.Single"
+                                Density="Density.Compact"
+                                ExpandMode="@ExpandMode"
+                                SelectionMode="@SelectionMode"
+                                AllowRowSelectOnRowClick="@AllowSelectRow"
+                                Value="@Value"
+                                ValueChanged="@(args => { Value = args; ValueChanged?.Invoke(args); })"
+                                CellRender="@CellRender"
+                                RowSelect=@SelectAction
+                                RowRender=@RowRender
+                                LoadChildData=@LoadChildData
+                                AllowSorting=@AllowSorting
+                                GotoFirstPageOnSort="true"
+                                AllowVirtualization=@AllowVirtualization>
+                    <Columns>
+                        @if (AllowSelection)
+                        {
+                            <RadzenDataGridColumn TItem="TItem" Width="60px" Sortable="false" Filterable="false">
+                                <HeaderTemplate>
+                                    <RadzenCheckBox TriState="false"
+                                                    TValue="bool?"
+                                                    Value="@((Value == null || Value?.Any() != true) ? false : SelectedItems?.All(i => Value.Contains(i)) != true ? null : SelectedItems?.Any(i => Value.Contains(i)) == true)"
+                                                    Change="@ToggleAll"/>
+                                </HeaderTemplate>
+                                <Template Context="item">
+                                    <RadzenCheckBox TriState="false"
+                                                    Value="@(SelectedItems != null && Value?.Contains(item) == true)"
+                                                    TValue="bool"
+                                                    Change="@(args => Grid.SelectRow(item))"/>
+                                </Template>
+                            </RadzenDataGridColumn>
+                        }
+                        @Columns
+                        <RadzenDataGridColumn TItem="TItem" MinWidth="0"/>
+                        @if ((LookIntoHref != null || CustomItemButtons != null) && !HideActionsColumn)
+                        {
+                            <RadzenDataGridColumn TItem="TItem" Sortable="false" Filterable="false" Width=@ButtonsColumnWidth Frozen="true" FrozenPosition="FrozenColumnPosition.Right">
+                                <Template Context="item">
+                                    @if (LookIntoHref != null && LookIntoHref(item) != null)
+                                    {
+                                        <RadzenLink Path="@LookIntoHref(item)">
+                                            <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Info" Icon="search" />
+                                        </RadzenLink>
+                                    }
+                                    @if (CustomItemButtons != null)
+                                    {
+                                        @CustomItemButtons(item)
+                                    }
+                                </Template>
+                            </RadzenDataGridColumn>
+                        }
+                    </Columns>
+                </RadzenDataGrid>
+                @if (_allowLoadMore)
+                {
+                    <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                        <RadzenButton Variant="Variant.Text" Text="Load more" ButtonStyle="ButtonStyle.Primary" Click="@(() => RunSearch(true))" Disabled="@IsLoading"/>
+                    </RadzenRow>
+                }
+            </RadzenStack>
+        </RadzenCard>
+    }
+</RadzenStack>
+
+@code {
+    [Parameter] public RenderFragment? HeaderTemplate { get; set; }
+    [Parameter] public RenderFragment? SearchForm { get; set; }
+    [Parameter] public RenderFragment? CreateButton { get; set; }
+    [Parameter] public bool HideFilter { get; set; }
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public EventCallback<bool> IsLoadingChanged { get; set; }
+    [Parameter] [EditorRequired] public TFilter Filter { get; set; }
+    [Parameter] [EditorRequired] public Func<TFilter, Task<IEnumerable<TItem>>> SearchFunc { get; set; } = default!;
+    [Parameter] public string SearchButtonText { get; set; } = "Search";
+    [Parameter] public string EmptyText { get; set; } = "No data found";
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public bool AllowSelectRow { get; set; }
+    [Parameter] public Variant Variant { get; set; } = Variant.Filled;
+    [Parameter] public Func<TItem, Task>? CreateAction { get; set; }
+    [Parameter] public RenderFragment<DialogService>? CreateDialogForm { get; set; }
+    [Parameter] public RenderFragment<DialogService>? CreateDialogHeader { get; set; }
+    [Parameter] public EventCallback<TItem> SelectAction { get; set; }
+    [Parameter] public Func<TItem, string>? LookIntoHref { get; set; }
+    [Parameter] public RenderFragment Columns { get; set; }
+    [Parameter] public DataGridExpandMode ExpandMode { get; set; }
+    [Parameter] public RenderFragment<TItem>? Template { get; set; }
+    [Parameter] public RenderFragment? CustomButtons { get; set; }
+    [Parameter] public RenderFragment<TItem>? CustomItemButtons { get; set; }
+    [Parameter] public bool HideAddUpdateDeleteButtons { get; set; }
+    [Parameter] public bool HideActionsColumn { get; set; }
+    [Parameter] public bool AllowSelection { get; set; }
+    [Parameter] public DataGridSelectionMode SelectionMode { get; set; }
+    [Parameter] public IList<TItem>? Value { get; set; }
+    [Parameter] public Action<IList<TItem>>? ValueChanged { get; set; }
+    [Parameter] public Action<DataGridCellRenderEventArgs<TItem>>? CellRender { get; set; }
+    private List<TItem> Values { get; set; } = new();
+    [Parameter] public EventCallback OnValuesLoaded { get; set; }
+    [Parameter] public string ButtonsColumnWidth { get; set; } = "100px";
+    [Parameter] public Predicate<TItem>? RowExpandable { get; set; }
+    [Parameter] public bool HideRefreshButton { get; set; }
+    [Parameter] public Func<DataGridLoadChildDataEventArgs<TItem>, Task>? LoadChildData { get; set; }
+    [Parameter] public bool AllowSorting { get; set; }
+    [Parameter] public string? DefaultOrderBy { get; set; }
+    [Parameter] public string? DefaultOrderByDescending { get; set; }
+    [Parameter] public bool AllowVirtualization { get; set; }
+
+    RadzenDataGrid<TItem> _grid;
+    RadzenDataGrid<TItem> Grid
+    {
+        get => _grid;
+        set
+        {
+            _grid = value;
+            if (Template != null && _grid != null)
+            {
+                _grid!.Template = Template;
+            }
+        }
+    }
+    
+    bool _showDataGrid;
+    bool _allowLoadMore;
+    int _page = 1;
+    int _pageSize;
+    List<TItem> SelectedItems { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        if (RunSearchImmediately) await RunSearch();
+    }
+    
+    public async Task RunSearch(bool loadingMore = false)
+    {
+        IsLoading = true;
+        await IsLoadingChanged.InvokeAsync(true);
+        try
+        {
+            PagingFilter? pf = Filter as PagingFilter;
+            
+            if (!loadingMore && pf != null)
+            {
+                pf.Offset = 0;
+                _allowLoadMore = false;
+            }
+            
+            var data = (await SearchFunc(Filter)).ToList();
+            if (!loadingMore)
+                Values = data;
+            else
+                Values = Values.Concat(data).ToList();
+            
+            _showDataGrid = true;
+            
+            StateHasChanged();
+            
+            if (AllowSorting)
+            {
+                if (!string.IsNullOrEmpty(DefaultOrderBy)) _grid?.OrderBy(DefaultOrderBy);
+                else if (!string.IsNullOrEmpty(DefaultOrderByDescending)) _grid?.OrderByDescending(DefaultOrderByDescending);
+            }
+            
+            await OnValuesLoaded.InvokeAsync();
+
+            if (pf != null)
+            {
+                _allowLoadMore = data.Count >= pf.Limit;
+                pf.Offset += pf.Limit;
+            }
+        }
+        finally
+        {
+            IsLoading = false;
+            await IsLoadingChanged.InvokeAsync(false);
+            StateHasChanged();
+        }
+    }
+    
+    void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
+    {
+        Logger.LogWarning(args.ToString());
+    }
+
+    void ToggleAll(bool? args)
+    {
+        Value = args == true ? SelectedItems?.ToList() : null;
+        ValueChanged?.Invoke(Value);
+    }
+    
+    void RowRender(RowRenderEventArgs<TItem> args)
+    {
+        args.Expandable = RowExpandable?.Invoke(args.Data) == true;
+    }
+
+    private async Task Create()
+    {
+        if (await DialogService.OpenAsync(CreateDialogHeader, CreateDialogForm))
+        {
+            
+        }
+    }
+
+}
+

@@ -1,0 +1,186 @@
+@using QuantInfra.Common.Interfaces.Api.Accounts
+@using UI.Interfaces.Accounts
+@using UI.SharedComponents.Base
+
+@inject IUiAccountsRepository Repository
+
+
+@if (Filter != null)
+{
+    <EditableView TItem="OrderHistoryView"
+                  TFilter="OrderFilter"
+                  EmptyText="No orders found"
+                  SearchFunc=@Repository.GetOrdersHistory
+                  Filter=@Filter
+                  HideRefreshButton=@HideRefreshButton
+                  HideFilter=@HideFilter
+                  RunSearchImmediately=@RunSearchImmediately
+                  Variant=@Variant
+                  AllowSorting=@AllowSorting
+                  DefaultOrderBy=@DefaultOrderBy
+                  DefaultOrderByDescending=@DefaultOrderByDescending
+                  @ref=_view>
+        <SearchForm>
+            <OrdersFilterForm @bind-Filter=@Filter HideAccountSelector=@HideAccount/>
+        </SearchForm>
+        <Columns>
+            @if (Columns != null)
+            {
+                @if (!HideAccount && Columns.Contains("AccountId"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Title="AccountId" Property=@nameof(OrderHistoryView.AccountId) Width="100px" />
+                }
+                
+                @if (!HideAccount && Columns.Contains("AccountName"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Title="Account" Property=@nameof(OrderHistoryView.AccountName) Width="100px" />
+                }
+
+                @if (Columns.Contains("ClOrdId"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Property=@nameof(OrderHistoryView.ClOrdId) Title="ClOrdId" Width="120px" Frozen="true" FrozenPosition="FrozenColumnPosition.Left"/>
+                }
+                
+                @if (Columns.Contains("OrderId"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Title="OrderId" Property=@nameof(OrderHistoryView.OrderId) Width="120px" Frozen="true" FrozenPosition="FrozenColumnPosition.Left" />
+                }
+                
+                @if (Columns.Contains("ExecId"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Property=@nameof(OrderHistoryView.ExecId) Title="ExecId" Width="120px" />
+                }
+                
+                @if (Columns.Contains("ExternalId"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Property=@nameof(OrderHistoryView.ExternalId) Title="ExternalId" Width="120px" />
+                }
+                
+                @if (Columns.Contains("TransactTime"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Property=@nameof(OrderHistoryView.TransactTime) Title="Dt" Width="180px"/>
+                }
+                
+
+                @if (Columns.Contains("Contract"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Title="Contract" Width="150px">
+                        <Template Context="order">
+                            <IdNameView Id="@order.ContractId" Name="@order.ContractName"/>
+                        </Template>
+                    </RadzenDataGridColumn>
+                }
+                
+                @if (Columns.Contains("OrdType"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Property=@nameof(OrderHistoryView.OrdType) Title="OrdType" Width="100px"/>
+                }
+
+                @if (Columns.Contains("Side"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Property=@nameof(OrderHistoryView.Side) Title="Side" Width="100px"/>
+                }
+
+                @if (Columns.Contains("OrdQty"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Property=@nameof(OrderHistoryView.OrderQty) Title="OrdQty" Width="100px"/>
+                }
+
+                @if (Columns.Contains("Price"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Property=@nameof(OrderHistoryView.Price) Title="Price" Width="100px"/>
+                }
+                
+                @if (Columns.Contains("StopPx"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Property=@nameof(OrderHistoryView.StopPx) Title="StopPx" Width="100px"/>
+                }
+                
+                @if (Columns.Contains("ExecType"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Property=@nameof(OrderHistoryView.ExecType) Title="ExecType" Width="100px"/>
+                }
+                
+                @if (Columns.Contains("ExecTypeReason"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Property=@nameof(OrderHistoryView.ExecTypeReason) Title="ExecTypeReason" Width="100px"/>
+                }
+                
+                @if (Columns.Contains("OrdStatus"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Property=@nameof(OrderHistoryView.OrdStatus) Title="OrdStatus" Width="100px"/>
+                }
+                
+                @if (Columns.Contains("RejectReason"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Property=@nameof(OrderHistoryView.RejectReason) Title="RejectReason" Width="100px"/>
+                }
+                
+                @if (Columns.Contains("RejectText"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Property=@nameof(OrderHistoryView.RejectText) Title="RejectText" Width="200px"/>
+                }
+                
+                @if (Columns.Contains("LastQty"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Property=@nameof(OrderHistoryView.LastQty) Title="LastQty" Width="100px"/>
+                }
+                
+                @if (Columns.Contains("LastPx"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Property=@nameof(OrderHistoryView.LastPx) Title="LastPx" Width="100px"/>
+                }
+                
+                @if (Columns.Contains("CalculatedCcyLastQty"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Property=@nameof(OrderHistoryView.CalculatedCcyLastQty) Title="CalculatedCcyLastQty" Width="100px"/>
+                }
+                
+                @if (Columns.Contains("CumQty"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Property=@nameof(OrderHistoryView.CumQty) Title="CumQty" Width="100px"/>
+                }
+                
+                @if (Columns.Contains("LeavesQty"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Property=@nameof(OrderHistoryView.LeavesQty) Title="LeavesQty" Width="100px"/>
+                }
+                
+
+                @if (Columns.Contains("StrategyPositionId"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Property=@(nameof(TradeView.StrategyPositionId)) Title="StrategyPositionId" Width="100px"/>
+                }
+
+                @if (Columns.Contains("PositionEffect"))
+                {
+                    <RadzenDataGridColumn TItem="OrderHistoryView" Property=@nameof(TradeView.PositionEffect) Title="PositionEffect" Width="100px"/>
+                }
+            }
+        </Columns>
+    </EditableView>
+}
+
+@code
+{
+    [Parameter] public OrderFilter? Filter { get; set; }
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public bool HideAccount { get; set; }
+    [Parameter] public List<string>? Columns { get; set; }
+    [Parameter] public bool HideRefreshButton { get; set; }
+    [Parameter] public bool HideFilter { get; set; }
+    [Parameter] public Variant Variant { get; set; } = Variant.Filled;
+    [Parameter] public bool AllowSorting { get; set; }
+    [Parameter] public string? DefaultOrderBy { get; set; }
+    [Parameter] public string? DefaultOrderByDescending { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        Filter ??= new();
+        Columns ??= ["AccountId", "AccountName", "ClOrdId", "OrderId", "ExecId", "ExternalId", "TransactTime", "Contract", "OrdType", "Side", "OrdQty", "Price", "StopPx", "ExecType", "ExecTypeReason", "OrdStatus", "RejectReason", "RejectText", "LeavesQty", "CumQty", "StrategyPositionId", "PositionEffect", "LastQty", "LastPx", "CalculatedCcyLastQty"];
+    }
+    
+    private EditableView<OrderHistoryView, OrderFilter> _view;
+    public Task Refresh() => _view.RunSearch();
+}

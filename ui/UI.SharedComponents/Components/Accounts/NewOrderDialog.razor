@@ -1,0 +1,40 @@
+﻿@inject DialogService DialogService
+
+@if (ShowButton)
+{
+    <RadzenButton Text="New order" ButtonStyle="ButtonStyle.Success" Icon="add" Variant="Variant.Text" Click=@Show />
+}
+
+@code {
+    [Parameter] public bool ShowButton { get; set; }
+    [Parameter] public int? AccountId { get; set; }
+    [Parameter] public bool HideAccountSelector { get; set; }
+    [Parameter] public EventCallback OnCompleted { get; set; }
+
+    dynamic? _dialog;
+
+    public void Show()
+    {
+        DialogService.Open<NewOrderForm>(
+            "New order", 
+            new Dictionary<string, object>()
+            {
+                { "AccountId", AccountId },
+                { "HideAccountSelector", HideAccountSelector },
+                { "OnCompleted", new EventCallback(this, Close) }
+            },
+            new()
+            {
+                CloseDialogOnOverlayClick = false
+            }
+        );
+    }
+    
+
+    async Task Close()
+    {
+        DialogService.Close(_dialog);
+        await OnCompleted.InvokeAsync();
+    }
+}
+

@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+
+    <ItemGroup>
+        <SupportedPlatform Include="browser"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.0" PrivateAssets="all" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\UI.ApiWrapper\UI.ApiWrapper.csproj" />
+      <ProjectReference Include="..\UI.Interfaces\UI.Interfaces.csproj" />
+      <ProjectReference Include="..\UI.SharedComponents.Accounts\UI.SharedComponents.Accounts.csproj" />
+      <ProjectReference Include="..\UI.SharedComponents.Base\UI.SharedComponents.Base.csproj" />
+      <ProjectReference Include="..\UI.SharedComponents.StaticData\UI.SharedComponents.StaticData.csproj" />
+      <ProjectReference Include="..\UI.SharedComponents\UI.SharedComponents.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Pages\Books\Book.razor" />
+      <_ContentIncludedByDefault Remove="Pages\Books\BookDetails\BookBase.razor" />
+      <_ContentIncludedByDefault Remove="Pages\Books\BookDetails\Composition.razor" />
+      <_ContentIncludedByDefault Remove="Pages\Books\BookDetails\SharePrice.razor" />
+      <_ContentIncludedByDefault Remove="Pages\Books\BookDetails\Simulation.razor" />
+      <_ContentIncludedByDefault Remove="Pages\Books\BookDetails\Summary.razor" />
+      <_ContentIncludedByDefault Remove="Pages\Books\Books.razor" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\js\" />
+    </ItemGroup>
+
+</Project>

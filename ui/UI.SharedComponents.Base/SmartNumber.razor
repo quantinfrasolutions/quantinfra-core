@@ -1,0 +1,28 @@
+@_number
+
+@code {
+    private double _number;
+
+    [Parameter, EditorRequired]
+    public double Number
+    {
+        get => _number;
+        set => _number = Round(value);
+    }
+
+    [Parameter] public bool RoundSmallNumbers { get; set; } = true;
+    [Parameter] public int SmallNumbersPrecision { get; set; } = 2;
+
+    private double Round(double num)
+    {
+        if (double.IsNaN(num) || double.IsInfinity(num) || num == 0) return num;
+        var abs = Math.Abs(num);
+        if (abs < 1) return RoundSmallNumbers ? Math.Round(abs, SmallNumbersPrecision) : abs;
+        var precision = abs < 10
+            ? 2
+            : abs < 30
+                ? 1
+                : 0;
+        return Math.Round(num, precision);
+    }
+}

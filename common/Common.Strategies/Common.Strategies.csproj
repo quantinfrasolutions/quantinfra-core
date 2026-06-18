@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <LangVersion>default</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>QuantInfra.Common.Strategies</AssemblyName>
+        <RootNamespace>QuantInfra.Common.Strategies</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="NodaTime" Version="3.2.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Common.Strategies.Abstractions\Common.Strategies.Abstractions.csproj" />
+      <ProjectReference Include="..\Common.Utils.Reflection\Common.Utils.Reflection.csproj" />
+    </ItemGroup>
+
+</Project>

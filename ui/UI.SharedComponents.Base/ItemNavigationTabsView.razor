@@ -1,0 +1,38 @@
+@inherits NavigationTabsView
+
+@typeparam TKey
+@typeparam TItem
+
+@{
+  base.BuildRenderTree(__builder);
+}
+
+@code {
+    private TKey _id;
+
+    [Parameter, EditorRequired]
+    public TKey Id
+    {
+        get => _id;
+        set
+        {
+            if (value != null && !value.Equals(_id))
+            {
+                _id = value;
+                Task.Run(LoadItem);
+            }
+        }
+    }
+
+    [Parameter, EditorRequired] public Func<TKey, Task<TItem>> Load { get; set; }
+
+    public TItem? Item { get; set; }
+    [Parameter] public EventCallback<TItem> ItemLoaded { get; set; }
+    
+    public async Task LoadItem()
+    {
+        Item = await Load(_id);
+        await ItemLoaded.InvokeAsync(Item);
+        StateHasChanged();
+    }
+}

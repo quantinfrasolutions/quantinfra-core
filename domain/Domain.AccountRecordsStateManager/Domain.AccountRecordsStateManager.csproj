@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <LangVersion>default</LangVersion>
+        <RootNamespace>QuantInfra.Domain.AccountRecordsStateManager</RootNamespace>
+        <PackageId>Domain.AccountRecordsStateManager</PackageId>
+        <AssemblyName>QuantInfra.Domain.AccountRecordsStateManager</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\common\Common.Accounts.Abstractions\Common.Accounts.Abstractions.csproj" />
+      <ProjectReference Include="..\..\common\Common.EventSourcing\Common.EventSourcing.csproj" />
+      <ProjectReference Include="..\..\Common\Common.Infrastructure.Abstractions\Common.Infrastructure.Abstractions.csproj" />
+      <ProjectReference Include="..\events\Domain.Events.Accounts.Management\Domain.Events.Accounts.Management.csproj" />
+      <ProjectReference Include="..\queries\Domain.Queries.Accounts.AccountsService\Domain.Queries.Accounts.AccountsService.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(UseLocalSdkReference)' == 'true'">
+        <ProjectReference Include="..\..\..\quantinfra-sdk\QuantInfra.Sdk.Package\QuantInfra.Sdk.Package.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(UseLocalSdkReference)' != 'true'">
+        <PackageReference Include="QuantInfra.Sdk" Version="0.9.0-beta5" />
+    </ItemGroup>
+
+</Project>

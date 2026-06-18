@@ -1,0 +1,107 @@
+@using UI.Interfaces.Accounts
+@using QuantInfra.Common.Interfaces.Api.Accounts
+@using QuantInfra.Sdk.Accounts
+@using UI.App.Platform.Layout
+@using UI.SharedComponents.Base
+@using UI.SharedComponents.Components
+
+@inherits LayoutComponentBase
+
+@layout MainLayout
+
+@inject IUiAccountsRepository Repository
+@inject NavigationManager NavigationManager
+
+<PageTitle>Account @Account?.Name</PageTitle>
+
+<ItemNavigationTabsView TKey="int"
+                        TItem="AccountListModel"
+                        Load=@Repository.GetAccount
+                        Id=@Id
+                        BasePath=@($"/accounts/{Id}")
+                        Tabs=@_tabs
+                        SelectedTabPath=@Path
+                        ItemLoaded=@OnAccountLoaded
+                        @ref=_nav>
+    <ChildContent>
+        <CascadingValue Value=@this>
+            @Body
+        </CascadingValue>
+    </ChildContent>
+</ItemNavigationTabsView>
+
+@code {
+
+    [Parameter]
+    public int Id
+    {
+        get => _id;
+        set
+        {
+            _id = value;
+            StateHasChanged();
+        }
+    }
+
+    [Parameter] public string Path { get; set; } = "summary";
+    [Parameter] public EventCallback<AccountListModel> AccountLoaded { get; set; }
+    
+    private ItemNavigationTabsView<int, AccountListModel> _nav;
+    private int _id;
+    public AccountListModel? Account => _nav.Item;
+
+    public Task Reload() => _nav.LoadItem();
+
+    private async Task OnAccountLoaded(AccountListModel account)
+    {
+        _tabs.Clear();
+        
+        _tabs.Add(new() { Text = "Summary", Path = "summary" });
+        
+        if (account.AccountType == AccountType.Fund) _tabs.Add(new() { Text = "Overview", Path = "fund-overview" });
+        
+        if (account.EnableSharePriceTracking)
+        {
+            _tabs.Add(new() { Text = "Share Price", Path = "share-price" });
+        }
+
+        if (account.AccountType == AccountType.VirtualAccount || account.AccountType == AccountType.StrategySubAccount ||
+            account.AccountType == AccountType.ExecutableSubAccount || account.AccountType == AccountType.BrokerAccount)
+        {
+            _tabs.Add(new() { Text = "Trading", Path = "trading" });
+        }
+
+        if (account.AccountType == AccountType.ExecutableSubAccount)
+        {
+            _tabs.Add(new() { Text = "Replication", Path = "replication" });
+        }
+
+        if (account.AccountType == AccountType.Fund)
+        {
+            _tabs.Add(new() { Text = "Strategy subaccounts", Path = "strategy-subaccounts" });
+            _tabs.Add(new() { Text = "Client subaccounts", Path = "client-subaccounts" });
+        }
+
+        if (account.AccountType == AccountType.StrategySubAccount || account.AccountType == AccountType.ExecutableSubAccount)
+        {
+            _tabs.Add(new() { Text = "Allocations", Path = "allocations" });
+            _tabs.Add(new() { Text = "Broker subaccounts", Path = "broker-subaccounts" });
+        }
+        
+        _tabs.Add(new() { Text = "Reporting", Path = "reporting" });
+
+        if (account.AccountType == AccountType.BrokerAccount)
+        {
+            _tabs.Add(new() { Text = "Reconciliation", Path = "reconciliation" });
+        }
+
+        if (!string.IsNullOrEmpty(Path) && _tabs.All(t => t.Path != Path))
+        {
+            NavigationManager.NavigateTo($"/accounts/{Id}");
+        }
+        
+        await AccountLoaded.InvokeAsync(account);
+    }
+    
+    private List<NavigationTabsItem> _tabs = new();
+}

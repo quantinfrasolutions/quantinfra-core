@@ -1,0 +1,180 @@
+﻿@* @using UI.Interfaces.Strategies *@
+@* @using QuantInfra.Common.Strategies.Api *@
+@* @using QuantInfra.Common.MarketData.Abstractions.Api *@
+@* @using QuantInfra.Common.Accounts.Abstractions *@
+@* @using QuantInfra.Common.Interfaces.Api *@
+@* *@
+@* @inject IUIStrategiesRepository Repository *@
+@* *@
+@* *@
+@* <RadzenTemplateForm TItem="CreateStrategyRequestModel" *@
+@*                     Data="@Strategy" *@
+@*                     @ref="form" *@
+@*                     Submit=@CreateStrategy> *@
+@*     <RadzenStack Gap="1rem"> *@
+@*         <RadzenRow> *@
+@*             <RadzenFormField Text="Name" Variant="Variant.Text"> *@
+@*                 <RadzenTextBox @bind-Value="Strategy.Name"></RadzenTextBox> *@
+@*             </RadzenFormField> *@
+@*         </RadzenRow> *@
+@*         <RadzenRow> *@
+@*             <StrategyClassSelector @bind-Value="Strategy.ClassName" @bind-Value:after=@OnStrategyClassSelected Disabled="_isLoading"/> *@
+@*         </RadzenRow> *@
+@*         <RadzenRow> *@
+@*             <RadzenFieldset Text="Candles"> *@
+@*                 <BarStoragesPicker BarStorages=@Strategy.BarStorageViews Editable="true" Disabled="_isLoading" AllowAddDeleteItems="true" /> *@
+@*             </RadzenFieldset> *@
+@*         </RadzenRow> *@
+@*         <RadzenRow> *@
+@*             <RadzenFieldset Text="Symbols"> *@
+@*                 <ContractsPicker Symbols=@Strategy.SymbolViews Editable="true" Disabled="_isLoading" AllowAddDeleteItems="true" /> *@
+@*             </RadzenFieldset> *@
+@*         </RadzenRow> *@
+@*         @if (Strategy.Params != null) *@
+@*         { *@
+@*             <RadzenRow> *@
+@*                 <RadzenFieldset Text="Params"> *@
+@*                     $1$ TODO #1# *@
+@*                     $1$ @if (_isLoading) #1# *@
+@*                     $1$ { #1# *@
+@*                     $1$     <RadzenDataGrid TItem="KeyValuePair<string, string>" Data="Strategy.Params" class="headerless"> #1# *@
+@*                     $1$         <Columns> #1# *@
+@*                     $1$             <RadzenDataGridColumn TItem="KeyValuePair<string, string>" Property="Key"/> #1# *@
+@*                     $1$             <RadzenDataGridColumn TItem="KeyValuePair<string, string>" Property="Value"/> #1# *@
+@*                     $1$         </Columns> #1# *@
+@*                     $1$     </RadzenDataGrid> #1# *@
+@*                     $1$ } #1# *@
+@*                     $1$ else #1# *@
+@*                     $1$ { #1# *@
+@*                     $1$     <RadzenRow> #1# *@
+@*                     $1$         <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" Wrap="FlexWrap.Wrap"> #1# *@
+@*                     $1$             @foreach (var i in Strategy.Params) #1# *@
+@*                     $1$             { #1# *@
+@*                     $1$                 <RadzenFormField Text="@i.Key" Variant="Variant.Text" Style="min-width: 180px;"> #1# *@
+@*                     $1$                     <RadzenTextBox Value="@i.Value" ValueChanged="(args) => Strategy.Params[i.Key] = args" Style="width: 100%;"/> #1# *@
+@*                     $1$                 </RadzenFormField> #1# *@
+@*                     $1$             } #1# *@
+@*                     $1$         </RadzenStack> #1# *@
+@*                     $1$     </RadzenRow> #1# *@
+@*                     $1$ } #1# *@
+@*                 </RadzenFieldset> *@
+@*             </RadzenRow> *@
+@*         } *@
+@*         <RadzenRow> *@
+@*             <RadzenFieldset Text="Account"> *@
+@*                 <RadzenStack Gap="1rem"> *@
+@*                     <RadzenFormField Text="Account type" Variant="Variant.Text"> *@
+@*                         <RadzenDropDown TValue="AccountType?" @bind-Value=@Strategy.AccountType Data=@_supportedAccountTypes /> *@
+@*                     </RadzenFormField> *@
+@*                     @if (Strategy.AccountType != AccountType.VirtualAccount) *@
+@*                     { *@
+@*                         <span>TODO: accounts selector</span> *@
+@*                     } *@
+@*                 </RadzenStack> *@
+@*             </RadzenFieldset> *@
+@*         </RadzenRow> *@
+@*         <RadzenRow> *@
+@*             <RadzenCheckBox TValue="bool" @bind-Value=@Strategy.StartImmediately Disabled=@_isLoading Name="CheckBox1" /> *@
+@*             <RadzenLabel Text="Start immediately" Component="CheckBox1" class="rz-ms-2" /> *@
+@*         </RadzenRow> *@
+@*         <RadzenRow JustifyContent="JustifyContent.End"> *@
+@*             <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" Text="Create strategy" Variant="Variant.Text" /> *@
+@*         </RadzenRow> *@
+@*     </RadzenStack> *@
+@* </RadzenTemplateForm> *@
+@* *@
+@* *@
+@* @code { *@
+@*     private bool _isLoading; *@
+@*     private readonly List<AccountType> _supportedAccountTypes = [AccountType.VirtualAccount, AccountType.StrategySubAccount]; *@
+@*      *@
+@*     [Parameter] public CreateStrategyRequestModel Strategy { get; set; } *@
+@*     [Parameter] public EventCallback OnCompleted { get; set; } *@
+@* *@
+@*     protected override async Task OnParametersSetAsync() *@
+@*     { *@
+@*         await base.OnParametersSetAsync(); *@
+@*         Strategy ??= new() *@
+@*         { *@
+@*             AccountType = AccountType.VirtualAccount *@
+@*         }; *@
+@*     } *@
+@* *@
+@*     RadzenTemplateForm<CreateStrategyRequestModel> form; *@
+@* *@
+@*     public async Task CreateStrategy() *@
+@*     { *@
+@*         try *@
+@*         { *@
+@*             _isLoading = true; *@
+@*             Strategy.RequiredBarStorages = Strategy.BarStorageViews.ToDictionary( *@
+@*                 kv => kv.Key, *@
+@*                 kv => kv.Value.ToBarStorageConfig()); *@
+@*             Strategy.Symbols = Strategy.SymbolViews.ToDictionary( *@
+@*                 kv => kv.Key, *@
+@*                 kv => kv.Value.Id *@
+@*             ); *@
+@*             await Repository.CreateStrategy(Strategy); *@
+@*             // if (OnCompleted.HasValue) await OnCompleted.Value.InvokeAsync(); *@
+@*             await OnCompleted.InvokeAsync(); *@
+@*         } *@
+@*         finally *@
+@*         { *@
+@*             _isLoading = false; *@
+@*         } *@
+@*     } *@
+@*      *@
+@*     private async Task OnStrategyClassSelected() *@
+@*     { *@
+@*         // var description = (await StrategyClassesRepository.GetAvailableStrategyClasses(false))[className]; *@
+@*         _isLoading = true; *@
+@*         try *@
+@*         { *@
+@*             var className = Strategy.ClassName; *@
+@*             var description = await Repository.GetStrategyClassDescription(className); *@
+@*             Strategy.ClassName = className; *@
+@*             // TODO *@
+@*             // Strategy.Params = description.Params.OrderBy(p => p.Key).ToDictionary( *@
+@*             //     i => i.Key, *@
+@*             //     i => i.Value *@
+@*             // ); *@
+@* *@
+@*             if (description.RequiredBarStorages.Count > 0) *@
+@*             { *@
+@*                 foreach (var bs in Strategy.BarStorageViews.Keys) *@
+@*                 { *@
+@*                     if (!description.RequiredBarStorages.Contains(bs)) Strategy.BarStorageViews.Remove(bs); *@
+@*                 } *@
+@* *@
+@*                 foreach (var bs in description.RequiredBarStorages) *@
+@*                 { *@
+@*                     if (!Strategy.BarStorageViews.ContainsKey(bs)) Strategy.BarStorageViews.Add(bs, new BarStorageView()); *@
+@*                 } *@
+@*             } *@
+@* *@
+@*             if (description.Symbols.Count > 0) *@
+@*             { *@
+@*                 foreach (var s in Strategy.SymbolViews.Keys) *@
+@*                 { *@
+@*                     if (!description.Symbols.Contains(s)) Strategy.SymbolViews.Remove(s); *@
+@*                 } *@
+@* *@
+@*                 foreach (var s in description.Symbols) *@
+@*                 { *@
+@*                     if (!Strategy.SymbolViews.ContainsKey(s)) Strategy.SymbolViews.Add(s, new BriefView<long>()); *@
+@*                 } *@
+@*             } *@
+@*         } *@
+@*         finally *@
+@*         { *@
+@*             _isLoading = false; *@
+@*         } *@
+@*     } *@
+@* *@
+@*     public class CreateStrategyRequestModel : CreateStrategyRequest *@
+@*     { *@
+@*         public Dictionary<string, BarStorageView> BarStorageViews { get; set; } = new(); *@
+@*         public Dictionary<string, BriefView<long>> SymbolViews { get; set; } = new(); *@
+@*     } *@
+@* } *@
+@* *@

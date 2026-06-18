@@ -1,0 +1,47 @@
+@using NodaTime
+@using NodaTime.Text
+
+@inject DialogService DialogService
+
+<div>
+    <RadzenTextBox Value="@PeriodPattern.Roundtrip.Format(Value)"
+                   ValueChanged="@OnChange" />
+    <RadzenButton Icon="refresh" Variant="Variant.Text" Size="ButtonSize.Small" Style="position: absolute; right: 30px;" Click="@ShowBuilder" />
+</div>
+
+@code {
+    dynamic dialog;
+    
+    [Parameter] public Period Value { get; set; }
+    [Parameter] public Action<Period> ValueChanged { get; set; }
+
+    async Task ShowBuilder()
+    {
+        dialog = await DialogService.OpenAsync<PeriodBuilderForm>(
+            "Build period",
+            new Dictionary<string, object>()
+            {
+                { "Value", Value },
+                { "ValueChanged", BuilderValueChanged },
+                { "Complete", CloseDialog }
+            }
+        );
+    }
+
+    async Task OnChange(string pattern)
+    {
+        Value = PeriodPattern.Roundtrip.Parse(pattern).Value;
+        ValueChanged(Value);
+    }
+
+    async Task BuilderValueChanged(Period value)
+    {
+        Value = value;
+        ValueChanged(value);
+    }
+
+    async Task CloseDialog()
+    {
+        await DialogService.Close(dialog);
+    }
+}

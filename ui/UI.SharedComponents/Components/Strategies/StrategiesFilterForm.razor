@@ -1,0 +1,25 @@
+@using QuantInfra.Common.Interfaces.Api.Strategies
+
+@* <div style="min-width: 300px"> *@
+@*     <StrategyClassSelectorMulti @bind-Value=@Filter.ClassNames /> *@
+@* </div> *@
+
+@code {
+    [Parameter, EditorRequired] public StrategiesFilter? Filter { get; set; }
+    [Parameter] public EventCallback<StrategiesFilter>? FilterChanged { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+
+    
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        if (Filter == null)
+        {
+            Filter = new();
+            await OnPropUpdated();
+        }
+    }
+
+    private Task OnPropUpdated() => FilterChanged?.InvokeAsync(Filter) ?? Task.CompletedTask;
+}

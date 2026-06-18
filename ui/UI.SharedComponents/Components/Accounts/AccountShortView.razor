@@ -1,0 +1,37 @@
+<RadzenLink Path=@($"accounts/{AccountId}") Text="@_text" />
+
+@code {
+    private int _accountId;
+    private string _accountName;
+    private string _text;
+
+    [Parameter]
+    [EditorRequired]
+    public int AccountId
+    {
+        get => _accountId;
+        set
+        {
+            _accountId = value;
+            UpdateText();
+        }
+    }
+
+    [Parameter]
+    [EditorRequired]
+    public string AccountName
+    {
+        get => _accountName;
+        set
+        {
+            _accountName = value;
+            UpdateText();
+        }
+    }
+
+    private void UpdateText()
+    {
+        _text = $"{AccountName} ({AccountId.ToString().Split('-').First()})";
+    }
+
+}

@@ -1,0 +1,33 @@
+﻿@* @using UI.SharedComponents.Components.StaticData *@
+@* *@
+@* @if (!HideAccountSelector) *@
+@* { *@
+@*     $1$ <AccountsSelector/> #1# *@
+@* } *@
+@* <ContractsSelector @bind-Value=@Filter.ContractId Required="false" /> *@
+@* <RadzenFormField Text="Ticker" Variant="@Variant.Text" Style="min-width: 180px;"> *@
+@*     <RadzenTextBox Value=@Filter.OrderId.ToString() ValueChanged=@TrySetOrderId Disabled=@Disabled /> *@
+@* </RadzenFormField> *@
+@* *@
+@* @code { *@
+@*     [Parameter, EditorRequired] public ActiveOrderFilter Filter { get; set; } *@
+@*     [Parameter] public EventCallback<ActiveOrderFilter>? FilterChanged { get; set; } *@
+@*     [Parameter] public bool Disabled { get; set; } *@
+@*     [Parameter] public bool HideAccountSelector { get; set; } *@
+@*      *@
+@*     private Task OnPropUpdated() => FilterChanged?.InvokeAsync(Filter) ?? Task.CompletedTask; *@
+@* *@
+@*     private async Task TrySetOrderId(string arg) *@
+@*     { *@
+@*         try *@
+@*         { *@
+@*             Filter.OrderId = long.Parse(arg); *@
+@*             await OnPropUpdated(); *@
+@*         } *@
+@*         catch *@
+@*         { *@
+@*             Filter.OrderId = null; *@
+@*         } *@
+@*     } *@
+@* *@
+@* } *@

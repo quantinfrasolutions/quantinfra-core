@@ -1,0 +1,24 @@
+@using QuantInfra.Common.Strategies
+@using UI.Interfaces.Strategies
+@using UI.SharedComponents.Base
+
+@inject IUiStrategyClassesRepository Repository
+
+@* <UI.SharedComponents.Components.EditableView TItem="StrategyTypeDescription" *@
+@*                                              TKey="string" *@
+@*                                              RefreshAction="@Repository.GetAvailableStrategyClasses" *@
+@*                                              @ref="grid"> *@
+@*     <Columns> *@
+@*         <RadzenDataGridColumn TItem="StrategyTypeDescription" Property="Name" Width="150px" /> *@
+@*         <RadzenDataGridColumn TItem="StrategyTypeDescription" Property="FullName" Width="200px" /> *@
+@*         <RadzenDataGridColumn TItem="StrategyTypeDescription" Property="Description" Width="400px" /> *@
+@*         <RadzenDataGridColumn TItem="StrategyTypeDescription" Property="Version" MinWidth="50px" /> *@
+@*     </Columns> *@
+@*     <CustomButtons> *@
+@*         <StrategiesDllSelector ValueChanged="@(_ => grid.Refresh(true))" /> *@
+@*     </CustomButtons> *@
+@* </UI.SharedComponents.Components.EditableView> *@
+
+@code {
+    EditableView<StrategyTypeDescription, StrategyTypeDescription> grid;
+}

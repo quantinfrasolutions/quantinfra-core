@@ -1,0 +1,46 @@
+﻿@using QuantInfra.Common.Interfaces.Api.Strategies
+@using QuantInfra.Sdk.Accounts
+@using UI.SharedComponents.Base
+
+@typeparam TValue
+
+<SearchSelector TKey="int?"
+                TItem="StrategyViewBrief"
+                Text="Strategy"
+                Required=@Required
+                @ref=_selector
+                KeySelector="@(c => c.StrategyId)"
+                LabelSelector="@(c => c.Name)"
+                Value=@(Value as int?)
+                ValueChanged=@OnValueChanged
+                LabelChanged=@LabelChanged
+                SomethingSelected="@(Value is int? && Value as int? != 0)"
+                Disabled=@Disabled
+                >
+    <Selector>
+        <StrategiesView AllowSelect="true" ValueChanged=@_selector.OnSomethingSelected Variant="Variant.Flat" EnableActions="false" Columns=@(new List<string> { "StrategyId", "IsActive", "Name", "StrategyClassName" })/>
+    </Selector>
+</SearchSelector>
+
+@code {
+    private SearchSelector<int?, StrategyViewBrief> _selector;
+    
+    [Parameter] public TValue Value { get; set; }
+    [Parameter] public EventCallback<TValue> ValueChanged { get; set; }
+    [Parameter] public EventCallback<string> LabelChanged { get; set; }
+
+    [Parameter] public bool Required { get; set; } = true;
+    
+    [Parameter] public AccountType? AccountType { get; set; }
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+
+    private async Task OnValueChanged(int? value)
+    {
+        if (!Required || (Required && value != null))
+        {
+            Value = (TValue)(object)value;
+            await ValueChanged.InvokeAsync(Value);
+        }
+    }
+}

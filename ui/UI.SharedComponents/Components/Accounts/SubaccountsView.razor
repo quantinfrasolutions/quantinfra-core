@@ -1,0 +1,30 @@
+@using QuantInfra.Common.Interfaces.Api.Accounts
+@using UI.Interfaces.Accounts
+@using UI.SharedComponents.Base
+
+@inject IUiAccountsRepository Repository
+
+<EditableView TItem="SubaccountListModel"
+              TFilter="SubaccountsFilter"
+              EmptyText="No subaccounts found"
+              SearchFunc=@Repository.GetSubAccounts
+              Filter=@Filter
+              RunSearchImmediately="true">
+    <CreateButton>
+        @CreateButton
+    </CreateButton>
+    <Columns>
+        <RadzenDataGridColumn TItem="SubaccountListModel" Property=@nameof(SubaccountListModel.AccountId) Title="Account Id" Width="120px" />
+        <RadzenDataGridColumn TItem="SubaccountListModel" Property=@nameof(SubaccountListModel.AccountName) Title="Account" Width="180px" />
+        <RadzenDataGridColumn TItem="SubaccountListModel" Property=@nameof(SubaccountListModel.SubaccountId) Title="Subaccount Id" Width="120px" />
+        <RadzenDataGridColumn TItem="SubaccountListModel" Property=@nameof(SubaccountListModel.SubaccountName) Title="Subaccount" Width="180px" />
+        <RadzenDataGridColumn TItem="SubaccountListModel" Property=@nameof(SubaccountListModel.Classifier) Title="Type" Width="120px" />
+    </Columns>
+</EditableView>
+
+@code {
+    [Parameter, EditorRequired] public SubaccountsFilter Filter { get; set; }
+    [Parameter] public RenderFragment? CreateButton { get; set; }    
+
+    // string GetLookIntoHref(AccountListModel a) => $"/accounts/{a.AccountId}";
+}

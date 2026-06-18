@@ -1,0 +1,90 @@
+@* @using UI.Interfaces.StaticData *@
+@* @using Common.StaticData *@
+@* @using QuantInfra.Common.StaticData.Abstractions *@
+@* *@
+@* @inject IUIExchangesRepository ExchangesRepository *@
+@* *@
+@* <ItemView TItem="Exchange" *@
+@*           TKey="long" *@
+@*           ParseFunc="@(s => long.Parse(s))" *@
+@*           Title="@("Exchange " + _exchange?.Name)" *@
+@*           RawId="@ExchangeId" *@
+@*           IdChanged="@(id => parsedId = id)" *@
+@*           Tab="@Tab" *@
+@*           TabNames="@tabNames" *@
+@*           RetrieveDictionary="@ExchangesRepository.GetExchanges" *@
+@*           @bind-Value="_exchange"> *@
+@*     <SummaryContent> *@
+@*         <RadzenTemplateForm TItem="Exchange" *@
+@*                             Data="@_exchange"> *@
+@*             <RadzenRow Gap="1rem"> *@
+@*                 <RadzenColumn Size="12"> *@
+@*                     <RadzenFormField Text="ID" Variant="Variant.Text"> *@
+@*                         <RadzenNumeric Value="@_exchange?.Id" Disabled="true" /> *@
+@*                     </RadzenFormField> *@
+@*                 </RadzenColumn> *@
+@*             </RadzenRow> *@
+@*             <RadzenRow Gap="1rem"> *@
+@*                 <RadzenColumn Size="12"> *@
+@*                     <RadzenFormField Text="Name" Variant="Variant.Text"> *@
+@*                         <RadzenNumeric Value="@_exchange?.Name" Disabled="true" /> *@
+@*                     </RadzenFormField> *@
+@*                 </RadzenColumn> *@
+@*             </RadzenRow> *@
+@*             <RadzenRow Gap="1rem"> *@
+@*                 <RadzenColumn Size="12"> *@
+@*                     <RadzenFormField Text="Timezone" Variant="Variant.Text"> *@
+@*                         <RadzenNumeric Value="@_exchange?.Timezone" Disabled="true" /> *@
+@*                     </RadzenFormField> *@
+@*                 </RadzenColumn> *@
+@*             </RadzenRow> *@
+@*         </RadzenTemplateForm> *@
+@*     </SummaryContent> *@
+@*     <TabsContent> *@
+@*         <RadzenTabsItem Text="Trading sessions" class="card-dark-background"> *@
+@*             <RadzenRow> *@
+@*                 <RadzenColumn Size="12"> *@
+@*                     @if (parsedId.HasValue) *@
+@*                     { *@
+@*                         <TradingSessionsView AllowCreate="true" ExchangeId="@parsedId.Value"/> *@
+@*                     } *@
+@*                 </RadzenColumn> *@
+@*             </RadzenRow> *@
+@*         </RadzenTabsItem> *@
+@*         <RadzenTabsItem Text="Commissions" class="card-dark-background"> *@
+@*             <RadzenRow> *@
+@*                 <RadzenColumn Size="12"> *@
+@*                     @if (parsedId.HasValue) *@
+@*                     { *@
+@*                         <CommissionsView ExchangeId="@parsedId.Value" Type="CommissionStructureType.Exchange" /> *@
+@*                     } *@
+@*                 </RadzenColumn> *@
+@*             </RadzenRow> *@
+@*         </RadzenTabsItem> *@
+@*         <RadzenTabsItem Text="Contracts" class="card-dark-background"> *@
+@*             <RadzenRow> *@
+@*                 <RadzenColumn Size="12"> *@
+@*                     @if (parsedId.HasValue) *@
+@*                     { *@
+@*                         <ContractsView ExchangeId="@parsedId.Value"/> *@
+@*                     } *@
+@*                 </RadzenColumn> *@
+@*             </RadzenRow> *@
+@*         </RadzenTabsItem> *@
+@*     </TabsContent> *@
+@* </ItemView> *@
+@* *@
+@* @code { *@
+@*     Exchange? _exchange; *@
+@*      *@
+@*     Dictionary<int, string> tabNames = new Dictionary<int, string>() *@
+@*     { *@
+@*         { 0, "trading-sessions" }, *@
+@*         { 1, "commissions" }, *@
+@*         { 2, "contracts" } *@
+@*     }; *@
+@*      *@
+@*     [Parameter] public string ExchangeId { get; set; } *@
+@*     [Parameter] public string Tab { get; set; } *@
+@*     long? parsedId = null; *@
+@* } *@

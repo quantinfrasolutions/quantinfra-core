@@ -1,0 +1,839 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Binance FAPI | v1",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/fapi/v1/order": {
+      "post": {
+        "operationId": "PlaceOrder",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "AUTH-REQUIRED",
+            "schema": {
+              "enum": [true],
+              "type": "boolean"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/NewOrderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BinanceOrder"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "CancelOrder",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "AUTH-REQUIRED",
+            "schema": {
+              "enum": [true],
+              "type": "boolean"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelOrderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BinanceOrder"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "ModifyOrder",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "AUTH-REQUIRED",
+            "schema": {
+              "enum": [true],
+              "type": "boolean"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/ModifyOrderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BinanceOrder"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fapi/v1/openOrders": {
+      "get": {
+        "operationId": "GetAccountRawOpenOrders",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "AUTH-REQUIRED",
+            "schema": {
+              "enum": [true],
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "timestamp",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BinanceOrder"
+                  } 
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fapi/v3/positionRisk": {
+      "get": {
+        "operationId": "GetAccountRawPositions",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "AUTH-REQUIRED",
+            "schema": {
+              "enum": [true],
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "timestamp",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BinancePosition"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fapi/v3/balance": {
+      "get": {
+        "operationId": "GetAccountBalances",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "AUTH-REQUIRED",
+            "schema": {
+              "enum": [true],
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "timestamp",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BalanceRecord"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fapi/v1/userTrades": {
+      "get": {
+        "operationId": "GetRawTrades",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "AUTH-REQUIRED",
+            "schema": {
+              "enum": [true],
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "timestamp",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "query",
+            "name": "symbol",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "startTime",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BinanceTrade"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fapi/v1/listenKey": {
+      "post": {
+        "operationId": "GetListenKey",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetListenKeyRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetListenKeyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetListenKeyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fapi/v1/positionSide/dual": {
+      "get": {
+        "operationId": "GetPositionMode",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "AUTH-REQUIRED",
+            "required": true,
+            "schema": {
+              "enum": [true],
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "timestamp",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PositionModeResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fapi/v1/exchangeInfo": {
+      "get": {
+        "operationId": "GetExchangeInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExchangeInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "GetListenKeyRequest": {
+        "required": [
+          "apiKey",
+          "signature"
+        ],
+        "type": "object",
+        "properties": {
+          "apiKey": {
+            "type": "string"
+          },
+          "signature": {
+            "type": "string"
+          }
+        }
+      },
+      "GetListenKeyResponse": {
+        "required": [
+          "listenKey"
+        ],
+        "type": "object",
+        "properties": {
+          "listenKey": {
+            "type": "string"
+          }
+        }
+      },
+      "NewOrderRequest": {
+        "type": "object",
+        "properties": {
+          "goodTillDate": {
+            "type": "string"
+          },
+          "newClientOrderId": {
+            "type": "string"
+          },
+          "price": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "string"
+          },
+          "side": {
+            "type": "string"
+          },
+          "stopPrice": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "timeInForce": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "ModifyOrderRequest": {
+        "type": "object",
+        "properties": {
+          "origClientOrderId": {
+            "type": "string"
+          },
+          "orderId": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "side": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "string"
+          },
+          "price": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          }
+        }
+      },
+      "CancelOrderRequest": {
+        "required": [
+          "symbol"
+        ],
+        "type": "object",
+        "properties": {
+          "origClientOrderId": {
+            "type": "string"
+          },
+          "orderId": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          }
+        }
+      },
+      "BinanceOrder": {
+        "type": "object",
+        "properties": {
+          "clientOrderId": {
+            "type": "string"
+          },
+          "cumQty": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "cumQuote": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "avgPrice": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "executedQty": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "orderId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "origQty": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "origType": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "reduceOnly": {
+            "type": "boolean"
+          },
+          "side": {
+            "type": "string"
+          },
+          "positionSide": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "stopPrice": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "closePosition": {
+            "type": "boolean"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "timeInForce": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "activatePrice": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "priceRate": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "updateTime": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "workingType": {
+            "type": "string"
+          },
+          "priceProtect": {
+            "type": "boolean"
+          },	
+          "priceMatch": {
+            "type": "string"
+          },
+          "selfTradePreventionMode": {
+            "type": "string"
+          },
+          "goodTillDate": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "BinancePosition": {
+        "type": "object",
+        "properties": {
+          "symbol": {
+            "type": "string"
+          },
+          "positionSide": {
+            "type": "string"
+          },
+          "positionAmt": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "entryPrice": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "breakEvenPrice": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "markPrice": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "unrealizedProfit": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "liquidationPrice": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "isolatedMargin": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "isolatedMargin": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "notional": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "marginAsset": {
+            "type": "string"
+          },
+          "isolatedWallet": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "initialMargin": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "maintMargin": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "positionInitialMargin": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "openOrderInitialMargin": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "adl": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "bidNotional": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "askNotional": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "updateTime": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "BinanceTrade": {
+        "type": "object",
+        "properties": {
+          "buyer": {
+            "type": "boolean"
+          },
+          "commission": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "commissionAsset": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "maker": {
+            "type": "boolean"
+          },
+          "orderId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "price": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "qty": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "quoteQty": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "realizedPnl": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "side": {
+            "type": "string"
+          },
+          "positionSide": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "time": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "BalanceRecord": {
+        "type": "object",
+        "required": [
+          "accountAlias",
+          "asset",
+          "balance",
+          "crossWalletBalance",
+          "crossUnPnl",
+          "availableBalance",
+          "maxWithdrawAmount",
+          "marginAvailable",
+          "updateTime"
+        ],
+        "properties": {
+          "accountAlias": {
+            "type": "string"
+          },
+          "asset": {
+            "type": "string"
+          },
+          "balance": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "crossWalletBalance": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "crossUnPnl": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "availableBalance": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "maxWithdrawAmount": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "marginAvailable": {
+            "type": "boolean"
+          },
+          "updateTime": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "OrderErrorResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer"
+          },
+          "msg": {
+            "type": "string"
+          }
+        }
+      },
+      "PositionModeResponse": {
+        "type": "object",
+        "required": ["dualSidePosition"],
+        "properties": {
+          "dualSidePosition": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ExchangeInfo": {
+        "type": "object",
+        "properties": {
+          "symbols": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExchangeInfoSymbol"
+            }
+          }     
+        }
+      },
+      "ExchangeInfoSymbol": {
+        "type": "object",
+        "required": [
+          "symbol"
+        ],
+        "properties": {
+          "symbol": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,6 @@
+﻿namespace QuantInfra.Connectors.Binance.Common;
+
+public interface IBinanceOrderBookSubscriptionsRepository :
+    Sdk.MarketData.IActiveSubscriptionsRepository<BinanceUsdmOrderBookSubscriptionRequest, BinanceUsdmOrderBookSubscription, BinanceUsdmOrderBookSubscriptionListView>
+{
+}

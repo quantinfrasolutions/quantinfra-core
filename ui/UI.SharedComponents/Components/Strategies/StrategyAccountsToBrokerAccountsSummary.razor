@@ -1,0 +1,112 @@
+@* @using UI.Interfaces.Strategies *@
+@* *@
+@* @inject IUiStrategiesRepository Repository *@
+@* @inject TooltipService TooltipService *@
+@* *@
+@* <EditableView TItem="StrategyAccountToBrokerAccountItemView" *@
+@*               TFilter="SsasToBrokerAccountsMappingSummaryFilter" *@
+@*               EmptyText="No execution configuration" *@
+@*               SearchFunc=@Repository.GetSsasToBrokerAccountsMappingSummary *@
+@*               RunSearchImmediately="true" *@
+@*               SearchButtonText="Refresh" *@
+@*               Filter=@_filter *@
+@*               CellRender=@CellRender> *@
+@*                    *@
+@*     <SearchForm /> *@
+@*      *@
+@*     <Columns> *@
+@*          *@
+@*         <RadzenDataGridColumn TItem="StrategyAccountToBrokerAccountItemView" Title="Strategy Id" Width="120px"> *@
+@*             <Template Context="strategy"> *@
+@*                 <TooltipGuidViewer Id=@strategy.StrategyId/> *@
+@*             </Template> *@
+@*         </RadzenDataGridColumn> *@
+@*         <RadzenDataGridColumn TItem="StrategyAccountToBrokerAccountItemView" Title="Name" Width="120px"> *@
+@*             <Template Context="account"> *@
+@*                 <RadzenLink Text=@account.Name Path=@($"/strategies/{account.StrategyId}") /> *@
+@*             </Template> *@
+@*         </RadzenDataGridColumn> *@
+@*         <RadzenDataGridColumn TItem="StrategyAccountToBrokerAccountItemView" Title="Class name" Width="220px"> *@
+@*             <Template Context="strategy"> *@
+@*                 <RadzenText TextStyle="TextStyle.Body2" MouseEnter="@(args => ShowTooltip(args, strategy.StrategyClassName, new TooltipOptions { Position = TooltipPosition.Right }))"> *@
+@*                     @strategy.StrategyClassName.Split('.').Last() *@
+@*                 </RadzenText> *@
+@*             </Template> *@
+@*         </RadzenDataGridColumn> *@
+@*          *@
+@*         <RadzenDataGridColumn TItem="StrategyAccountToBrokerAccountItemView" Title="Account" Width="360px"> *@
+@*             <Columns> *@
+@*                 <RadzenDataGridColumn TItem="StrategyAccountToBrokerAccountItemView" Title="Id" Width="120px"> *@
+@*                     <Template Context="strategy"> *@
+@*                         <TooltipGuidViewer Id=@strategy.Account.AccountId /> *@
+@*                     </Template> *@
+@*                 </RadzenDataGridColumn> *@
+@*                 <RadzenDataGridColumn TItem="StrategyAccountToBrokerAccountItemView" Title="Type" Property="Account.AccountType" Width="120px" /> *@
+@*                 <RadzenDataGridColumn TItem="StrategyAccountToBrokerAccountItemView" Title="Name" Width="120px"> *@
+@*                     <Template Context="account"> *@
+@*                         <RadzenLink Text=@account.Account.AccountName Path=@($"/accounts/{account.Account.AccountId}") /> *@
+@*                     </Template> *@
+@*                 </RadzenDataGridColumn> *@
+@*             </Columns> *@
+@*         </RadzenDataGridColumn> *@
+@*          *@
+@*         <RadzenDataGridColumn TItem="StrategyAccountToBrokerAccountItemView" Title="Contract" Width="220px"> *@
+@*             <Columns> *@
+@*                 <RadzenDataGridColumn TItem="StrategyAccountToBrokerAccountItemView" Title="Id" Property=@nameof(StrategyAccountToBrokerAccountItemView.ContractId) Width="100px"/> *@
+@*                 <RadzenDataGridColumn TItem="StrategyAccountToBrokerAccountItemView" Title="Ticker" Property=@nameof(StrategyAccountToBrokerAccountItemView.Ticker) Width="120px" /> *@
+@*             </Columns> *@
+@*         </RadzenDataGridColumn> *@
+@*          *@
+@*         <RadzenDataGridColumn TItem="StrategyAccountToBrokerAccountItemView" Title="Broker" Width="220px"> *@
+@*             <Columns> *@
+@*                 <RadzenDataGridColumn TItem="StrategyAccountToBrokerAccountItemView" Title="Id" Property=@nameof(StrategyAccountToBrokerAccountItemView.BrokerId) Width="100px" /> *@
+@*                 <RadzenDataGridColumn TItem="StrategyAccountToBrokerAccountItemView" Title="Broker" Property=@nameof(StrategyAccountToBrokerAccountItemView.BrokerName) Width="120px" /> *@
+@*             </Columns> *@
+@*         </RadzenDataGridColumn> *@
+@*          *@
+@*         <RadzenDataGridColumn TItem="StrategyAccountToBrokerAccountItemView" Title="Broker account" Width="390px"> *@
+@*             <Columns> *@
+@*                 <RadzenDataGridColumn TItem="StrategyAccountToBrokerAccountItemView" Title="Id" Property="BrokerAccount.AccountId" Width="120px"> *@
+@*                     <Template Context="strategy"> *@
+@*                         <TooltipGuidViewer Id=@strategy.BrokerAccount?.AccountId /> *@
+@*                     </Template> *@
+@*                 </RadzenDataGridColumn> *@
+@*                 <RadzenDataGridColumn TItem="StrategyAccountToBrokerAccountItemView" Width="120px"> *@
+@*                     <Template Context="account"> *@
+@*                         @if (account.BrokerAccount != null) *@
+@*                         { *@
+@*                             <RadzenLink Text=@account.BrokerAccount.AccountName Path=@($"/accounts/{account.BrokerAccount.AccountId}")/> *@
+@*                         } *@
+@*                     </Template> *@
+@*                 </RadzenDataGridColumn> *@
+@*                 <RadzenDataGridColumn TItem="StrategyAccountToBrokerAccountItemView" Title="External account ID" Property=@nameof(StrategyAccountToBrokerAccountItemView.ExternalAccountId) Width="150px"/> *@
+@*             </Columns> *@
+@*         </RadzenDataGridColumn> *@
+@*     </Columns> *@
+@* </EditableView> *@
+@* *@
+@* @code { *@
+@*     private SsasToBrokerAccountsMappingSummaryFilter _filter = new(); *@
+@* *@
+@*     private string GetLookIntoHref(StrategyViewBrief a) => $"/strategies/{a.StrategyId}"; *@
+@*     private void ShowTooltip(ElementReference elementReference, string text, TooltipOptions options = null) =>  *@
+@*         TooltipService.Open(elementReference, text, options); *@
+@*      *@
+@*     private void CellRender(DataGridCellRenderEventArgs<StrategyAccountToBrokerAccountItemView> args) *@
+@*     { *@
+@*         if (!args.Data.BrokerId.HasValue) *@
+@*         { *@
+@*             if (args.Column.Title == "Broker") args.Attributes.Add("class", "rz-background-color-danger"); *@
+@*             else args.Attributes.Add("class", "rz-background-color-warning-lighter"); *@
+@*         } *@
+@*         else  *@
+@*         { *@
+@*             if (args.Data.BrokerAccount == null && args.Column.Title == "Broker account") args.Attributes.Add("class", "rz-background-color-danger"); *@
+@*             if (string.IsNullOrEmpty(args.Data.ExternalAccountId) && args.Column.Title == "External account ID") args.Attributes.Add("class", "rz-background-color-danger"); *@
+@*             if ((args.Data.BrokerAccount == null || string.IsNullOrEmpty(args.Data.ExternalAccountId)) *@
+@*                 && args.Column.Title != "Broker account" && args.Column.Title != "External account ID" *@
+@*                ) args.Attributes.Add("class", "rz-background-color-warning-lighter"); *@
+@* *@
+@*         } *@
+@*     } *@
+@* } *@

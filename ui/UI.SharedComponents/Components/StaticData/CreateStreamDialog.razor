@@ -1,0 +1,38 @@
+﻿@inject DialogService DialogService
+
+@if (RenderButton)
+{
+    <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" Variant="Variant.Flat" Click=@Show />
+}
+
+@code {
+    dynamic dialog;
+
+    [Parameter]
+    public Func<Task>? OnCompleted { get; set; }
+
+    [Parameter]
+    public bool RenderButton { get; set; }
+
+    public async Task Show()
+    {
+        dialog = await DialogService.OpenAsync<CreateStreamForm>(
+            "Create stream",
+            new Dictionary<string, object>()
+            {
+                { "ShowButton", true },
+                { "OnCompleted", Close }
+            }
+        );
+    }
+
+    async Task Close()
+    {
+        DialogService.Close(dialog);
+        if (OnCompleted != null)
+        {
+            await OnCompleted.Invoke();
+        }
+    }
+}
+

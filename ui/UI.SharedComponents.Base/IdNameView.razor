@@ -1,0 +1,49 @@
+@using System.Text
+@if (string.IsNullOrEmpty(RoutePrefix))
+{
+    <span>@_label</span>
+}
+else
+{
+    if (!OpenLinkInNewTab)
+    {
+        <RadzenLink Text="@_label" Path="@($"{RoutePrefix}/{Id}")"/>
+    }
+    else
+    {
+        <RadzenLink Text="@_label" Path="@($"{RoutePrefix}/{Id}")" target="_blank">
+            <RadzenIcon Icon="open_in_new" />
+        </RadzenLink>
+    }
+}
+
+@code {
+    private string _label;
+    
+    [Parameter] [EditorRequired] public long? Id { get; set; }
+    [Parameter] [EditorRequired] public string? Name { get; set; }
+    [Parameter] public string? RoutePrefix { get; set; }
+    [Parameter] public bool OpenLinkInNewTab { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        _label = GetLabel(Id, Name);
+    }
+
+    public static string GetLabel(object? id, string? name)
+    {
+        var sb = new StringBuilder();
+        sb.Append(name);
+
+        if (id != null)
+        {
+            if (!string.IsNullOrEmpty(name)) sb.Append(" (");
+            sb.Append(id);
+            if (!string.IsNullOrEmpty(name)) sb.Append(")");
+        }
+
+        return sb.ToString();
+    }
+}

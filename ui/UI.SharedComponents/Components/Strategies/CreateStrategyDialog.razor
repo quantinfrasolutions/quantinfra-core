@@ -1,0 +1,34 @@
+﻿@inject DialogService DialogService
+
+@if (ShowButton)
+{
+    <RadzenButton Text="Create" ButtonStyle="ButtonStyle.Success" Icon="add" Variant="Variant.Text" Click=@Show />
+}
+
+@code {
+    [Parameter] public bool ShowButton { get; set; }
+
+    dynamic? _dialog;
+
+    public void Show()
+    {
+        DialogService.Open<CreateStrategyForm>(
+            "New strategy", 
+            new Dictionary<string, object>()
+            {
+                { "OnCompleted", new EventCallback(this, Close) }
+            },
+            new()
+            {
+                CloseDialogOnOverlayClick = false
+            }
+        );
+    }
+    
+
+    void Close()
+    {
+        DialogService.Close(_dialog);
+    }
+}
+

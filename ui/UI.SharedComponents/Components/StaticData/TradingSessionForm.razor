@@ -1,0 +1,128 @@
+﻿@* @using NodaTime *@
+@* @using UI.Interfaces.StaticData *@
+@* *@
+@* @inject IUIExchangesRepository Repository *@
+@* *@
+@* <RadzenTemplateForm TItem="TradingSessionModel"> *@
+@*     <RadzenStack Orientation="Orientation.Vertical"> *@
+@*         @if (!Disabled) *@
+@*         { *@
+@*             <RadzenRow Gap="1rem"> *@
+@*                 <RadzenFormField Variant="Variant.Text" Text="Name"> *@
+@*                     <RadzenTextBox @bind-Value="Value.Name" /> *@
+@*                 </RadzenFormField> *@
+@*             </RadzenRow> *@
+@*         } *@
+@*         <RadzenRow Gap="1rem"> *@
+@*             <div class="rz-text-align-center"> *@
+@*                 <RadzenCheckBox @bind-Value=@Value.Is24X7 Name="cb" Disabled="@Disabled" /> *@
+@*                 <RadzenLabel Text="Is 24x7" Component="cb" Style="margin-left: 8px; vertical-align: middle;" /> *@
+@*             </div> *@
+@*         </RadzenRow> *@
+@*         @if (!Value.Is24X7) *@
+@*         { *@
+@*             <RadzenRow Gap="1rem"> *@
+@*                 $1$ <EditableView TItem="TradingSessionDayModel"  #1# *@
+@*                 $1$               TKey="IsoDayOfWeek" #1# *@
+@*                 $1$               EmptyText="Empty" #1# *@
+@*                 $1$               RefreshAction="@GetComponents" #1# *@
+@*                 $1$               HideRefreshButton="true" #1# *@
+@*                 $1$               CreateAction="@AddComponent" #1# *@
+@*                 $1$               UpdateAction="@EditComponent" #1# *@
+@*                 $1$               DeleteAction="@DeleteComponent" #1# *@
+@*                 $1$               RefreshAfterModification="false" #1# *@
+@*                 $1$               HideAddUpdateDeleteButtons="@Disabled" #1# *@
+@*                 $1$               EditMode="DataGridEditMode.Single"> #1# *@
+@*                 $1$     <CustomButtons> #1# *@
+@*                 $1$         @if (!Disabled) #1# *@
+@*                 $1$         { #1# *@
+@*                 $1$             <RadzenButton Variant="Variant.Text" #1# *@
+@*                 $1$                           ButtonStyle="ButtonStyle.Primary" #1# *@
+@*                 $1$                           Text="Save" #1# *@
+@*                 $1$                           Click="@Save" /> #1# *@
+@*                 $1$         } #1# *@
+@*                 $1$     </CustomButtons> #1# *@
+@*                 $1$     <Columns> #1# *@
+@*                 $1$         <RadzenDataGridColumn TItem="TradingSessionDayModel" Property="DayOfWeek"> #1# *@
+@*                 $1$             <EditTemplate Context="item"> #1# *@
+@*                 $1$                 <RadzenFormField Variant="Variant.Text" Text="Day"> #1# *@
+@*                 $1$                     <RadzenDropDown Name="Type" #1# *@
+@*                 $1$                                     AllowClear="false" #1# *@
+@*                 $1$                                     @bind-Value="@item.DayOfWeek" #1# *@
+@*                 $1$                                     Data="@(Enum.GetValues(typeof(IsoDayOfWeek)).Cast<Enum>())" /> #1# *@
+@*                 $1$                 </RadzenFormField> #1# *@
+@*                 $1$             </EditTemplate> #1# *@
+@*                 $1$         </RadzenDataGridColumn> #1# *@
+@*                 $1$         <RadzenDataGridColumn TItem="TradingSessionDayModel" Title="Start"> #1# *@
+@*                 $1$             <Template Context="item"> #1# *@
+@*                 $1$                 @Formatters.DateTimeShowOnlyTime(item.StartDt) #1# *@
+@*                 $1$             </Template> #1# *@
+@*                 $1$             <EditTemplate Context="item"> #1# *@
+@*                 $1$                 <RadzenDatePicker @bind-Value="item.StartDt" ShowTime="true" TimeOnly="true" DateFormat="HH:mm" /> #1# *@
+@*                 $1$             </EditTemplate> #1# *@
+@*                 $1$         </RadzenDataGridColumn> #1# *@
+@*                 $1$         <RadzenDataGridColumn TItem="TradingSessionDayModel" Title="End"> #1# *@
+@*                 $1$             <Template Context="item"> #1# *@
+@*                 $1$                 @Formatters.DateTimeShowOnlyTime(item.EndDt) #1# *@
+@*                 $1$             </Template> #1# *@
+@*                 $1$             <EditTemplate Context="item"> #1# *@
+@*                 $1$                 <RadzenDatePicker @bind-Value="item.EndDt" ShowTime="true" TimeOnly="true" DateFormat="HH:mm" /> #1# *@
+@*                 $1$             </EditTemplate> #1# *@
+@*                 $1$         </RadzenDataGridColumn> #1# *@
+@*                 $1$     </Columns> #1# *@
+@*                 $1$ </EditableView> #1# *@
+@*             </RadzenRow> *@
+@*         } *@
+@*     @if (!Disabled) *@
+@*     { *@
+@*         <RadzenRow Gap="1rem"> *@
+@*             <RadzenButton ButtonType="ButtonType.Submit" Click="Save" Text="Create" Disabled="isLoading" /> *@
+@*         </RadzenRow> *@
+@*     } *@
+@*     </RadzenStack> *@
+@* </RadzenTemplateForm> *@
+@* *@
+@* @code *@
+@* { *@
+@*     [Parameter] *@
+@*     public bool Disabled { get; set; } *@
+@* *@
+@*     [Parameter] *@
+@*     public TradingSessionModel Value { get; set; } = new TradingSessionModel(); *@
+@* *@
+@*     [Parameter] *@
+@*     public Func<Task>? OnCompleted { get; set; } *@
+@* *@
+@*     async Task<Dictionary<IsoDayOfWeek, TradingSessionIntervalModel>> GetComponents(bool refresh) => Value?.Schedule; *@
+@*     bool isLoading; *@
+@* *@
+@*     async Task AddComponent(TradingSessionIntervalModel d) *@
+@*     { *@
+@*         Value.Schedule.Add(d.StartDay, d); *@
+@*     } *@
+@* *@
+@*     async Task EditComponent(TradingSessionIntervalModel d) *@
+@*     {			 *@
+@*     } *@
+@* *@
+@*     async Task<bool> DeleteComponent(TradingSessionIntervalModel d) *@
+@*     { *@
+@*         Value.Schedule.Remove(d.StartDay); *@
+@*         return true; *@
+@*     } *@
+@* *@
+@*     async Task Save() *@
+@*     {			 *@
+@*         isLoading = true; *@
+@*         try *@
+@*         { *@
+@*             await Repository.CreateTradingSession(Value); *@
+@*             OnCompleted?.Invoke(); *@
+@*         } *@
+@*         catch { } *@
+@*         finally *@
+@*         { *@
+@*             isLoading = false; *@
+@*         } *@
+@*     } *@
+@* } *@

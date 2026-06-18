@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <LangVersion>default</LangVersion>
+        <AssemblyName>QuantInfra.Services.AccountsCore</AssemblyName>
+        <RootNamespace>QuantInfra.Services.AccountsCore</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.6" />
+      <PackageReference Include="Quartz" Version="3.15.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\common\Common.EventSourcing\Common.EventSourcing.csproj" />
+      <ProjectReference Include="..\..\common\Common.MarketData.Abstractions\Common.MarketData.Abstractions.csproj" />
+      <ProjectReference Include="..\..\domain\commands\Domain.Commands.Strategies.AccountsService\Domain.Commands.Strategies.AccountsService.csproj" />
+      <ProjectReference Include="..\..\domain\Domain.Accounts.Base\Domain.Accounts.Base.csproj" />
+      <ProjectReference Include="..\..\domain\Domain.Accounts.Execution\Domain.Accounts.Execution.csproj" />
+      <ProjectReference Include="..\..\domain\Domain.VirtualExecution\Domain.VirtualExecution.csproj" />
+      <ProjectReference Include="..\..\domain\events\Domain.Events.Accounts.External\Domain.Events.Accounts.External.csproj" />
+      <ProjectReference Include="..\..\domain\events\Domain.Events.Persistence\Domain.Events.Persistence.csproj" />
+      <ProjectReference Include="..\..\domain\queries\Domain.Queries.Accounts.AccountsService\Domain.Queries.Accounts.AccountsService.csproj" />
+      <ProjectReference Include="..\..\domain\queries\Domain.Queries.Accounts.ExecutionService\Domain.Queries.Accounts.ExecutionService.csproj" />
+      <ProjectReference Include="..\..\domain\queries\Domain.Queries.Strategies.AccountsService\Domain.Queries.Strategies.AccountsService.csproj" />
+      <ProjectReference Include="..\AccountsCore.State\AccountsCore.State.csproj" />
+    </ItemGroup>
+
+    
+
+</Project>

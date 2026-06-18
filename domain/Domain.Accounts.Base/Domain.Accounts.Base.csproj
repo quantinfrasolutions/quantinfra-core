@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <RootNamespace>QuantInfra.Domain.Accounts.Base</RootNamespace>
+        <LangVersion>default</LangVersion>
+        <AssemblyName>QuantInfra.Domain.Accounts.Base</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Common\Common.EventSourcing\Common.EventSourcing.csproj" />
+      <ProjectReference Include="..\commands\Domain.Commands.Accounts.AccountsService\Domain.Commands.Accounts.AccountsService.csproj" />
+      <ProjectReference Include="..\Domain.Accounts.Base.State\Domain.Accounts.Base.State.csproj" />
+      <ProjectReference Include="..\queries\Domain.Queries.Accounts.AccountsService\Domain.Queries.Accounts.AccountsService.csproj" />
+      <ProjectReference Include="..\queries\Domain.Queries.MarketData\Domain.Queries.MarketData.csproj" />
+      <ProjectReference Include="..\Queries\Domain.Queries.StaticData\Domain.Queries.StaticData.csproj" />
+    </ItemGroup>
+
+</Project>

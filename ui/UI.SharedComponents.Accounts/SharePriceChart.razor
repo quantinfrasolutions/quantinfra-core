@@ -1,0 +1,129 @@
+@using QuantInfra.Sdk.Accounting
+@using Vizor.ECharts
+
+<RadzenStack Gap="1rem">
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            @if (_chartOptions is not null)
+            {
+                <RadzenCard>
+                    <Vizor.ECharts.EChart Options="@_chartOptions" Width="auto" Height="400px" />
+                </RadzenCard>
+            }
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    private ChartOptions? _chartOptions;
+    
+    [Parameter] public IReadOnlyList<SharePriceHistory>? SingleAccount { get; set; }
+    [Parameter] public IReadOnlyDictionary<int, IReadOnlyList<SharePriceHistory>>? MultipleAccounts { get; set; }
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        BuildChart();
+    }
+
+    private void BuildChart()
+    {
+        _chartOptions = new()
+        {
+            Grid = new()
+            {
+                Left = 0,
+                Right = 0,
+                Top = 0,
+                Bottom = 0,
+            }
+        };
+
+        if (SingleAccount is not null)
+        {
+            _chartOptions.XAxis = new()
+            {
+                Type = AxisType.Time,
+            };
+
+            _chartOptions.Tooltip = new()
+            {
+                Trigger = TooltipTrigger.Axis,
+                Formatter =
+                    @"
+                    <b>{c0}</b><br/>
+                    Yield: <b>{c1}%</b><br/>
+                    Daily return: <b>{c2}%</b><br/>
+                ",
+            };
+
+            _chartOptions.YAxisList =
+            [
+                new YAxis()
+                {
+                    Type = AxisType.Value,
+                    Name = "Yield, %",
+                    Id = "yield"
+                },
+                new YAxis()
+                {
+                    Type = AxisType.Value,
+                    Position = LeftOrRight.Right,
+                    Name = "Daily return, %",
+                    Id = "returns",
+                },
+            ];
+
+            _chartOptions.Dataset = new()
+            {
+                Dimensions = ["dt", "yield", "dailyReturn"],
+                Source = SingleAccount.Select(i =>
+                    new SeriesData<DateTime, decimal, decimal>(
+                        i.Dt.ToDateTimeUtc(),
+                        Math.Round((i.SharePrice - 1) * 100, 2),
+                        Math.Round(i.DailyReturn * 100, 2)
+                    )
+                ),
+            };
+
+            _chartOptions.Series =
+            [
+                new LineSeries()
+                {
+                    DatasetIndex = 0,
+                    DataGroupId = "yield",
+                    YAxisIndex = 0,
+                    Symbol = "none",
+                },
+                new BarSeries()
+                {
+                    DatasetIndex = 0,
+                    DataGroupId = "dailyReturn",
+                    YAxisIndex = 1,
+                },
+            ];
+            // _data = GetDataForSingleChart(SingleAccount);
+        }
+
+        else if (MultipleAccounts is not null)
+        {
+            throw new NotImplementedException();
+            // if (MultipleAccounts.Count == 1)
+            // {
+            //     _data = GetDataForSingleChart(MultipleAccounts.Values.First());
+            // }
+            // else
+            // {
+            //     _data = new()
+            //     {
+            //         Dts = MultipleAccounts.Values.First().Select(sp => sp.Dt.ToUnixTimeMilliseconds()).ToList(),
+            //         Data = MultipleAccounts.Select(kv => new Series()
+            //         {
+            //             name = $"{kv.Key}",
+            //             data = kv.Value.Select(sp => Math.Round((sp.SharePrice - 1) * 100, 2)).ToList(),
+            //         }).ToList(),
+            //     };
+            // }
+        }
+    }
+}

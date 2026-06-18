@@ -1,0 +1,27 @@
+@using UI.SharedComponents.Accounts
+
+@page "/strategies/{StrategyId:int}/share-price"
+
+@layout StrategyBase
+
+@if (StrategyBase?.Strategy != null)
+{
+    <AccountSharePriceHistory AccountId=@StrategyBase.Strategy.Account.AccountId />
+}
+
+@code {
+    [Parameter] public int StrategyId { get; set; }
+    
+    [CascadingParameter] public StrategyBase? StrategyBase { get; set; }
+
+    protected override void OnInitialized()
+    {
+        StrategyBase!.Id = StrategyId;
+        StrategyBase.Path = "share-price";
+    }
+
+    private Task OnAccountSelected(int account)
+    {
+        throw new NotImplementedException();
+    }
+}

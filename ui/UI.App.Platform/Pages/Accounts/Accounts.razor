@@ -1,0 +1,43 @@
+@using UI.App.Platform.Layout
+@using UI.SharedComponents.Base
+@using UI.SharedComponents.Components
+@inherits LayoutComponentBase
+
+@layout MainLayout
+
+@page "/accounts"
+
+<PageTitle>Accounts</PageTitle>
+
+<NavigationTabsView BasePath="/accounts"
+                    Tabs=@_tabs
+                    SelectedTabPath=@Path
+                    DisplayAsList=@string.IsNullOrEmpty(Path)>
+    <ChildContent>
+        <CascadingValue Value=@this>
+            @Body
+        </CascadingValue>
+    </ChildContent>
+</NavigationTabsView>
+
+
+@code {
+    private string _path;
+    public string Path
+    {
+        get => _path;
+        set
+        {
+            _path = value;
+            StateHasChanged();
+        }
+    }
+
+    private List<NavigationTabsItem> _tabs = new()
+    {
+        new() { Text = "Strategy subaccounts", Path = "ssa" },
+        new() { Text = "Executable subaccounts", Path = "esa" },
+        new() { Text = "Broker accounts", Path = "broker" },
+        new() { Text = "Funds", Path = "funds" },
+    };
+}
