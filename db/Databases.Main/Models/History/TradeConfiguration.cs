@@ -1,9 +1,9 @@
-using Common.Trading;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using QuantInfra.Databases.Main.Models.Entities;
 using QuantInfra.Databases.Main.Models.Events;
 using QuantInfra.Sdk.StaticData;
+using QuantInfra.Sdk.Trading;
 
 namespace QuantInfra.Databases.Main.Models.History;
 

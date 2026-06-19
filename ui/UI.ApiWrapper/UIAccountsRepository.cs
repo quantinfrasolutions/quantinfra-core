@@ -1,6 +1,6 @@
-using Common.Accounts.Abstractions;
 using NodaTime;
 using NodaTime.Text;
+using QuantInfra.Common.Accounts.Abstractions;
 using QuantInfra.Common.Interfaces.Api.Accounts;
 using QuantInfra.Sdk.Accounting;
 using QuantInfra.Sdk.Accounts;
@@ -25,7 +25,7 @@ public partial class ApiRepository : IUiAccountsRepository
         RetrieveCollection("accounts", () => _wrapper.Client.GetAccountsAsync(
             filter.AccountIds, 
             filter.AccountName, 
-            filter.AccountTypes,
+            filter.AccountTypes.Select(a => (int)a),
             filter.StrategyId,
             CancellationToken.None
         ));
@@ -36,15 +36,16 @@ public partial class ApiRepository : IUiAccountsRepository
 
     public Task<IEnumerable<BalanceOperationHistoryModel>> GetBalanceOperations(BalanceOperationsFilter filter) =>
         RetrieveCollection("balance operations", () => _wrapper.Client.GetBalanceOperationsHistoryAsync(filter.AccountId,
-            filter.BalanceOperationId, InstantToString(filter.FromDt), InstantToString(filter.ToDt), filter.ExternalId,
+            filter.BalanceOperationId, filter.FromDt, filter.ToDt, filter.ExternalId,
             filter.Limit, filter.Offset));
 
     public Task CreateBalanceOperation(NewBalanceOperation request) =>
         Call("balance operation created", "Failed",
             () => _wrapper.Client.CreateBalanceOperationAsync(request.AccountId, request));
 
-    public async Task<AccountListModel> GetAccount(int accountId) =>
-        (await GetAccounts(new AccountsFilter { AccountIds = [accountId] })).SingleOrDefault();
+    public Task<AccountListModel> GetAccount(int accountId) =>
+        Retrieve("account", () => _wrapper.Client.GetAccountAsync(accountId));
+        // (await GetAccounts(new AccountsFilter { AccountIds = [accountId] })).SingleOrDefault();
 
     public Task<IEnumerable<BalanceModel>> GetBalances(int accountId) =>
         RetrieveCollection("balances", () => _wrapper.Client.GetBalancesAsync(accountId));
@@ -60,12 +61,12 @@ public partial class ApiRepository : IUiAccountsRepository
                 filter.AccountId,
                 filter.OrderId,
                 filter.ContractId,
-                filter.OrdStatus.ToString(),
+                (int?)filter.OrdStatus,
                 filter.ExternalId,
                 filter.ExecutionRequestId,
-                InstantToString(filter.FromDt), 
-                InstantToString(filter.ToDt),
-                filter.ExecType.ToString(),   
+                filter.FromDt, 
+                filter.ToDt,
+                (int?)filter.ExecType,   
                 filter.Limit, filter.Offset)
         );
 
@@ -82,13 +83,13 @@ public partial class ApiRepository : IUiAccountsRepository
 
         public Task<IEnumerable<PositionView>> GetPositionsHistory(PositionHistoryFilter? filter = null) =>
             RetrieveCollection("positions history", () => _wrapper.Client.GetPositionsHistoryAsync(
-                InstantToString(filter?.CloseDtFrom),
-                InstantToString(filter?.CloseDtTo),
-                filter.Type,
-                InstantToString(filter?.OpenDtFrom),
-                InstantToString(filter?.OpenDtTo),
-                InstantToString(filter?.HistoryOpenDtFrom),
-                InstantToString(filter?.HistoryOpenDtTo),
+                filter?.CloseDtFrom,
+                filter?.CloseDtTo,
+                filter?.Type?.Select(i => (int)i),
+                filter?.OpenDtFrom,
+                filter?.OpenDtTo,
+                filter?.HistoryOpenDtFrom,
+                filter?.HistoryOpenDtTo,
                 filter?.AccountId,
                 filter?.ContractId,
                 filter?.TradeId
@@ -97,8 +98,8 @@ public partial class ApiRepository : IUiAccountsRepository
     public Task<IEnumerable<TradeView>> GetTradesHistory(TradeFilter filter) =>
         RetrieveCollection("trades history",
             () => _wrapper.Client.GetTradesHistoryAsync(
-                InstantToString(filter.FromDt), 
-                InstantToString(filter.ToDt), 
+                filter.FromDt, 
+                filter.ToDt, 
                 filter.AccountId, filter.TradeId, filter.ContractId, filter.ExternalId, 
                 filter.Limit, filter.Offset
             )
@@ -142,10 +143,15 @@ public partial class ApiRepository : IUiAccountsRepository
     public Task<IEnumerable<SharePriceHistory>> GetSharePriceHistory(SharePriceHistoryFilter filter) =>
         RetrieveCollection("share price history",
             () => _wrapper.Client.GetSharePriceHistoryAsync(filter.AccountId, filter.SortDescending, 
-                InstantToString(filter.FromDt), InstantToString(filter.ToDt), 
-                filter.ChangeType?.ToString(), filter.Limit, filter.Offset)
+                filter.FromDt, filter.ToDt, 
+                (int?)filter.ChangeType, filter.Limit, filter.Offset)
         );
-    // Call("Positions adjusted", "Failed", () => _wrapper.Client.ReconcileTargetPositionsAsync(accountId));
+
+    public Task CreateTradingAccountConfig(CreateTradingClientConfigRequest data) =>
+        Call("Configuration created", "Error", () => _wrapper.Client.CreateTradingClientConfigAsync(data.AccountId, data));
+
+    public Task DeleteTradingAccountConfig(int accountId) =>
+        Call("Configuration deleted", "Error", () => _wrapper.Client.DeleteTradingClientConfigAsync(accountId));
 
     private string? InstantToString(Instant? i) =>
         i.HasValue ? InstantPattern.ExtendedIso.Format(i.Value) : null;

@@ -1,10 +1,10 @@
 {
   "runtime": "Net90",
   "defaultVariables": null,
-  "input": "Api.json",
+  "input": "../../services/OpenApiGenerator/obj/Api.json",
   "documentGenerator": {
     "fromDocument": {
-        "url": "Api.json",
+        "url": "../../services/OpenApiGenerator/obj/Api.json",
       "newLineBehavior": "Auto"
     }
   },
@@ -44,11 +44,10 @@
         "className": "ApiClient",
         "operationGenerationMode": "SingleClientFromOperationId",
         "additionalNamespaceUsages": [
-            "Common.Accounts.Abstractions",
-            "Common.Infrastructure.Abstractions",
-            "Common.Infrastructure.Abstractions.Api",
-            "Common.Trading",
+            "QuantInfra.Common.Accounts.Abstractions",
+            "QuantInfra.Common.Infrastructure.Abstractions",
             "QuantInfra.Common.Interfaces.Api.Accounts",
+            "QuantInfra.Common.Interfaces.Api.Infrastructure",
             "QuantInfra.Common.Interfaces.Api.StaticData",
             "QuantInfra.Common.Interfaces.Api.Strategies",
             "QuantInfra.Common.Strategies",
@@ -56,8 +55,9 @@
             "QuantInfra.Sdk.Accounts",
             "QuantInfra.Sdk.StaticData",
             "QuantInfra.Sdk.Strategies",
+            "QuantInfra.Sdk.Trading",
             "QuantInfra.Sdk.Trading.Orders",
-            "QuantInfra.Sdk.Trading.Positions",
+            "QuantInfra.Sdk.Trading.Positions"
         ],
         "additionalContractNamespaceUsages": [],
         "generateOptionalParameters": false,
@@ -76,7 +76,7 @@
         "dateType": "System.DateTime",
         "jsonConverters": null,
         "anyType": "object",
-        "dateTimeType": "NodaTime.Instant",
+        "dateTimeType": "string",
         "timeType": "System.TimeSpan",
         "timeSpanType": "System.TimeSpan",
         "arrayType": "System.Collections.Generic.List",
@@ -240,7 +240,7 @@
         "templateDirectory": null,
         "typeNameGeneratorType": null,
         "propertyNameGeneratorType": null,
-        "enumNameGeneratorType": null,
+        "enumNameGeneratorType": "",
         "serviceHost": null,
         "serviceSchemes": null,
         "newLineBehavior": "Auto"

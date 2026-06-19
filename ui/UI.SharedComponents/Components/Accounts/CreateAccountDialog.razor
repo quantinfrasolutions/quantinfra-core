@@ -10,6 +10,7 @@
     [Parameter] public bool ShowButton { get; set; }
     [Parameter] public AccountType? Type { get; set; }
     [Parameter] public bool HideAccountType { get; set; }
+    [Parameter] public EventCallback? OnAccountCreated { get; set; }
 
     dynamic? _dialog;
 
@@ -21,7 +22,7 @@
             {
                 { "Type", Type! },
                 { "HideAccountType", HideAccountType },
-                { "OnCompleted", new EventCallback(this, Close) }
+                { "OnCompleted", new EventCallback(this, CloseAndCallback) }
             },
             new()
             {
@@ -29,9 +30,14 @@
             }
         );
     }
-    
 
-    void Close()
+    private Task CloseAndCallback()
+    {
+        Close();
+        return OnAccountCreated?.InvokeAsync() ?? Task.CompletedTask;
+    }
+
+    private void Close()
     {
         DialogService.Close(_dialog);
     }

@@ -1,6 +1,6 @@
-﻿namespace Common.Infrastructure.Abstractions;
+﻿namespace QuantInfra.Common.Infrastructure.Abstractions;
 
-public class AccountServiceInstance
+public class StrategiesServiceInstance
 {
     public string Name { get; init; }
     public string LocationName { get; init; }

@@ -1,5 +1,7 @@
 @using QuantInfra.Sdk.Accounts
+@using Radzen
 @using Radzen.Blazor
+@using UI.SharedComponents.Accounts
 @using UI.SharedComponents.Components.Accounts
 
 @page "/accounts/{AccountId:int}"
@@ -18,6 +20,33 @@
                                                         AccountBase?.Account.AccountType == AccountType.StrategySubAccount || AccountBase?.Account.AccountType == AccountType.ExecutableSubAccount)/>
                 </RadzenCard>
             </RadzenColumn>
+            @if (AccountBase.Account.AccountType == AccountType.BrokerAccount)
+            {
+                <RadzenColumn SizeXS="6" SizeSM="4" SizeMD="3" Size="2" Style="min-width: 350px;">
+                    <RadzenCard class="details-form-card">
+                        <RadzenStack AlignItems="AlignItems.Stretch">
+                            <RadzenRow>
+                                <RadzenText TextStyle="TextStyle.DisplayH6">Trading client configuration</RadzenText>
+                            </RadzenRow>
+                            <RadzenRow>
+                                @if (AccountBase.Account.TradingClientConfig == null)
+                                {
+                                    <RadzenText TextStyle="TextStyle.Body2">Trading client not configured for this broker account.</RadzenText>
+                                }
+                                else
+                                {
+                                    <TradingClientConfigForm AccountId=@AccountId 
+                                                                    Data=@new(AccountBase.Account.TradingClientConfig)
+                                                                    ReadOnly="true" />
+                                }
+                            </RadzenRow>
+                            <RadzenRow JustifyContent="JustifyContent.End">
+                                <TradingAccountConfigButtons Account=@AccountBase.Account OnCompleted=@AccountBase.Reload />
+                            </RadzenRow>
+                        </RadzenStack>
+                    </RadzenCard>
+                </RadzenColumn>
+            }
         </RadzenRow>
     </RadzenStack>
 }

@@ -1,6 +1,6 @@
-﻿using Common.Trading;
-using NodaTime;
+﻿using NodaTime;
 using QuantInfra.Sdk.StaticData;
+using QuantInfra.Sdk.Trading;
 
 namespace QuantInfra.Domain.Events.Accounts.AccountsService.Primary;
 

@@ -29,7 +29,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(UseLocalSdkReference)' == 'true'">
-        <ProjectReference Include="..\..\..\quantinfra-sdk\QuantInfra.StandardIndicators\QuantInfra.StandardIndicators.csproj" />
+        <ProjectReference Include="..\..\..\quantinfra-standard-indicators\QuantInfra.StandardIndicators.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(UseLocalSdkReference)' != 'true'">

@@ -1,0 +1,41 @@
+@using QuantInfra.Common.Interfaces.Api.Accounts
+@using Radzen
+@using UI.Interfaces.Accounts
+
+@inject IUiAccountsRepository AccountsRepository
+
+<RadzenStack>
+    <RadzenRow>
+        <TradingClientConfigForm AccountId=@AccountId Data=@_data ReadOnly=@_loading />
+    </RadzenRow>
+    <RadzenRow JustifyContent="JustifyContent.End">
+        <RadzenButton ButtonStyle="ButtonStyle.Primary" Text="Configure" Variant="Variant.Text" Click=@Create IsBusy=@_loading />
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    private CreateTradingClientConfigRequest _data;
+    private bool _loading;
+
+    [Parameter, EditorRequired] public int AccountId { get; set; }
+    [Parameter] public EventCallback OnCompleted { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        _data = new() { AccountId = AccountId, };
+    }
+
+    private async Task Create()
+    {
+        _loading = true;
+        try
+        {
+            await AccountsRepository.CreateTradingAccountConfig(_data);
+            await OnCompleted.InvokeAsync();
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+}

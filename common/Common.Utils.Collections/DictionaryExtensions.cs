@@ -1,4 +1,4 @@
-﻿namespace Common.Utils.Collections;
+﻿namespace QuantInfra.Common.Utils.Collections;
 
 public static class DictionaryExtensions
 {

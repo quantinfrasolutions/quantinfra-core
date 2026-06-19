@@ -1,6 +1,6 @@
-using Common.Trading;
 using QuantInfra.Common.EventSourcing;
 using QuantInfra.Domain.Accounts.Base;
+using QuantInfra.Sdk.Trading;
 
 namespace QuantInfra.Tests.Mocks;
 

@@ -1,4 +1,3 @@
-using Common.Trading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NodaTime;
@@ -7,6 +6,7 @@ using QuantInfra.Domain.Accounts.Base.State;
 using QuantInfra.Domain.Events.Accounts.AccountsService.Primary;
 using QuantInfra.Sdk.Accounts;
 using QuantInfra.Sdk.StaticData;
+using QuantInfra.Sdk.Trading;
 using QuantInfra.Sdk.Trading.Orders;
 
 namespace Domain.Accounts.Base.State.Tests;

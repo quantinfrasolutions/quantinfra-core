@@ -1,7 +1,7 @@
-using Common.Trading.Positions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using QuantInfra.Databases.Main.Models.Entities;
+using QuantInfra.Sdk.Trading.Positions;
 
 namespace QuantInfra.Databases.Main.Models.Events;
 

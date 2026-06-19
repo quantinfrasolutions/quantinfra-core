@@ -1,4 +1,4 @@
-using Common.Accounts.Abstractions;
+using QuantInfra.Common.Accounts.Abstractions;
 using QuantInfra.Common.Interfaces.Api.Accounts;
 using QuantInfra.Sdk.Accounting;
 using QuantInfra.Sdk.Trading.Orders;
@@ -28,4 +28,6 @@ public interface IUiAccountsRepository
     Task AssignBrokerAccountToSsa(int accountId, AssignSsaToBrokerAccountRequest request);
     Task CreateSubaccount(CreateSubaccountRequest r);
     Task<IEnumerable<SharePriceHistory>> GetSharePriceHistory(SharePriceHistoryFilter filter);
+    Task CreateTradingAccountConfig(CreateTradingClientConfigRequest data);
+    Task DeleteTradingAccountConfig(int accountId);
 }

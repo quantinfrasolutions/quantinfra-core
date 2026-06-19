@@ -1,6 +1,6 @@
 ﻿using QuantInfra.Sdk.Accounts;
 
-namespace Common.Accounts.Abstractions;
+namespace QuantInfra.Common.Accounts.Abstractions;
 
 public interface IAccountRecordsRepository : IAccountRecordsRepositoryReadonly
 {

@@ -1,9 +1,10 @@
-using Common.Accounts.Abstractions;
-using Common.Trading.Positions;
+using QuantInfra.Common.Accounts.Abstractions;
 using QuantInfra.Common.Interfaces.Api.Accounts;
 using QuantInfra.Common.Interfaces.Api.Strategies;
 using QuantInfra.Sdk.Accounting;
+using QuantInfra.Sdk.Accounts;
 using QuantInfra.Sdk.Trading.Orders;
+using QuantInfra.Sdk.Trading.Positions;
 
 namespace QuantInfra.Common.Interfaces.Api.Management;
 
@@ -19,4 +20,6 @@ public interface IManagementServiceClient
     Task CancelOrderAsync(OrderCancelRequest ocr);
     Task CreateStrategyAsync(CreateStrategyRequest request);
     Task StartStrategyAsync(int strategyId);
+    Task CreateTradingClientConfig(TradingClientConfig config);
+    Task DeleteTradingClientConfig(int accountId);
 }

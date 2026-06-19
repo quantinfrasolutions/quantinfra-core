@@ -1,6 +1,7 @@
 using Common.Infrastructure.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using QuantInfra.Common.Infrastructure.Abstractions;
 using QuantInfra.Databases.Main.Models.Entities;
 
 namespace QuantInfra.Databases.Main.Models.Infrastructure;

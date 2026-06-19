@@ -1,6 +1,6 @@
 using QuantInfra.Common.Infrastructure.Abstractions;
 
-namespace Common.Infrastructure.Abstractions.Api;
+namespace QuantInfra.Common.Interfaces.Api.Infrastructure;
 
 public class StrategiesServiceListView : StrategiesServiceInstance
 {

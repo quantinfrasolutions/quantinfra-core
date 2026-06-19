@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using Common.Trading.Positions;
 using Domain.Queries.Accounts.AccountsService;
 using QuantInfra.Common.EventSourcing;
+using QuantInfra.Sdk.Trading.Positions;
 
 namespace QuantInfra.Domain.Queries.Accounts.AccountsService;
 

@@ -1,10 +1,10 @@
 using System.Runtime.CompilerServices;
 using Common.StaticData.Abstractions;
-using Common.Trading;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using QuantInfra.Sdk.StaticData;
 using QuantInfra.Sdk.StaticData.Synthetics;
+using QuantInfra.Sdk.Trading;
 using Contract = QuantInfra.Sdk.StaticData.Contract;
 using Stream = QuantInfra.Sdk.StaticData.Stream;
 

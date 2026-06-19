@@ -1,10 +1,10 @@
 using AccountsCore;
-using Common.Accounts.Abstractions;
 using Common.Infrastructure.Abstractions;
 using Disruptor.Dsl;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NodaTime;
+using QuantInfra.Common.Accounts.Abstractions;
 using QuantInfra.Common.EventSourcing;
 using QuantInfra.Common.Infrastructure.Abstractions;
 using QuantInfra.Common.Messaging.Json;

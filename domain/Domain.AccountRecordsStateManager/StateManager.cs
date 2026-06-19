@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Common.Accounts.Abstractions;
 using Common.Infrastructure.Abstractions;
 using Microsoft.Extensions.Logging;
 using NodaTime;
+using QuantInfra.Common.Accounts.Abstractions;
 using QuantInfra.Common.EventSourcing;
 using QuantInfra.Common.Infrastructure.Abstractions;
 using QuantInfra.Domain.AccountRecords.AccountRecordsClientStateManager;
@@ -63,10 +63,9 @@ public class StateManager :
                 var existingAcc = _store.AccountRecords[account.AccountId];
                 if (existingAcc.TradingClientConfig != account.TradingClientConfig)
                 {
-                    _logger.LogInformation("Updating account record {accountId} {name}", account.AccountId,
-                        account.Name);
+                    _logger.LogInformation("Updating account record {accountId} {name}", account.AccountId, account.Name);
                     _client.PublishMessage(new TradingClientConfigurationChangedEvt(account.AccountId,
-                        account.AccountId, account.TradingClientConfig, processingDt), processingDt);
+                        account.AccountId, new(account.TradingClientConfig) { TradingClientSecret = null }, processingDt), processingDt);
                 }
             }
         }

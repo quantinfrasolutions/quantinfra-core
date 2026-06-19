@@ -1,4 +1,3 @@
-using Common.Trading;
 using Domain.Accounts.Base.Tests;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -10,6 +9,7 @@ using QuantInfra.Domain.Queries.MarketData;
 using QuantInfra.Domain.Queries.StaticData;
 using QuantInfra.Sdk.Accounts;
 using QuantInfra.Sdk.StaticData;
+using QuantInfra.Sdk.Trading;
 using QuantInfra.Sdk.Trading.Positions;
 using QuantInfra.Tests.Mocks;
 using GenericMockEventHandler = Domain.Accounts.Base.Tests.GenericMockEventHandler;

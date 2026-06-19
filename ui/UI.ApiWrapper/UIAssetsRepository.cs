@@ -7,7 +7,7 @@ namespace UI.ApiWrapper;
 public partial class ApiRepository : IUiAssetsRepository
 {
     public Task<IEnumerable<Asset>> GetAssets(AssetFilter? filter = null) =>
-        RetrieveCollection("assets", () => _wrapper.Client.GetAssetsAsync(filter?.Id, filter?.Name, filter?.AssetType?.ToString(), filter?.Limit, filter?.Offset));
+        RetrieveCollection("assets", () => _wrapper.Client.GetAssetsAsync(filter?.Id, filter?.Name, (int?)filter?.AssetType, filter?.Limit, filter?.Offset));
 
     public Task CreateAsset(Asset asset)
     {

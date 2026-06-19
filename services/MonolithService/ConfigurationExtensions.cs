@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NodaTime;
+using QuantInfra.Common.Infrastructure.Abstractions;
 using QuantInfra.Common.Messaging;
 using QuantInfra.Common.Messaging.InProcess;
 using QuantInfra.Databases.Main;
@@ -26,6 +27,10 @@ public static class ConfigurationExtensions
             .UseMainDbInfrastructureRepository()
             .UseMainDbAccountRecordsRepository()
             .UseMainDbStrategyRecordsRepository()
+            .UseTradingAccountsRepository()
+            
+            .AddSingleton<FileSecretProviderConfig>(sp => new() { FilePath = Path.Combine(sp.GetRequiredService<Config>().WorkingDirPath, ".secret") })
+            .AddSingleton<ISecretProvider, FileSecretProvider>()
             
             .ConfigureMarketDataHistoryDb(configuration)
             .AddMarketDataHistoryDbContext()

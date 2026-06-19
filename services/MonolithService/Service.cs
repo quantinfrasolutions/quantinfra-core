@@ -468,6 +468,7 @@ public class Service : IHostedService
             })
             
             .ReuseInProcessMessaging(_serviceProvider)
+            .AddSingleton<ISecretProvider>(_serviceProvider.GetRequiredService<ISecretProvider>())
             
             .ConfigureMainDb(_serviceProvider.GetRequiredService<NpgsqlDataSource>())
             .AddMainDbContext()

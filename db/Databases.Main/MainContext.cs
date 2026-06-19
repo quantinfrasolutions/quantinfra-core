@@ -1,5 +1,4 @@
-﻿using Common.Trading.Positions;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using QuantInfra.Connectors.Binance.Common;
 using QuantInfra.Connectors.Ibkr.Interfaces;
@@ -11,6 +10,7 @@ using QuantInfra.Databases.Main.Models.Projections;
 using QuantInfra.Databases.Main.Models.StaticData;
 using QuantInfra.Sdk.Accounting;
 using QuantInfra.Sdk.StaticData;
+using QuantInfra.Sdk.Trading.Positions;
 using Stream = QuantInfra.Sdk.StaticData.Stream;
 using TradingClientConfig = QuantInfra.Sdk.Accounts.TradingClientConfig;
 

@@ -1,5 +1,6 @@
 using Common.Infrastructure.Abstractions;
-using Common.Infrastructure.Abstractions.Api;
+using QuantInfra.Common.Infrastructure.Abstractions;
+using QuantInfra.Common.Interfaces.Api.Infrastructure;
 
 namespace UI.Interfaces.Infrastructure;
 

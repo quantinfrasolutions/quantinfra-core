@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using Common.Trading.Positions;
 using NodaTime;
 using QuantInfra.Sdk.Accounting;
+using QuantInfra.Sdk.Trading.Positions;
 
 namespace QuantInfra.Domain.Events.Accounts.AccountsService.Primary;
 

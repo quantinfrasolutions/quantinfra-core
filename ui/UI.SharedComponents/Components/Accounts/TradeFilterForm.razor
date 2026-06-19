@@ -1,11 +1,12 @@
+@using QuantInfra.Common.Interfaces.Api
 @using QuantInfra.Common.Interfaces.Api.Accounts
-@using UI.SharedComponents.Base
+
 @if (!HideAccountSelector)
 {
     <AccountsSelector @bind-Value=@Filter.AccountId Required="false" />
 }
 <RadzenFormField Text="FromDt" Variant="@Variant.Text" Style="min-width: 180px;">
-    <RadzenDatePicker TValue="DateTime?" ShowTime="true" ShowSeconds="true" HourFormat="24" 
+    <RadzenDatePicker TValue="DateTime?" ShowTime="true" ShowSeconds="true" HourFormat="24"
                       Value=@(Filter.FromDt?.ToDateTimeUtc())
                       ValueChanged=@(dt => Filter.FromDt = dt.ParseInput())
                       Disabled="@Disabled" />

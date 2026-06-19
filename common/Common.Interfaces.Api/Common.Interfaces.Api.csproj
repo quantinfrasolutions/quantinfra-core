@@ -19,6 +19,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Common.Accounts.Abstractions\Common.Accounts.Abstractions.csproj" />
+      <ProjectReference Include="..\Common.Infrastructure.Abstractions\Common.Infrastructure.Abstractions.csproj" />
     </ItemGroup>
 
 </Project>

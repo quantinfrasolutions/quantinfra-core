@@ -8,7 +8,7 @@ public partial class ApiRepository : IUiCommissionsRepository
 {
     public Task<IEnumerable<CommissionStructure>> GetCommissions(CommissionsFilter filter) =>
         RetrieveCollection("commissions", () => _wrapper.Client.GetCommissionStructuresAsync(filter.CommissionId,
-            filter.Name, filter.CurrencyId, filter.Type.ToString(), filter.BrokerId, filter.ExchangeId, filter.Limit, filter.Offset));
+            filter.Name, filter.CurrencyId, (int?)filter.Type, filter.BrokerId, filter.ExchangeId, filter.Limit, filter.Offset));
 
     public Task CreateCommission(CommissionStructure commission)
     {

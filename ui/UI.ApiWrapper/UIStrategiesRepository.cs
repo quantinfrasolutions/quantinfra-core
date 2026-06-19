@@ -10,7 +10,7 @@ public partial class ApiRepository : IUiStrategiesRepository, IUiStrategyClasses
     public Task<IEnumerable<StrategyViewBrief>> GetStrategies(StrategiesFilter? filter = null) =>
         RetrieveCollection("strategies",
             () => _wrapper.Client.GetStrategiesAsync(
-                filter?.Status, 
+                filter?.Status?.Select(i => (int)i), 
                 filter?.ClassNames, 
                 filter?.StrategyIds,
                 filter?.Limit, 

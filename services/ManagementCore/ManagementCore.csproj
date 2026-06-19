@@ -18,6 +18,7 @@
       <ProjectReference Include="..\..\common\Common.Interfaces.Api\Common.Interfaces.Api.csproj" />
       <ProjectReference Include="..\..\common\Common.Messaging.Patterns\Common.Messaging.Patterns.csproj" />
       <ProjectReference Include="..\..\common\Common.Strategies.Abstractions\Common.Strategies.Abstractions.csproj" />
+      <ProjectReference Include="..\..\common\Common.Trading.Infrastructure\Common.Trading.Infrastructure.csproj" />
       <ProjectReference Include="..\..\domain\commands\Domain.Commands.Accounts.AccountsService\Domain.Commands.Accounts.AccountsService.csproj" />
       <ProjectReference Include="..\..\domain\commands\Domain.Commands.StaticData\Domain.Commands.StaticData.csproj" />
       <ProjectReference Include="..\..\domain\events\Domain.Events.Accounts.AccountsService\Domain.Events.Accounts.AccountsService.csproj" />

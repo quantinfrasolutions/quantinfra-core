@@ -47,7 +47,7 @@ public class TradingClient : GenericWebSocketClient.Client, IHostedService, IHos
         _responsesHandler = responsesHandler;
         _clock = clock;
         _accountId = config.AccountId;
-        _restClient = new(_config, loggerFactory);
+        _restClient = new(_config, config.TradingClientSecret!, loggerFactory);
         _schedulerFactory = serviceProvider.GetService<ISchedulerFactory>()!;
     }
 

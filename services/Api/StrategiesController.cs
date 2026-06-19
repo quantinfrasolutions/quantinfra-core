@@ -10,7 +10,6 @@ using QuantInfra.Common.Strategies;
 using QuantInfra.Databases.Main;
 using QuantInfra.Sdk.MarketData;
 using QuantInfra.Sdk.Strategies;
-using CreateStrategyRequest = QuantInfra.Common.Interfaces.Api.Strategies.CreateStrategyRequest;
 
 namespace QuantInfra.Services.Api;
 

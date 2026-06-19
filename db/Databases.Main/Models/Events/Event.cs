@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
-using Common.Trading.Positions;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using QuantInfra.Common.EventSourcing;
@@ -9,6 +8,7 @@ using QuantInfra.Databases.Main.Models.Entities;
 using QuantInfra.Databases.Main.Models.History;
 using QuantInfra.Databases.Main.Models.Infrastructure;
 using QuantInfra.Sdk.Accounting;
+using QuantInfra.Sdk.Trading.Positions;
 
 namespace QuantInfra.Databases.Main.Models.Events;
 

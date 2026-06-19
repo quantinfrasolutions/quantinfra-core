@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Common.Trading;
-using Common.Trading.Positions;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 using QuantInfra.Common.EventSourcing;
@@ -14,7 +12,9 @@ using QuantInfra.Sdk.Accounting;
 using QuantInfra.Sdk.Accounts;
 using QuantInfra.Sdk.Accounts.AccountStates;
 using QuantInfra.Sdk.StaticData;
+using QuantInfra.Sdk.Trading;
 using QuantInfra.Sdk.Trading.Orders;
+using QuantInfra.Sdk.Trading.Positions;
 
 namespace QuantInfra.Domain.Accounts.Base;
 
@@ -130,7 +130,7 @@ public class AccountBase : Processor, IAccount
     )
     {
         if (LoggingEnabled && Logger.IsEnabled(LogLevel.Information)) 
-            Logger.LogInformation($"ProcessBalanceOperation, request={request}");
+            Logger.LogInformation($"ProcessBalanceOperation, request={request}, requestId={requestId}");
         
         if (request.AccountId != AccountId) throw new InvalidOperationException("AccountId doesn't match the account");
 

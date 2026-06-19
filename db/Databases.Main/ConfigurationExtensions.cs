@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using Common.Accounts.Abstractions;
 using Common.StaticData.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -8,6 +7,7 @@ using Microsoft.Extensions.Options;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
 using Npgsql;
+using QuantInfra.Common.Accounts.Abstractions;
 using QuantInfra.Common.EventSourcing;
 using QuantInfra.Common.Infrastructure.Abstractions;
 using QuantInfra.Common.Strategies.Abstractions;
@@ -96,8 +96,13 @@ namespace QuantInfra.Databases.Main
 			.AddSingleton<IPersistentEventStorage<AccountServiceState>>(sp => sp.GetRequiredService<PersistentEventStorage>());
 		
 		public static IServiceCollection UseTradingAccountsRepositoryReadonly(this IServiceCollection sc) => sc
-			.AddSingleton<TradingAccountsRepositoryReadonly>()
-			.AddSingleton<ITradingAccountsRepositoryReadonly>(sp => sp.GetRequiredService<TradingAccountsRepositoryReadonly>());
+			.AddSingleton<TradingAccountsRepository>()
+			.AddSingleton<ITradingAccountsRepositoryReadonly>(sp => sp.GetRequiredService<TradingAccountsRepository>());
+		
+		public static IServiceCollection UseTradingAccountsRepository(this IServiceCollection sc) => sc
+			.AddSingleton<TradingAccountsRepository>()
+			.AddSingleton<ITradingAccountsRepositoryReadonly>(sp => sp.GetRequiredService<TradingAccountsRepository>())
+			.AddSingleton<ITradingAccountsRepository>(sp => sp.GetRequiredService<TradingAccountsRepository>());
 		
 		public static IServiceCollection UseMainDbInfrastructureRepository(this IServiceCollection sc) => sc
 			.AddSingleton<InfrastructureRepository>()

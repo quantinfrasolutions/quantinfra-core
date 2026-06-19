@@ -1,4 +1,4 @@
-namespace Common.Infrastructure.Abstractions;
+namespace QuantInfra.Common.Infrastructure.Abstractions;
 
 public class Location
 {

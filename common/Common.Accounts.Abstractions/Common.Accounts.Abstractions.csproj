@@ -5,6 +5,8 @@
         <LangVersion>10</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <AssemblyName>QuantInfra.Common.Accounts.Abstractions</AssemblyName>
+        <RootNamespace>QuantInfra.Common.Accounts.Abstractions</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(UseLocalSdkReference)' == 'true'">

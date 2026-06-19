@@ -1,12 +1,12 @@
-using Common.Accounts.Abstractions;
-using Common.Trading.Positions;
 using ManagementCore;
 using Microsoft.Extensions.Logging;
 using NodaTime;
+using QuantInfra.Common.Accounts.Abstractions;
 using QuantInfra.Common.Interfaces.Api.Accounts;
 using QuantInfra.Common.Interfaces.Api.Strategies;
 using QuantInfra.Common.Messaging;
 using QuantInfra.Common.Strategies.Abstractions;
+using QuantInfra.Common.Trading.Infrastructure;
 using QuantInfra.Connectors.Common;
 using QuantInfra.Domain.Commands.Accounts.AccountsService;
 using QuantInfra.Domain.Commands.StaticData;
@@ -17,6 +17,7 @@ using QuantInfra.Sdk.Accounting;
 using QuantInfra.Sdk.Accounts;
 using QuantInfra.Sdk.Strategies;
 using QuantInfra.Sdk.Trading.Orders;
+using QuantInfra.Sdk.Trading.Positions;
 using OrderCancelRequest = QuantInfra.Sdk.Trading.Orders.OrderCancelRequest;
 
 namespace QuantInfra.Services.ManagementCore;
@@ -24,10 +25,12 @@ namespace QuantInfra.Services.ManagementCore;
 public class ManagementService(
     IAccountRecordsRepository accountsRepository,
     IStrategyRecordsRepository strategiesRepository,
+    ITradingAccountsRepository tradingAccountsRepository,
     IPublisher publisher, 
     RequestsManager<NewOrderIdentifier> newOrderRequestsManager,
     RequestsManager<Guid> requestsManager,
-    ILogger<ManagementService> logger
+    ILogger<ManagementService> logger,
+    IClock clock
 )
 {
     public async Task<int> CreateAccountAsync(CreateAccountRequest request, int userId)
@@ -36,7 +39,7 @@ public class ManagementService(
         var account = await accountsRepository.CreateAccountAsync(request, userId);
         
         publisher.PublishUnwrappedObject(new AccountCreatedEvt(account.AccountId /* HACK */, account.AccountId, 
-            account, SystemClock.Instance.GetCurrentInstant()));
+            account, clock.GetCurrentInstant()));
         
         return account.AccountId;
     }
@@ -62,7 +65,23 @@ public class ManagementService(
         );
         
         publisher.PublishUnwrappedObject(new SubaccountAssignedEvt(request.AccountId /* HACK */, account!.AccountServiceName, request.AccountId,
-            subaccount, SystemClock.Instance.GetCurrentInstant()));
+            subaccount, clock.GetCurrentInstant()));
+    }
+
+    public async Task CreateTradingClientConfigAsync(TradingClientConfig config, int userId)
+    {
+        logger.LogInformation($"Creating trading client config for account {config.AccountId}");
+        await tradingAccountsRepository.CreateTradingClientConfig(config);
+        
+        publisher.PublishUnwrappedObject(new TradingClientConfigurationChangedEvt(config.AccountId, config.AccountId, new(config) { TradingClientSecret = null }, clock.GetCurrentInstant()));
+    }
+
+    public async Task DeleteTradingClientConfigAsync(int accountId, int userId)
+    {
+        logger.LogInformation($"Deleting trading client config for account {accountId}");
+        await tradingAccountsRepository.RemoveTradingClientConfig(accountId);
+        
+        publisher.PublishUnwrappedObject(new TradingClientConfigurationChangedEvt(accountId, accountId, null, clock.GetCurrentInstant()));
     }
     
     public async Task<int> CreateStrategyAsync(CreateStrategyRequest request, int userId)
@@ -72,7 +91,7 @@ public class ManagementService(
         var (strategy, account) = await strategiesRepository.CreateStrategyAsync(request, userId);
 
         publisher.PublishUnwrappedObject(new AccountCreatedEvt(account.AccountId /* HACK */, account.AccountId, 
-            account, SystemClock.Instance.GetCurrentInstant()));
+            account, clock.GetCurrentInstant()));
 
         if (account.AccountType == AccountType.VirtualAccount && request.Account.AddInitialInvestment)
         {
@@ -90,7 +109,7 @@ public class ManagementService(
         }
         
         publisher.PublishUnwrappedObject(new StrategyCreatedEvt(strategy.StrategyId /* HACK */, strategy.StrategyId, 
-            strategy, account, SystemClock.Instance.GetCurrentInstant()));
+            strategy, account, clock.GetCurrentInstant()));
         
         return account.AccountId;
     }

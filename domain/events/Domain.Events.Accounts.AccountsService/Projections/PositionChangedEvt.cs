@@ -1,5 +1,4 @@
-﻿using Common.Trading.Positions;
-using NodaTime;
+﻿using NodaTime;
 using QuantInfra.Sdk.Trading.Positions;
 
 namespace QuantInfra.Domain.Events.Accounts.AccountsService.Projections;

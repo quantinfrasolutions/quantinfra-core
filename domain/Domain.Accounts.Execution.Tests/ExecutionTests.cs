@@ -1,5 +1,3 @@
-using Common.Trading;
-using Common.Trading.Positions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NodaTime;
@@ -13,8 +11,10 @@ using QuantInfra.Domain.Queries.StaticData;
 using QuantInfra.Sdk.Accounts;
 using QuantInfra.Sdk.Accounts.ExternalAccounts;
 using QuantInfra.Sdk.StaticData;
+using QuantInfra.Sdk.Trading;
 using QuantInfra.Sdk.Trading.ExternalAccounts;
 using QuantInfra.Sdk.Trading.Orders;
+using QuantInfra.Sdk.Trading.Positions;
 using QuantInfra.Tests.Mocks;
 using Stream = QuantInfra.Sdk.StaticData.Stream;
 

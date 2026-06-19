@@ -1,7 +1,8 @@
-﻿@using Common.Accounts.Abstractions
+﻿@using QuantInfra.Common.Accounts.Abstractions
 @using QuantInfra.Sdk.Accounts
 @using UI.Interfaces.Accounts
 @using UI.SharedComponents.Components.StaticData
+@using UI.SharedComponents.Infrastructure
 
 @inject IUiAccountsRepository Repository
 
@@ -11,21 +12,24 @@
                     Submit=@CreateStrategy>
     <RadzenStack Gap="1rem" AlignItems="AlignItems.Stretch">
         <RadzenRow>
+            <AccountsServiceSelector TValue="string" @bind-Value=@_account.AccountServiceName />
+        </RadzenRow>
+        <RadzenRow>
             <RadzenFormField Text="Name" Variant="Variant.Text">
-                <RadzenTextBox @bind-Value="_account.Name" />
+                <RadzenTextBox @bind-Value="_account.Name"/>
             </RadzenFormField>
         </RadzenRow>
         <RadzenRow>
             <RadzenFormField Text="Account type" Variant="Variant.Text">
                 <RadzenDropDown @bind-Value="@_account.AccountType"
                                 Data=@_supportedAccountTypes
-                                Disabled=@_isLoading />
+                                Disabled=@_isLoading/>
             </RadzenFormField>
         </RadzenRow>
         @if (_account.AccountType == AccountType.BrokerAccount)
         {
             <RadzenRow>
-                <BrokersSelector @bind-Value=@_account.BrokerId />
+                <BrokersSelector @bind-Value=@_account.BrokerId/>
             </RadzenRow>
         }
         <RadzenRow>
@@ -35,12 +39,12 @@
             <RadzenFormField Text="Position tracking" Variant="Variant.Text">
                 <RadzenDropDown @bind-Value="@_account.PositionAccounting"
                                 Data=@(Enum.GetValues(typeof(PositionAccounting)).Cast<Enum>())
-                                Disabled=@_isLoading />
+                                Disabled=@_isLoading/>
             </RadzenFormField>
         </RadzenRow>
         <RadzenRow>
-            <RadzenCheckBox TValue="bool" @bind-Value=@_account.EnableSharePriceTracking Disabled=@_isLoading Name="EnableMt" />
-            <RadzenLabel Text="Enable share price tracking" Component="EnableMt" class="rz-ms-2" />
+            <RadzenCheckBox TValue="bool" @bind-Value=@_account.EnableSharePriceTracking Disabled=@_isLoading Name="EnableMt"/>
+            <RadzenLabel Text="Enable share price tracking" Component="EnableMt" class="rz-ms-2"/>
         </RadzenRow>
         @if (_account.EnableSharePriceTracking)
         {
@@ -50,7 +54,7 @@
             </RadzenRow>
         }
         <RadzenRow JustifyContent="JustifyContent.End">
-            <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" Text="Create account" Variant="Variant.Text" />
+            <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" Text="Create account" Variant="Variant.Text"/>
         </RadzenRow>
     </RadzenStack>
 </RadzenTemplateForm>

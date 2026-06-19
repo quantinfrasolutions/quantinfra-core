@@ -1,5 +1,5 @@
-using Common.Accounts.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
+using QuantInfra.Common.Accounts.Abstractions;
 using QuantInfra.Sdk.Accounts;
 
 namespace QuantInfra.Databases.Main.DAL;

@@ -1,10 +1,11 @@
-using Common.Accounts.Abstractions;
-using Common.Trading.Positions;
+using QuantInfra.Common.Accounts.Abstractions;
 using QuantInfra.Common.Interfaces.Api.Accounts;
 using QuantInfra.Common.Interfaces.Api.Management;
 using QuantInfra.Common.Interfaces.Api.Strategies;
 using QuantInfra.Sdk.Accounting;
+using QuantInfra.Sdk.Accounts;
 using QuantInfra.Sdk.Trading.Orders;
+using QuantInfra.Sdk.Trading.Positions;
 
 namespace QuantInfra.Services.ManagementCore;
 
@@ -32,4 +33,10 @@ public class ManagementServiceClient(ManagementService service) : IManagementSer
     public Task CreateStrategyAsync(CreateStrategyRequest request) => service.CreateStrategyAsync(request, 0);
 
     public Task StartStrategyAsync(int strategyId) => service.StartStrategyAsync(strategyId, 0);
+
+    public Task CreateTradingClientConfig(TradingClientConfig request) =>
+        service.CreateTradingClientConfigAsync(request, 0);
+
+    public Task DeleteTradingClientConfig(int accountId) =>
+        service.DeleteTradingClientConfigAsync(accountId, 0);
 }

@@ -1,4 +1,3 @@
-using Common.Trading;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 using QuantInfra.Common.EventSourcing;
@@ -7,6 +6,7 @@ using QuantInfra.Domain.Queries.StaticData;
 using QuantInfra.Sdk.Accounts;
 using QuantInfra.Sdk.StaticData;
 using QuantInfra.Sdk.Strategies;
+using QuantInfra.Sdk.Trading;
 using QuantInfra.Sdk.Trading.Orders;
 
 namespace QuantInfra.Domain.VirtualExecution;

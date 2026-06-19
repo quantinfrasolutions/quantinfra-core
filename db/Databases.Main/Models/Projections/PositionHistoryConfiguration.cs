@@ -1,4 +1,3 @@
-using Common.Trading.Positions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using QuantInfra.Databases.Main.Models.Entities;

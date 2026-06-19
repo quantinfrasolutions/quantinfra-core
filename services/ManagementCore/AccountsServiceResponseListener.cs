@@ -1,4 +1,3 @@
-using Common.Trading.Positions;
 using ManagementCore;
 using QuantInfra.Common.EventSourcing;
 using QuantInfra.Common.Messaging;
@@ -7,6 +6,7 @@ using QuantInfra.Connectors.Common;
 using QuantInfra.Domain.Events.Accounts.AccountsService.Primary;
 using QuantInfra.Domain.Queries.Accounts.AccountsService;
 using QuantInfra.Sdk.Trading.Orders;
+using QuantInfra.Sdk.Trading.Positions;
 
 namespace QuantInfra.Services.ManagementCore;
 

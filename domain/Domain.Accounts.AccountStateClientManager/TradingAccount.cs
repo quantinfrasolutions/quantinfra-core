@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Common.Metrics;
-using Common.Trading;
-using Common.Trading.Positions;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 using Prometheus;
@@ -11,7 +9,9 @@ using QuantInfra.Common.Infrastructure.Abstractions;
 using QuantInfra.Domain.Accounts.Base.State;
 using QuantInfra.Domain.Events.Accounts.AccountsService.Primary;
 using QuantInfra.Sdk.Accounts;
+using QuantInfra.Sdk.Trading;
 using QuantInfra.Sdk.Trading.Orders;
+using QuantInfra.Sdk.Trading.Positions;
 
 namespace QuantInfra.Domain.Accounts.AccountStateClientManager;
 

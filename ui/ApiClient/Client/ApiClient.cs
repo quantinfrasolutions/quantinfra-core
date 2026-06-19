@@ -6,11 +6,10 @@
 
 #nullable enable
 
-using Common.Accounts.Abstractions;
-using Common.Infrastructure.Abstractions;
-using Common.Infrastructure.Abstractions.Api;
-using Common.Trading;
+using QuantInfra.Common.Accounts.Abstractions;
+using QuantInfra.Common.Infrastructure.Abstractions;
 using QuantInfra.Common.Interfaces.Api.Accounts;
+using QuantInfra.Common.Interfaces.Api.Infrastructure;
 using QuantInfra.Common.Interfaces.Api.StaticData;
 using QuantInfra.Common.Interfaces.Api.Strategies;
 using QuantInfra.Common.Strategies;
@@ -18,6 +17,7 @@ using QuantInfra.Sdk.Accounting;
 using QuantInfra.Sdk.Accounts;
 using QuantInfra.Sdk.StaticData;
 using QuantInfra.Sdk.Strategies;
+using QuantInfra.Sdk.Trading;
 using QuantInfra.Sdk.Trading.Orders;
 using QuantInfra.Sdk.Trading.Positions;
 
@@ -75,7 +75,7 @@ namespace QuantInfra.Api.Client
 
         /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<AccountListModel>> GetAccountsAsync(System.Collections.Generic.IEnumerable<int>? accountIds, string? accountName, System.Collections.Generic.IEnumerable<AccountType>? accountTypes, int? strategyId)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<AccountListModel>> GetAccountsAsync(System.Collections.Generic.IEnumerable<int>? accountIds, string? accountName, System.Collections.Generic.IEnumerable<int>? accountTypes, int? strategyId)
         {
             return GetAccountsAsync(accountIds, accountName, accountTypes, strategyId, System.Threading.CancellationToken.None);
         }
@@ -83,7 +83,7 @@ namespace QuantInfra.Api.Client
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<AccountListModel>> GetAccountsAsync(System.Collections.Generic.IEnumerable<int>? accountIds, string? accountName, System.Collections.Generic.IEnumerable<AccountType>? accountTypes, int? strategyId, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<AccountListModel>> GetAccountsAsync(System.Collections.Generic.IEnumerable<int>? accountIds, string? accountName, System.Collections.Generic.IEnumerable<int>? accountTypes, int? strategyId, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -588,6 +588,167 @@ namespace QuantInfra.Api.Client
 
         /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task CreateTradingClientConfigAsync(int accountId, CreateTradingClientConfigRequest body)
+        {
+            return CreateTradingClientConfigAsync(accountId, body, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="SwaggerException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task CreateTradingClientConfigAsync(int accountId, CreateTradingClientConfigRequest body, System.Threading.CancellationToken cancellationToken)
+        {
+            if (accountId == null)
+                throw new System.ArgumentNullException("accountId");
+
+            if (body == null)
+                throw new System.ArgumentNullException("body");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/accounts/{accountId}/trading-client"
+                    urlBuilder_.Append("api/accounts/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(accountId, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/trading-client");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
+                            throw new SwaggerException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <returns>OK</returns>
+        /// <exception cref="SwaggerException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task DeleteTradingClientConfigAsync(int accountId)
+        {
+            return DeleteTradingClientConfigAsync(accountId, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="SwaggerException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task DeleteTradingClientConfigAsync(int accountId, System.Threading.CancellationToken cancellationToken)
+        {
+            if (accountId == null)
+                throw new System.ArgumentNullException("accountId");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/accounts/{accountId}/trading-client"
+                    urlBuilder_.Append("api/accounts/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(accountId, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/trading-client");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
+                            throw new SwaggerException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <returns>OK</returns>
+        /// <exception cref="SwaggerException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<BalanceModel>> GetBalancesAsync(int accountId)
         {
             return GetBalancesAsync(accountId, System.Threading.CancellationToken.None);
@@ -671,7 +832,7 @@ namespace QuantInfra.Api.Client
 
         /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<BalanceOperationHistoryModel>> GetBalanceOperationsHistoryAsync(int? accountId, long? balanceOperationId, string? fromDt, string? toDt, string? externalId, int? limit, int? offset)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<BalanceOperationHistoryModel>> GetBalanceOperationsHistoryAsync(int? accountId, long? balanceOperationId, long? fromDt, long? toDt, string? externalId, int? limit, int? offset)
         {
             return GetBalanceOperationsHistoryAsync(accountId, balanceOperationId, fromDt, toDt, externalId, limit, offset, System.Threading.CancellationToken.None);
         }
@@ -679,7 +840,7 @@ namespace QuantInfra.Api.Client
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<BalanceOperationHistoryModel>> GetBalanceOperationsHistoryAsync(int? accountId, long? balanceOperationId, string? fromDt, string? toDt, string? externalId, int? limit, int? offset, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<BalanceOperationHistoryModel>> GetBalanceOperationsHistoryAsync(int? accountId, long? balanceOperationId, long? fromDt, long? toDt, string? externalId, int? limit, int? offset, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -944,7 +1105,7 @@ namespace QuantInfra.Api.Client
 
         /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<SharePriceHistory>> GetSharePriceHistoryAsync(int? accountId, bool? sortDescending, string? fromDt, string? toDt, string? changeType, int? limit, int? offset)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<SharePriceHistory>> GetSharePriceHistoryAsync(int? accountId, bool? sortDescending, long? fromDt, long? toDt, int? changeType, int? limit, int? offset)
         {
             return GetSharePriceHistoryAsync(accountId, sortDescending, fromDt, toDt, changeType, limit, offset, System.Threading.CancellationToken.None);
         }
@@ -952,7 +1113,7 @@ namespace QuantInfra.Api.Client
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<SharePriceHistory>> GetSharePriceHistoryAsync(int? accountId, bool? sortDescending, string? fromDt, string? toDt, string? changeType, int? limit, int? offset, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<SharePriceHistory>> GetSharePriceHistoryAsync(int? accountId, bool? sortDescending, long? fromDt, long? toDt, int? changeType, int? limit, int? offset, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -1135,7 +1296,7 @@ namespace QuantInfra.Api.Client
 
         /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<PositionView>> GetPositionsHistoryAsync(string? closeDtFrom, string? closeDtTo, System.Collections.Generic.IEnumerable<PositionChangeType>? type, string? openDtFrom, string? openDtTo, string? historyOpenDtFrom, string? historyOpenDtTo, int? accountId, int? contractId, long? tradeId)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<PositionView>> GetPositionsHistoryAsync(long? closeDtFrom, long? closeDtTo, System.Collections.Generic.IEnumerable<int>? type, long? openDtFrom, long? openDtTo, long? historyOpenDtFrom, long? historyOpenDtTo, int? accountId, int? contractId, long? tradeId)
         {
             return GetPositionsHistoryAsync(closeDtFrom, closeDtTo, type, openDtFrom, openDtTo, historyOpenDtFrom, historyOpenDtTo, accountId, contractId, tradeId, System.Threading.CancellationToken.None);
         }
@@ -1143,7 +1304,7 @@ namespace QuantInfra.Api.Client
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<PositionView>> GetPositionsHistoryAsync(string? closeDtFrom, string? closeDtTo, System.Collections.Generic.IEnumerable<PositionChangeType>? type, string? openDtFrom, string? openDtTo, string? historyOpenDtFrom, string? historyOpenDtTo, int? accountId, int? contractId, long? tradeId, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<PositionView>> GetPositionsHistoryAsync(long? closeDtFrom, long? closeDtTo, System.Collections.Generic.IEnumerable<int>? type, long? openDtFrom, long? openDtTo, long? historyOpenDtFrom, long? historyOpenDtTo, int? accountId, int? contractId, long? tradeId, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -1496,7 +1657,7 @@ namespace QuantInfra.Api.Client
 
         /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<OrderHistoryView>> GetOrdersHistoryAsync(int? accountId, long? orderId, int? contractId, string? ordStatus, string? externalId, long? executionRequestId, string? fromDt, string? toDt, string? execType, int? limit, int? offset)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<OrderHistoryView>> GetOrdersHistoryAsync(int? accountId, long? orderId, int? contractId, int? ordStatus, string? externalId, long? executionRequestId, long? fromDt, long? toDt, int? execType, int? limit, int? offset)
         {
             return GetOrdersHistoryAsync(accountId, orderId, contractId, ordStatus, externalId, executionRequestId, fromDt, toDt, execType, limit, offset, System.Threading.CancellationToken.None);
         }
@@ -1504,7 +1665,7 @@ namespace QuantInfra.Api.Client
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<OrderHistoryView>> GetOrdersHistoryAsync(int? accountId, long? orderId, int? contractId, string? ordStatus, string? externalId, long? executionRequestId, string? fromDt, string? toDt, string? execType, int? limit, int? offset, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<OrderHistoryView>> GetOrdersHistoryAsync(int? accountId, long? orderId, int? contractId, int? ordStatus, string? externalId, long? executionRequestId, long? fromDt, long? toDt, int? execType, int? limit, int? offset, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -1704,7 +1865,7 @@ namespace QuantInfra.Api.Client
 
         /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<TradeView>> GetTradesHistoryAsync(string? fromDt, string? toDt, int? accountId, long? tradeId, int? contractId, string? externalId, int? limit, int? offset)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<TradeView>> GetTradesHistoryAsync(long? fromDt, long? toDt, int? accountId, long? tradeId, int? contractId, string? externalId, int? limit, int? offset)
         {
             return GetTradesHistoryAsync(fromDt, toDt, accountId, tradeId, contractId, externalId, limit, offset, System.Threading.CancellationToken.None);
         }
@@ -1712,7 +1873,7 @@ namespace QuantInfra.Api.Client
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<TradeView>> GetTradesHistoryAsync(string? fromDt, string? toDt, int? accountId, long? tradeId, int? contractId, string? externalId, int? limit, int? offset, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<TradeView>> GetTradesHistoryAsync(long? fromDt, long? toDt, int? accountId, long? tradeId, int? contractId, string? externalId, int? limit, int? offset, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -3204,7 +3365,7 @@ namespace QuantInfra.Api.Client
 
         /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Asset>> GetAssetsAsync(int? id, string? name, string? assetType, int? limit, int? offset)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Asset>> GetAssetsAsync(int? id, string? name, int? assetType, int? limit, int? offset)
         {
             return GetAssetsAsync(id, name, assetType, limit, offset, System.Threading.CancellationToken.None);
         }
@@ -3212,7 +3373,7 @@ namespace QuantInfra.Api.Client
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Asset>> GetAssetsAsync(int? id, string? name, string? assetType, int? limit, int? offset, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Asset>> GetAssetsAsync(int? id, string? name, int? assetType, int? limit, int? offset, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -3742,7 +3903,7 @@ namespace QuantInfra.Api.Client
 
         /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<CommissionStructure>> GetCommissionStructuresAsync(int? commissionId, string? name, int? currencyId, string? type, int? brokerId, int? exchangeId, int? limit, int? offset)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<CommissionStructure>> GetCommissionStructuresAsync(int? commissionId, string? name, int? currencyId, int? type, int? brokerId, int? exchangeId, int? limit, int? offset)
         {
             return GetCommissionStructuresAsync(commissionId, name, currencyId, type, brokerId, exchangeId, limit, offset, System.Threading.CancellationToken.None);
         }
@@ -3750,7 +3911,7 @@ namespace QuantInfra.Api.Client
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<CommissionStructure>> GetCommissionStructuresAsync(int? commissionId, string? name, int? currencyId, string? type, int? brokerId, int? exchangeId, int? limit, int? offset, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<CommissionStructure>> GetCommissionStructuresAsync(int? commissionId, string? name, int? currencyId, int? type, int? brokerId, int? exchangeId, int? limit, int? offset, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -3942,7 +4103,7 @@ namespace QuantInfra.Api.Client
 
         /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<StrategyViewBrief>> GetStrategiesAsync(System.Collections.Generic.IEnumerable<StrategyStatus>? status, System.Collections.Generic.IEnumerable<string>? classNames, System.Collections.Generic.IEnumerable<int>? strategyIds, int? limit, int? offset)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<StrategyViewBrief>> GetStrategiesAsync(System.Collections.Generic.IEnumerable<int>? status, System.Collections.Generic.IEnumerable<string>? classNames, System.Collections.Generic.IEnumerable<int>? strategyIds, int? limit, int? offset)
         {
             return GetStrategiesAsync(status, classNames, strategyIds, limit, offset, System.Threading.CancellationToken.None);
         }
@@ -3950,7 +4111,7 @@ namespace QuantInfra.Api.Client
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<StrategyViewBrief>> GetStrategiesAsync(System.Collections.Generic.IEnumerable<StrategyStatus>? status, System.Collections.Generic.IEnumerable<string>? classNames, System.Collections.Generic.IEnumerable<int>? strategyIds, int? limit, int? offset, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<StrategyViewBrief>> GetStrategiesAsync(System.Collections.Generic.IEnumerable<int>? status, System.Collections.Generic.IEnumerable<string>? classNames, System.Collections.Generic.IEnumerable<int>? strategyIds, int? limit, int? offset, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;

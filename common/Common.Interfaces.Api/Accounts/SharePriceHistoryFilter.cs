@@ -7,7 +7,7 @@ public class SharePriceHistoryFilter : PagingFilter
 {
     public int AccountId { get; set; }
     public bool SortDescending { get; set; }
-    public Instant? FromDt { get; set; }
-    public Instant? ToDt { get; set; }
+    public long? FromDt { get; set; }
+    public long? ToDt { get; set; }
     public SharePriceHistoryChangeType? ChangeType { get; set; }
 }

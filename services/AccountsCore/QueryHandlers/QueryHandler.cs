@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using Common.Trading.Positions;
-using Common.Utils.Collections;
 using QuantInfra.Common.EventSourcing;
+using QuantInfra.Common.Utils.Collections;
 using QuantInfra.Domain.Account.Execution.State;
 using QuantInfra.Domain.Accounts.Base.State;
 using QuantInfra.Domain.Queries.Accounts.AccountsService;
@@ -11,6 +10,7 @@ using QuantInfra.Sdk.Accounts;
 using QuantInfra.Sdk.Accounts.AccountStates;
 using QuantInfra.Sdk.Strategies;
 using QuantInfra.Sdk.Trading.Orders;
+using QuantInfra.Sdk.Trading.Positions;
 using QuantInfra.Services.AccountsCore.State;
 
 namespace QuantInfra.Services.AccountsCore.QueryHandlers;

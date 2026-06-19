@@ -1,12 +1,15 @@
-using Common.Accounts.Abstractions;
-using Common.Trading;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
+using QuantInfra.Common.Accounts.Abstractions;
+using QuantInfra.Common.Interfaces.Api;
 using QuantInfra.Common.Interfaces.Api.Accounts;
 using QuantInfra.Common.Interfaces.Api.Management;
 using QuantInfra.Databases.Main;
 using QuantInfra.Sdk.Accounting;
+using QuantInfra.Sdk.Accounts;
+using QuantInfra.Sdk.Trading;
 using QuantInfra.Sdk.Trading.Orders;
 
 namespace QuantInfra.Services.Api;
@@ -18,33 +21,16 @@ public class AccountsController(
     IManagementServiceClient managementClient
 ) : Controller
 {
-    // [HttpGet]
-    // [EndpointName("GetAccounts")]
-    // [Produces("application/json")]
-    // public Task<IReadOnlyCollection<AccountListModel>> GetAccounts(
-    //     [FromQuery] int? accountId = null,
-    //     [FromQuery] List<int>? accountIds = null,
-    //     [FromQuery] string? accountName = null,
-    //     [FromQuery] string? accountType = null,
-    //     [FromQuery] string? accountTypes = null,
-    //     [FromQuery] int? strategyId = null
-    // ) => GetAccounts(new()
-    // {
-    //     AccountId = accountId,
-    //     AccountIds = accountIds,
-    //     AccountName = accountName,
-    //     AccountType = string.IsNullOrEmpty(accountType) ? null : Enum.Parse<AccountType>(accountType),
-    //     AccountTypes = string.IsNullOrEmpty(accountTypes) ? null : accountTypes.Split(',').Select(t => Enum.Parse<AccountType>(t)).ToList(),
-    //     StrategyId = strategyId,
-    // });
-
     [HttpGet]
     [EndpointName("GetAccounts")]
     [Produces("application/json")]
-    public async Task<IReadOnlyCollection<AccountListModel>> GetAccounts([FromQuery] AccountsFilter? filter)
+    public Task<IReadOnlyCollection<AccountListModel>> GetAccounts([FromQuery] AccountsFilter? filter) =>
+        GetAccountsInternal(filter, false);
+
+    private async Task<IReadOnlyCollection<AccountListModel>> GetAccountsInternal(AccountsFilter? filter, bool includeTradingClient)
     {
         filter ??= new();
-        return await context.Accounts
+        var query = context.Accounts
             .Where(a => 
                 (filter.AccountIds == null || filter.AccountIds.Count == 0 || filter.AccountIds.Contains(a.AccountId))
                 && (filter.AccountTypes == null || filter.AccountTypes.Count == 0 || filter.AccountTypes.Contains(a.AccountType))
@@ -55,16 +41,27 @@ public class AccountsController(
             )
             .Include(a => a.Currency).ThenInclude(c => c.Asset)
             .Include(a => a.Broker)
-            .AsNoTracking()
-            .Select(a => new AccountListModel(
+            .AsNoTracking();
+
+        if (includeTradingClient)
+        {
+            query = query.Include(a => a.TradingClientConfig);
+        }
+        return await query.Select(a => 
+            new AccountListModel(
                 a, 
                 a.Currency.Asset.Name,
                 a.Broker != null ? a.Broker.Name : null,
                 a.Broker != null ? a.Broker.BrokerType : null,
                 null,
-                a.Strategy.StrategyId,
+                a.Strategy!.StrategyId,
                 a.Strategy.Name
-            ))
+            )
+            {
+                TradingClientConfig = includeTradingClient && a.TradingClientConfig != null
+                    ? new TradingClientConfig(a.TradingClientConfig) { TradingClientSecret = null }
+                    : null
+            })
             .ToListAsync();
     }
 
@@ -81,7 +78,7 @@ public class AccountsController(
     [Produces("application/json")]
     public async Task<ActionResult<AccountListModel>> GetAccount([FromRoute] int accountId)
     {
-        var account = (await GetAccounts(new() { AccountIds = [accountId] })).SingleOrDefault();
+        var account = (await GetAccountsInternal(new() { AccountIds = [accountId] }, true)).SingleOrDefault();
         return account == null ? NotFound() : Ok(account);
     }
 
@@ -97,7 +94,7 @@ public class AccountsController(
                 sa.AccountId == accountId 
                 && (filter.Classifier == null || sa.Classifier == filter.Classifier)
             )
-            .Select(sa => new SubaccountListModel(sa, sa.Account.Name, sa.Subaccount.Name, sa.Broker.Name))
+            .Select(sa => new SubaccountListModel(sa, sa.Account.Name, sa.Subaccount.Name, sa.Broker!.Name))
             .AsNoTracking()
             .ToListAsync();
     }
@@ -119,9 +116,23 @@ public class AccountsController(
             .Where(sa => 
                 sa.SubaccountId == accountId 
             )
-            .Select(sa => new SubaccountListModel(sa, sa.Account.Name, sa.Subaccount.Name, sa.Broker.Name))
+            .Select(sa => new SubaccountListModel(sa, sa.Account.Name, sa.Subaccount.Name, sa.Broker!.Name))
             .AsNoTracking()
             .ToListAsync();
+    }
+
+    [HttpPost, Route("{accountId:int}/trading-client")]
+    [EndpointName(nameof(CreateTradingClientConfig))]
+    public async Task CreateTradingClientConfig([FromBody] CreateTradingClientConfigRequest request)
+    {
+        await managementClient.CreateTradingClientConfig(request.ToConfig());
+    }
+    
+    [HttpDelete, Route("{accountId:int}/trading-client")]
+    [EndpointName(nameof(DeleteTradingClientConfig))]
+    public async Task DeleteTradingClientConfig([FromRoute] int accountId)
+    {
+        await managementClient.DeleteTradingClientConfig(accountId);
     }
         
     
@@ -142,13 +153,16 @@ public class AccountsController(
     [Produces("application/json")]
     public async Task<IReadOnlyCollection<BalanceOperationHistoryModel>> GetBalanceOperationsHistory([FromQuery] BalanceOperationsFilter filter)
     {
+        var fromDt = filter.FromDt.FromApiFormat();
+        var toDt = filter.ToDt.FromApiFormat();
+        
         return await context.BalanceOperations
             .Where(bo =>
                 (filter.AccountId == null || bo.AccountId == filter.AccountId)
                 && (filter.BalanceOperationId == null || bo.BalanceOperationId == filter.BalanceOperationId)
                 && (filter.ExternalId == null || bo.ExternalId == filter.ExternalId)
-                && (filter.FromDt == null || filter.FromDt <= bo.Dt)
-                && (filter.ToDt == null || filter.ToDt >= bo.Dt)
+                && (fromDt == null || fromDt <= bo.Dt)
+                && (toDt == null || toDt >= bo.Dt)
             )
             .OrderBy(bo => bo.Dt)
             .Skip(filter.Offset)
@@ -187,11 +201,14 @@ public class AccountsController(
     [Produces("application/json")]
     public async Task<IEnumerable<SharePriceHistory>> GetSharePriceHistory([FromQuery] SharePriceHistoryFilter filter)
     {
+        var fromDt = filter.FromDt.FromApiFormat();
+        var toDt = filter.ToDt.FromApiFormat();
+        
         var query = context.SharePriceHistory
             .Where(sp => sp.AccountId == filter.AccountId 
                 && (filter.ChangeType == null || filter.ChangeType == sp.Type)
-                && (filter.FromDt == null || filter.FromDt <= sp.Dt)
-                && (filter.ToDt == null || filter.ToDt >= sp.Dt)
+                && (fromDt == null || fromDt <= sp.Dt)
+                && (toDt == null || toDt >= sp.Dt)
             );
             
         query = filter.SortDescending
@@ -272,20 +289,26 @@ public class AccountsController(
     public async Task<IEnumerable<PositionView>> GetPositionsHistory([FromQuery] PositionHistoryFilter? filter = null)
     {
         filter ??= new();
+        var openDtFrom = filter.OpenDtFrom.FromApiFormat();
+        var openDtTo = filter.OpenDtTo.FromApiFormat();
+        var historyOpenDtFrom = filter.HistoryOpenDtFrom.FromApiFormat();
+        var historyOpenDtTo = filter.HistoryOpenDtTo.FromApiFormat();
+        var closeDtFrom = filter.CloseDtFrom.FromApiFormat();
+        var closeDtTo = filter.CloseDtTo.FromApiFormat();
         
         return await context.PositionsHistory
             .Include(p => p.Account)
             .Include(p => p.Contract)
             .Where(p =>
-                (filter.OpenDtFrom == null || filter.OpenDtFrom <= p.OpenDt)
-                && (filter.OpenDtTo == null || filter.OpenDtTo >= p.OpenDt)
-                && (filter.HistoryOpenDtFrom == null || filter.HistoryOpenDtFrom <= p.HistoryOpenDt)
-                && (filter.HistoryOpenDtTo == null || filter.HistoryOpenDtTo >= p.HistoryOpenDt)
+                (openDtFrom == null || openDtFrom <= p.OpenDt)
+                && (openDtTo == null || openDtTo >= p.OpenDt)
+                && (historyOpenDtFrom == null || historyOpenDtFrom <= p.HistoryOpenDt)
+                && (historyOpenDtTo == null || historyOpenDtTo >= p.HistoryOpenDt)
                 && (filter.AccountId == null || filter.AccountId == p.AccountId)
                 && (filter.ContractId == null || filter.ContractId == p.ContractId)
                 && (filter.TradeId == null || filter.TradeId == p.OpenTradeId || filter.TradeId == p.CloseTradeId)
-                && (filter.CloseDtFrom == null || filter.CloseDtFrom <= p.CloseDt)
-                && (filter.CloseDtTo == null || filter.CloseDtTo >= p.CloseDt)
+                && (closeDtFrom == null || closeDtFrom <= p.CloseDt)
+                && (closeDtTo == null || closeDtTo >= p.CloseDt)
                 && (filter.Type == null || filter.Type.Contains(p.Type))
             )
             .OrderBy(p => p.CloseDt)
@@ -335,6 +358,8 @@ public class AccountsController(
     public async Task<IEnumerable<OrderHistoryView>> GetOrdersHistory([FromQuery] OrderFilter? filter = null)
     {
         filter ??= new();
+        var fromDt = filter.FromDt.FromApiFormat();
+        var toDt = filter.ToDt.FromApiFormat();
         
         return await context.OrdersHistory
             .Where(o =>
@@ -344,8 +369,8 @@ public class AccountsController(
                 && (filter.OrdStatus == null || filter.OrdStatus == o.OrdStatus)
                 && (string.IsNullOrEmpty(filter.ExternalId) || filter.ExternalId == o.ExternalId)
                 && (filter.ExecutionRequestId == null || filter.ExecutionRequestId == o.ExecutionRequestId)
-                && (filter.FromDt == null || filter.FromDt <= o.TransactTime)
-                && (filter.ToDt == null || filter.ToDt >= o.TransactTime)
+                && (fromDt == null || fromDt <= o.TransactTime)
+                && (toDt == null || toDt >= o.TransactTime)
                 && (filter.ExecType == null || filter.ExecType == o.ExecType)
             )
             .OrderBy(o => o.ExecId)
@@ -388,15 +413,17 @@ public class AccountsController(
     public async Task<IEnumerable<TradeView>> GetTradesHistory([FromQuery] TradeFilter? filter = null)
     {
         filter ??= new();
-
+        var fromDt = filter.FromDt.FromApiFormat();
+        var toDt = filter.ToDt.FromApiFormat();
+        
         return await context.Trades
             .Where(t =>
                 (filter.AccountId == null || filter.AccountId == t.AccountId)
                 && (filter.ContractId == null || filter.ContractId == t.ContractId)
                 && (filter.TradeId == null || filter.TradeId == t.TradeId)
                 && (string.IsNullOrEmpty(filter.ExternalId) || filter.ExternalId == t.ExternalTradeId)
-                && (filter.FromDt == null || filter.FromDt <= t.Dt)
-                && (filter.ToDt == null || filter.ToDt >= t.Dt)
+                && (fromDt == null || fromDt <= t.Dt)
+                && (toDt == null || toDt >= t.Dt)
             )
             .Select(t => new TradeView(t, t.Account.Name, t.Contract.Ticker))
             .AsNoTracking()
@@ -561,8 +588,8 @@ public class AccountsController(
     //                 && (filter.ContractId == null || tp.ContractId == filter.ContractId)
     //                 && (filter.StrategyPositionId == null || tp.StrategyPositionId == filter.StrategyPositionId)
     //                 && (filter.SignalGroupId == null || tp.SignalGroupId == filter.SignalGroupId)
-    //                 && (filter.FromDt == null || tp.Dt >= filter.FromDt)
-    //                 && (filter.ToDt == null || tp.Dt < filter.ToDt)
+    //                 && (fromDt == null || tp.Dt >= fromDt)
+    //                 && (toDt == null || tp.Dt < toDt)
     //             )
     //             .Include(tp => tp.Account)
     //             .Include(tp => tp.Contract)
@@ -732,7 +759,6 @@ public class AccountsController(
     //     return Ok();
     // }
     // #endregion
-    
     
     private async Task<Dictionary<int, string>> GetContractNames(List<int> contractIds) =>
         (await context.Contracts

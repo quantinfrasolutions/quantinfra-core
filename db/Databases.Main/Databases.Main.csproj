@@ -29,6 +29,7 @@
       <ProjectReference Include="..\..\common\Common.StaticData.Abstractions\Common.StaticData.Abstractions.csproj" />
       <ProjectReference Include="..\..\common\Common.Strategies\Common.Strategies.csproj" />
       <ProjectReference Include="..\..\common\Common.Trading.Infrastructure\Common.Trading.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\common\Common.Utils.Cryptography\Common.Utils.Cryptography.csproj" />
       <ProjectReference Include="..\..\domain\events\Domain.Events.Accounts.AccountsService\Domain.Events.Accounts.AccountsService.csproj" />
       <ProjectReference Include="..\..\domain\events\Domain.Events.Accounts.Management\Domain.Events.Accounts.Management.csproj" />
       <ProjectReference Include="..\..\domain\events\Domain.Events.Persistence\Domain.Events.Persistence.csproj" />

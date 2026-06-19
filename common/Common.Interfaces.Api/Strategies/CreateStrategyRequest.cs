@@ -1,4 +1,4 @@
-using Common.Accounts.Abstractions;
+using QuantInfra.Common.Accounts.Abstractions;
 using QuantInfra.Sdk.MarketData;
 using QuantInfra.Sdk.Strategies;
 

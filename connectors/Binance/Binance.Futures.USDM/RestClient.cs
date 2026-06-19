@@ -18,7 +18,7 @@ public class RestClient
     private readonly JsonSerializerOptions? _options;
     private readonly BinanceClient _client;
 
-    public RestClient(TradingClientConfig config, ILoggerFactory loggerFactory)
+    public RestClient(TradingClientConfig config, string apiSecret, ILoggerFactory loggerFactory)
     {
         _config = config;
         _logger = loggerFactory.CreateLogger<RestClient>();
@@ -35,7 +35,7 @@ public class RestClient
             DefaultRequestHeaders = { { "X-MBX-APIKEY", _config.ApiKey } }
         })
         {
-            ApiSecret = _config.ApiSecret,
+            ApiSecret = apiSecret,
             Logger = _logger,
         };
     }

@@ -1,5 +1,4 @@
-﻿using Common.Trading.Positions;
-using QuantInfra.Sdk.Trading.Positions;
+﻿using QuantInfra.Sdk.Trading.Positions;
 
 namespace QuantInfra.Common.Interfaces.Api.Accounts
 {
