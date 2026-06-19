@@ -9,8 +9,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Common\Common.Infrastructure.Abstractions\Common.Infrastructure.Abstractions.csproj" />
-      <ProjectReference Include="..\..\Common\Common.Metrics\Common.Metrics.csproj" />
+      <ProjectReference Include="..\..\common\Common.Infrastructure.Abstractions\Common.Infrastructure.Abstractions.csproj" />
+      <ProjectReference Include="..\..\common\Common.Metrics\Common.Metrics.csproj" />
       <ProjectReference Include="..\Domain.Accounts.Execution.State\Domain.Accounts.Execution.State.csproj" />
       <ProjectReference Include="..\events\Domain.Events.Accounts.AccountsService\Domain.Events.Accounts.AccountsService.csproj" />
       <ProjectReference Include="..\queries\Domain.Queries.Accounts.AccountsService\Domain.Queries.Accounts.AccountsService.csproj" />

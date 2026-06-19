@@ -27,7 +27,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\common\Common.StaticData.InMemory\Common.StaticData.InMemory.csproj" />
       <ProjectReference Include="..\AccountsCore\AccountsCore.csproj" />
-      <ProjectReference Include="..\..\Common\Common.Messaging.Json\Common.Messaging.Json.csproj" />
+      <ProjectReference Include="..\..\common\Common.Messaging.Json\Common.Messaging.Json.csproj" />
       <ProjectReference Include="..\..\Tests\Tests.Mocks\Tests.Mocks.csproj" />
     </ItemGroup>
 

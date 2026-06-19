@@ -23,11 +23,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Common\Common.Accounts.Abstractions\Common.Accounts.Abstractions.csproj" />
+      <ProjectReference Include="..\..\common\Common.Accounts.Abstractions\Common.Accounts.Abstractions.csproj" />
       <ProjectReference Include="..\..\common\Common.EventSourcing\Common.EventSourcing.csproj" />
       <ProjectReference Include="..\..\common\Common.Infrastructure.Abstractions\Common.Infrastructure.Abstractions.csproj" />
       <ProjectReference Include="..\..\common\Common.StaticData.Abstractions\Common.StaticData.Abstractions.csproj" />
-      <ProjectReference Include="..\..\Common\Common.Strategies\Common.Strategies.csproj" />
+      <ProjectReference Include="..\..\common\Common.Strategies\Common.Strategies.csproj" />
       <ProjectReference Include="..\..\common\Common.Trading.Infrastructure\Common.Trading.Infrastructure.csproj" />
       <ProjectReference Include="..\..\domain\events\Domain.Events.Accounts.AccountsService\Domain.Events.Accounts.AccountsService.csproj" />
       <ProjectReference Include="..\..\domain\events\Domain.Events.Accounts.Management\Domain.Events.Accounts.Management.csproj" />

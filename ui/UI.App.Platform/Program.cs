@@ -14,7 +14,7 @@ builder.Services.AddLogging();
 builder.Services.AddSingleton<ILogger>(sp => sp.GetService<ILoggerFactory>()!.CreateLogger("Logger"));
 builder.Services.AddRadzenComponents();
 builder.Services.AddApiRepository();
-builder.Services.ConfigureApiServiceWrapper(builder.Configuration);
+builder.Services.ConfigureApiServiceWrapper(builder.Configuration, replaceBaseUri: builder.HostEnvironment.BaseAddress);
 builder.Services.AddScopedApiWrapper();
 
 builder.Services.AddRadzenCookieThemeService(options =>

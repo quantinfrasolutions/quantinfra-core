@@ -9,12 +9,18 @@ namespace QuantInfra.Api
         public static IServiceCollection ConfigureApiServiceWrapper(
             this IServiceCollection services,
             IConfiguration configuration,
-            string sectionName = "service-wrapper"
+            string sectionName = "service-wrapper",
+            string? replaceBaseUri = null
         ) => services
             .Configure<ServiceWrapperConfig>(conf =>
                 configuration.GetSection(sectionName).Bind(conf)
             )
-            .AddSingleton<ServiceWrapperConfig>(sp => sp.GetService<IOptions<ServiceWrapperConfig>>()!.Value);
+            .AddSingleton<ServiceWrapperConfig>(sp =>
+            {
+                var config = sp.GetService<IOptions<ServiceWrapperConfig>>()!.Value;
+                if (!string.IsNullOrEmpty(replaceBaseUri)) config.Endpoint = replaceBaseUri;
+                return config;
+            });
         
         public static IServiceCollection AddSingletonApiWrapper(
             this IServiceCollection serviceCollection

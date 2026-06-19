@@ -204,6 +204,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ibkr.TwsApi.MarketDataClien
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ibkr.TwsApi.TradingClient", "connectors\Ibkr\Ibkr.TwsApi.TradingClient\Ibkr.TwsApi.TradingClient.csproj", "{69BB6B61-F7B2-45DB-B057-8A8E1A3491E0}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deployment", "Deployment", "{F792314E-5C3F-40FF-807C-74509FB46836}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TradingEngine", "TradingEngine", "{1D97E12E-A630-461D-9567-86675A44F8D6}"
+	ProjectSection(SolutionItems) = preProject
+		deployment\trading-engine\.env.local = deployment\trading-engine\.env.local
+		deployment\trading-engine\docker-run.sh = deployment\trading-engine\docker-run.sh
+		deployment\trading-engine\docker-run-local.sh = deployment\trading-engine\docker-run-local.sh
+		deployment\trading-engine\.env = deployment\trading-engine\.env
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -304,6 +314,7 @@ Global
 		{F5C088E1-07F1-4932-B8E1-9704C385A035} = {1BBD5AF8-1E25-424A-9D6C-723A0C058889}
 		{5C9EE7AA-C2BB-4F94-A851-7CAE69D79231} = {1BBD5AF8-1E25-424A-9D6C-723A0C058889}
 		{69BB6B61-F7B2-45DB-B057-8A8E1A3491E0} = {1BBD5AF8-1E25-424A-9D6C-723A0C058889}
+		{1D97E12E-A630-461D-9567-86675A44F8D6} = {F792314E-5C3F-40FF-807C-74509FB46836}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{9FB43BE1-9878-4544-BA48-2BC901BC0AF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

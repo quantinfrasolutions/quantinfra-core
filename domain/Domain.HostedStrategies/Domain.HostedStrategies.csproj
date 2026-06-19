@@ -10,7 +10,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\common\Common.MarketData\Common.MarketData.csproj" />
-      <ProjectReference Include="..\..\Common\Common.Metrics\Common.Metrics.csproj" />
+      <ProjectReference Include="..\..\common\Common.Metrics\Common.Metrics.csproj" />
       <ProjectReference Include="..\..\common\Common.Strategies\Common.Strategies.csproj" />
       <ProjectReference Include="..\Domain.Accounts.AccountStateClientManager\Domain.Accounts.AccountStateClientManager.csproj" />
       <ProjectReference Include="..\events\Domain.Events.MarketData\Domain.Events.MarketData.csproj" />

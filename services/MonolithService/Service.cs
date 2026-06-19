@@ -350,7 +350,9 @@ public class Service : IHostedService
                 _configuration.GetSection("accounts-service"),
                 configureAction: conf =>
                 {
+                    conf.AccountServiceName = instance.Name;
                     conf.Monolith = true;
+                    conf.SingleHost = true;
                 })
             .AddAccountsCore()
             
@@ -440,6 +442,7 @@ public class Service : IHostedService
                     conf.StrategiesServiceName = instance.Name;
                     conf.AccountsServiceName = asName;
                     conf.Monolith = true;
+                    conf.SingleHost = true;
                 })
             .AddStrategiesCore()
 
@@ -496,6 +499,7 @@ public class Service : IHostedService
                 {
                     conf.ExecutionServiceName = instance.Name;
                     conf.Monolith = true;
+                    conf.SingleHost = true;
                 })
             .AddExecutionService()
             .AddSingleton<IHostApplicationLifetime>(_serviceProvider.GetRequiredService<IHostApplicationLifetime>())
