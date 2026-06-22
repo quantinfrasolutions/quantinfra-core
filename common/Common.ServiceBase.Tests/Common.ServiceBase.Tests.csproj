@@ -22,7 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Tests\Tests.Mocks\Tests.Mocks.csproj" />
+      <ProjectReference Include="..\..\tests\Tests.Mocks\Tests.Mocks.csproj" />
       <ProjectReference Include="..\Common.Messaging.Json\Common.Messaging.Json.csproj" />
       <ProjectReference Include="..\Common.ServiceBase\Common.ServiceBase.csproj" />
     </ItemGroup>
