@@ -1,4 +1,4 @@
-name: Unit Tests
+name: Run unit tests
 
 on:
   push:
@@ -23,7 +23,7 @@ jobs:
             9.0.x
 
       - name: Restore
-        run: dotnet restore YourSolution.sln
+        run: dotnet restore QuantInfra.Core.sln
 
       - name: Build
         run: dotnet build QuantInfra.Core.sln --configuration Release --no-restore
