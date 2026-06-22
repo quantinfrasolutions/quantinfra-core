@@ -33,7 +33,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(UseLocalSdkReference)' != 'true'">
-        <PackageReference Include="QuantInfra.Sdk.StandardIndicators" Version="0.9.0-beta2" />
+        <PackageReference Include="QuantInfra.Sdk.StandardIndicators" Version="0.9.0-beta3" />
     </ItemGroup>
 
 </Project>
