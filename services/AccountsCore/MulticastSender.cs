@@ -60,8 +60,8 @@ public class MulticastSender : Disruptor.IEventHandler<OutgoingDisruptorMessage>
         if (config.WritePerformanceMetrics)
         {
             _writePerformanceMetrics = true;
-            _totalProcessingTime = SharedMetricsDefinition.TotalProcessingTime;
-            _downstreamSenderMessages = SharedMetricsDefinition.DownstreamSenderMessages;
+            _totalProcessingTime = SharedMetricsDefinition.GetTotalProcessingTime(config.AccountServiceName, config.Monolith);
+            _downstreamSenderMessages = SharedMetricsDefinition.GetDownstreamSenderMessages(config.AccountServiceName, config.Monolith);
         }
     }
     

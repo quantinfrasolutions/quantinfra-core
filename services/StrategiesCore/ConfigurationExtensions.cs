@@ -50,7 +50,16 @@ public static class ConfigurationExtensions
                 return new() { StrategiesServiceName = conf.StrategiesServiceName };
             })
             
-            .AddSingleton<ParserConfig>(sp => new ParserConfig() { WritePerformanceMetrics = sp.GetRequiredService<Config>().WritePerformanceMetrics })
+            .AddSingleton<ParserConfig>(sp =>
+            {
+                var config = sp.GetRequiredService<Config>();
+                return new ParserConfig
+                {
+                    WritePerformanceMetrics = config.WritePerformanceMetrics,
+                    ServiceName = config.StrategiesServiceName,
+                    Monolith =  config.Monolith,
+                };
+            })
             .AddSingleton<Parser>(sp => new(sp.GetRequiredKeyedService<IMessageFactory>("rabbitmq"), sp.GetRequiredService<ParserConfig>()))
             
             .UseSingletonInMemoryBus()

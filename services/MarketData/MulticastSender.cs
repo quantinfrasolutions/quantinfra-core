@@ -47,9 +47,11 @@ public class MulticastSender : Disruptor.IEventHandler<OutgoingDisruptorMessage>
         if (config.WritePerformanceMetrics)
         {
             _writePerformanceMetrics = true;
-            _sendingDelay = SharedMetricsDefinition.SendingDelay;
-            _totalTime = SharedMetricsDefinition.TotalProcessingTime;
-            _downstreamSenderMessages = SharedMetricsDefinition.DownstreamSenderMessages;
+            _sendingDelay = SharedMetricsDefinition.GetSendingDelay(config.MarketDataServiceName, !config.SingleHost,
+                config.SendingDelayParams[0], config.SendingDelayParams[1], config.SendingDelayParams[2]);
+            _totalTime = SharedMetricsDefinition.GetTotalProcessingTime(config.MarketDataServiceName, !config.SingleHost,
+                config.TotalProcessingTimeParams[0], config.TotalProcessingTimeParams[1], config.TotalProcessingTimeParams[2]);
+            _downstreamSenderMessages = SharedMetricsDefinition.GetDownstreamSenderMessages(config.MarketDataServiceName, !config.SingleHost);
         }
     }
 

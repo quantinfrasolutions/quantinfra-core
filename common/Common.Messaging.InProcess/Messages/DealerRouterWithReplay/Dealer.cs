@@ -1,3 +1,4 @@
+using Common.Metrics;
 using Disruptor.Dsl;
 using NodaTime;
 using QuantInfra.Common.ServiceBase;
@@ -27,6 +28,7 @@ public class Dealer :
 
     public void SendMessage(Patterns.DealerRouterWithReplay.DownstreamMessage message)
     {
+        message.LogSendingTime(MetricsUtils.GetUnixMicro());
         _topology.SendMessageToRouter(_targetCompId, message);
     }
 }

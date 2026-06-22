@@ -1,3 +1,4 @@
+using Common.Metrics;
 using Disruptor.Dsl;
 using NodaTime;
 using QuantInfra.Common.Messaging.Patterns.TopicMulticast;
@@ -26,6 +27,7 @@ public class MulticastTransport :
 
     public void SendMessage(QuantInfra.Common.Messaging.Patterns.TopicMulticast.DownstreamMessage message)
     {
+        message.LogSendingTime(MetricsUtils.GetUnixMicro());
         _topology.SendTopicMulticastMessage(message.TopicName, message);
     }
 

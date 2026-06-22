@@ -555,6 +555,7 @@ public class Service : IHostedService
                 configureAction: conf =>
                 {
                     conf.MarketDataServiceName = "MDS";
+                    conf.SingleHost = true;
                     conf.Monolith = true;
                 })
             .AddSimpleMarketDataService()
@@ -612,7 +613,6 @@ public class Service : IHostedService
                 configureAction: conf =>
                 {
                     conf.ClientName = clientName;
-                    // conf.Monolith = true;
                 }
             )
             .AddBinanceUsdmFuturesMarketDataGatewayService()
@@ -629,6 +629,7 @@ public class Service : IHostedService
                 configureAction: conf =>
                 {
                     conf.MarketDataServiceName = clientName;
+                    conf.SingleHost = true;
                     conf.Monolith = true;
                 }
             )

@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Binance.Common;
 using Binance.Futures.USDM;
+using Common.Metrics;
 using Disruptor.Dsl;
 using GenericWebSocketClient;
 using Microsoft.Extensions.Hosting;
@@ -13,11 +14,11 @@ using Prometheus;
 using QuantInfra.Binance.Futures.USDM.MarketData;
 using QuantInfra.Common.MarketData.Infrastructure;
 using QuantInfra.Common.MarketData.OrderBooks;
+using QuantInfra.Common.Metrics;
 using QuantInfra.Common.ServiceBase;
 using QuantInfra.Connectors.Binance.Common;
 using QuantInfra.Connectors.Binance.Futures.Usdm.Messages.MarketData;
 using QuantInfra.Connectors.Common;
-using QuantInfra.Connectors.Common.Metrics;
 using QuantInfra.Domain.Events.MarketData;
 using QuantInfra.Domain.Queries.MarketData;
 using QuantInfra.Sdk.MarketData;
@@ -127,27 +128,31 @@ public class MarketDataClient : GenericWebSocketClient.Client,
             _writePerformanceMetrics = true;
             
             _receiveBarDelay = Metrics.CreateHistogram(
-                "receive_bar_delay",
+                config.Monolith ? $"{config.ClientName}_receive_bar_delay" : "receive_bar_delay",
                 "Difference between Binance timestamp in the bar and reception time in milliseconds", 
-                new HistogramConfiguration() { Buckets = Histogram.LinearBuckets(10, 10, 10)}
+                new HistogramConfiguration() { Buckets = Histogram.LinearBuckets(config.ReceiveBarDelayParams[0],
+                    config.ReceiveBarDelayParams[1], config.ReceiveBarDelayParams[2]) }
             );
 
             _receiveOrderBookUpdateDelay = Metrics.CreateHistogram(
-                "receive_ob_update_delay",
+                config.Monolith ? $"{config.ClientName}_receive_ob_update_delay" : "receive_ob_update_delay",
                 "Difference between Binance timestamp in the order book update and reception time, ms",
-                new HistogramConfiguration() { Buckets = Histogram.LinearBuckets(10, 10, 10)}
+                new HistogramConfiguration() { Buckets = Histogram.LinearBuckets(config.ReceiveObDelayParams[0],
+                    config.ReceiveObDelayParams[1], config.ReceiveObDelayParams[2])}
             );
             
             _receiveClosedBarDelay = Metrics.CreateHistogram(
-                "receive_closed_bar_delay",
+                config.Monolith ? $"{config.ClientName}_receive_closed_bar_delay": "receive_closed_bar_delay",
                 "Difference between Binance timestamp and Binance candle close time in milliseconds",
-                new HistogramConfiguration() { Buckets = Histogram.LinearBuckets(50, 50, 10)}
+                new HistogramConfiguration() { Buckets = Histogram.LinearBuckets(config.ReceiveClosedBarDelayParams[0],
+                    config.ReceiveClosedBarDelayParams[1], config.ReceiveClosedBarDelayParams[2])}
             );
             
-            _receiveCloseBarCloseDt = Metrics.CreateHistogram("receive_closed_bar_delay_close_dt",
+            _receiveCloseBarCloseDt = Metrics.CreateHistogram(
+                config.Monolith ? $"{config.ClientName}_receive_closed_bar_delay_close_dt" : "receive_closed_bar_delay_close_dt",
                 "Difference between the close time of the closed bar and the reception time in milliseconds");
             
-            _processingTime = SharedMetricsDefinition.ProcessingTime;
+            _processingTime = SharedMetricsDefinition.GetProcessingTime(config.ClientName, config.Monolith);
         }
     }
 

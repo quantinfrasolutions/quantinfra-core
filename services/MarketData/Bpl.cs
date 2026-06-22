@@ -74,9 +74,12 @@ public class Bpl : Disruptor.IEventHandler<IncomingDisruptorMessage>, IHostedSer
 		{
 			_writePerformanceMetrics = true;
 			
-			_receiveBarHop = SharedMetricsDefinition.ReceiveBarHop;
-			_processingDelay = SharedMetricsDefinition.ProcessingDelay;
-			_processingTime  = SharedMetricsDefinition.ProcessingTime;
+			_receiveBarHop = SharedMetricsDefinition.GetIncomingMessageHop(config.MarketDataServiceName, config.SingleHost, config.Monolith,
+				config.ReceiveMessageHopHistParams[0], config.ReceiveMessageHopHistParams[1], config.ReceiveMessageHopHistParams[2]);
+			_processingDelay = SharedMetricsDefinition.GetProcessingDelayHistogram(config.MarketDataServiceName, config.Monolith,
+				config.ProcessingDelayParams[0], config.ProcessingDelayParams[1], config.ProcessingDelayParams[2]);
+			_processingTime = SharedMetricsDefinition.GetProcessingTime(config.MarketDataServiceName, config.Monolith,
+				config.ProsessingTimeParams[0], config.ProsessingTimeParams[1], config.ProsessingTimeParams[2]);
 		}
 	}
 	

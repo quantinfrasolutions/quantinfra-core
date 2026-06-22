@@ -16,8 +16,10 @@ public class Parser : IEventHandler<IncomingDisruptorMessage>
         MessageFactory = messageFactory;
         if (config?.WritePerformanceMetrics == true)
         {
-            _parseWaitTime = MetricsDefinition.ParseWaitTime;
-            _parseTime = MetricsDefinition.ParseTime;
+            _parseWaitTime = MetricsDefinition.GetParseWaitTime(config.ServiceName, config.Monolith,
+                config.ParseWaitTimeParams[0], config.ParseWaitTimeParams[1], config.ParseWaitTimeParams[2]);
+            _parseTime = MetricsDefinition.GetParseTime(config.ServiceName, config.Monolith,
+                config.ParseTimeParams[0], config.ParseTimeParams[1], config.ParseTimeParams[2]);
         }
     }
 
@@ -38,5 +40,10 @@ public class Parser : IEventHandler<IncomingDisruptorMessage>
 
 public class ParserConfig
 {
+    public string ServiceName { get; set; }
+    public bool Monolith { get; set; }
     public bool WritePerformanceMetrics { get; set; }
+    
+    public int[] ParseWaitTimeParams { get; set; } = [50, 50, 10];
+    public int[] ParseTimeParams { get; set; } = [50, 50, 10];
 }

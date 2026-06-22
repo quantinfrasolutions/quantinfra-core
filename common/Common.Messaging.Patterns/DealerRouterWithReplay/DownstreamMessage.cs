@@ -44,15 +44,8 @@ public class DownstreamMessage : ITransportMessage
         Payload = payload;
     }
 
-    // public static DownstreamMessage CreateSessionStartMessage(long sessionId) => 
-    //     new(MessageType.SessionStart, sessionId, 0, null);
-    //
-    // public static DownstreamMessage CreateDataMessage(long sessionId, long sequence, string payload) =>
-    //     new(MessageType.DataMessage, sessionId, sequence, payload);
-    //
-    // public static DownstreamMessage CreateDataMessage(string senderCompId, long sessionId, long sequence, string payload) =>
-    //     new(MessageType.DataMessage, sessionId, sequence, payload) { SenderCompId = senderCompId };
-    //
-    // public static DownstreamMessage CreateSequenceResetMessage(long sessionId, long sequence) =>
-    //     new(MessageType.SequenceReset, sessionId, sequence, null);
+    public void LogSendingTime(long timestamp)
+    {
+        SendingTimestamp = timestamp;
+    }
 }

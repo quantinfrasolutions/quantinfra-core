@@ -1,3 +1,5 @@
+using Common.Metrics;
+
 namespace QuantInfra.Common.Messaging.InProcess.Messages.TopicMulticast;
 
 public class DownstreamMessage : QuantInfra.Common.Messaging.Patterns.TopicMulticast.DownstreamMessage,

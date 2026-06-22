@@ -24,8 +24,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\common\Common.Metrics\Common.Metrics.csproj" />
       <ProjectReference Include="..\Connectors.Common\Connectors.Common.csproj" />
-      <ProjectReference Include="..\Connectors.Common.Metrics\Connectors.Common.Metrics.csproj" />
     </ItemGroup>
 
 </Project>

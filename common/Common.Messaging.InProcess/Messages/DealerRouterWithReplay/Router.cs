@@ -44,7 +44,7 @@ public class Router :
         if (!_started) return;
         if (message is not Patterns.DealerRouterWithReplay.DownstreamMessage dm)
             throw new NotSupportedException($"Received message of type {message.GetType()} not supported");
-            
+        
         ReceiverFilter.HandleIncomingMessage(dm);
     }
 

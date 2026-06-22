@@ -28,7 +28,7 @@ public abstract class BusinessLogicProcessorBase<TState> : IEventHandler<Incomin
     protected long CurrentWalPartition => _currentWalPartition;
     
     private readonly bool _writePerformanceMetrics;
-    private readonly Histogram? _receiveBarHop;
+    private readonly Histogram? _receiveMessageHop;
     private readonly Histogram? _processingDelay;
     private readonly Histogram? _processingTime;
     private readonly Histogram? _bplDelay;
@@ -38,15 +38,12 @@ public abstract class BusinessLogicProcessorBase<TState> : IEventHandler<Incomin
     protected TState State { get; private init; }
 
     protected BusinessLogicProcessorBase(
+        BplConfig config,
         WalManager<TState> walManager,
-        // DownstreamFilter filter,
-        // Finalizer.Finalizer finalizer,
         TState state,
         Disruptor<OutgoingDisruptorMessage> outputDisruptor,
         ReplayingClock clock, 
-        ILogger logger,
-        bool writePerformanceMetrics = false,
-        bool singleHost = false
+        ILogger logger
     )
     {
         _walManager = walManager;
@@ -56,17 +53,23 @@ public abstract class BusinessLogicProcessorBase<TState> : IEventHandler<Incomin
         State = state;
         _clock = clock;
         Logger = logger;
-        _singleHost = singleHost;
+        _singleHost = config.SingleHost;
 
-        if (writePerformanceMetrics)
+        if (config.WritePerformanceMetrics)
         {
             _writePerformanceMetrics = true;
-            _receiveBarHop = SharedMetricsDefinition.ReceiveBarHop;
-            _processingDelay = SharedMetricsDefinition.ProcessingDelay;
-            _bplDelay = MetricsDefinition.BplDelay;
-            _bplTime = MetricsDefinition.BplTime;
-            _processingTime = SharedMetricsDefinition.ProcessingTime;
-            _stateTime = MetricsDefinition.StateTime;
+            _receiveMessageHop = SharedMetricsDefinition.GetIncomingMessageHop(config.ServiceName, config.SingleHost, config.Monolith,
+                config.ReceiveMessageHopHistParams[0], config.ReceiveMessageHopHistParams[1], config.ReceiveMessageHopHistParams[2]);
+            _processingDelay = SharedMetricsDefinition.GetProcessingDelayHistogram(config.ServiceName, config.Monolith,
+                config.ProcessingDelayParams[0], config.ProcessingDelayParams[1], config.ProcessingDelayParams[2]);
+            _bplDelay = MetricsDefinition.GetBplDelay(config.ServiceName, config.Monolith,
+                config.BplDelayParams[0], config.BplDelayParams[1], config.BplDelayParams[2]);
+            _bplTime = MetricsDefinition.GetBplTime(config.ServiceName, config.Monolith,
+                config.BplTimeParams[0], config.BplTimeParams[1], config.BplTimeParams[2]);
+            _processingTime = SharedMetricsDefinition.GetProcessingTime(config.ServiceName, config.Monolith,
+                config.ProcessingTimeParams[0], config.ProcessingTimeParams[1], config.ProcessingTimeParams[2]);
+            _stateTime = MetricsDefinition.GetStateTime(config.ServiceName, config.Monolith,
+                config.StateTimeParams[0], config.StateTimeParams[1], config.StateTimeParams[2]);
         }
     }
     
@@ -84,7 +87,7 @@ public abstract class BusinessLogicProcessorBase<TState> : IEventHandler<Incomin
             if (_writePerformanceMetrics && !data.IsReplay)
             {
                 if (data.TransportMessage.SendingTimestamp != 0)
-                    _receiveBarHop!.Observe((_singleHost ? data.SwReceivedAt : data.ReceivedAt) - data.TransportMessage.SendingTimestamp);
+                    _receiveMessageHop!.Observe((_singleHost ? data.SwReceivedAt : data.ReceivedAt) - data.TransportMessage.SendingTimestamp);
                 
                 _processingDelay!.Observe(swStartProcessing - data.SwReceivedAt);
             }

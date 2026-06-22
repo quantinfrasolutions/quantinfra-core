@@ -99,7 +99,16 @@ public static class ConfigurationExtensions
                 sp.GetRequiredService<ITradingClientResponsesHandler>()
             ))
             
-            .AddSingleton<ParserConfig>(sp => new ParserConfig() { WritePerformanceMetrics = sp.GetRequiredService<Config>().WritePerformanceMetrics })
+            .AddSingleton<ParserConfig>(sp =>
+            {
+                var config = sp.GetRequiredService<Config>();
+                return new ParserConfig
+                {
+                    WritePerformanceMetrics = config.WritePerformanceMetrics,
+                    ServiceName = config.ExecutionServiceName,
+                    Monolith =  config.Monolith,
+                };
+            })
             .AddSingleton<Parser>()
             
             .AddSingleton<RequestSnapshotHandler>()

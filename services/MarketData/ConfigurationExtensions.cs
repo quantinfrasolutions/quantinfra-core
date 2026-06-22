@@ -32,7 +32,16 @@ namespace QuantInfra.Services.MarketData
             .AddInputDisruptor()
             .AddOutputDisruptor()
             
-            .AddSingleton<ParserConfig>(sp => new ParserConfig() { WritePerformanceMetrics = sp.GetRequiredService<Config>().WritePerformanceMetrics })
+            .AddSingleton<ParserConfig>(sp =>
+            {
+                var config = sp.GetRequiredService<Config>();
+                return new ParserConfig
+                {
+                    WritePerformanceMetrics = config.WritePerformanceMetrics,
+                    ServiceName = config.MarketDataServiceName,
+                    Monolith =  config.Monolith,
+                };
+            })
             .AddSingleton<Parser>(sp => new(sp.GetRequiredKeyedService<IMessageFactory>("rabbitmq"), sp.GetRequiredService<ParserConfig>()))
             .AddSingleton<IReceiverStateProvider, MockReceiverStateProvider>()
             

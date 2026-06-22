@@ -50,9 +50,10 @@ public class Persister : Disruptor.IEventHandler<OutgoingDisruptorMessage>
 
         if (config.WritePerformanceMetrics)
         {
-            _persistedMessages = SharedMetricsDefinition.PersistedMessages;
-            _numberOfCommits = SharedMetricsDefinition.NumberOfCommits;
-            _persistTime = SharedMetricsDefinition.PersistTime;
+            _persistedMessages = SharedMetricsDefinition.GetPersistedMessages(config.AccountServiceName, config.Monolith);
+            _numberOfCommits = SharedMetricsDefinition.GetNumberOfCommits(config.AccountServiceName, config.Monolith);
+            _persistTime = SharedMetricsDefinition.GetPersistTime(config.AccountServiceName, config.Monolith,
+                config.PersistTimeParams[0], config.PersistTimeParams[1], config.PersistTimeParams[2]);
         }
     }
 

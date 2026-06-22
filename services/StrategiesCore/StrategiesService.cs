@@ -94,7 +94,8 @@ namespace QuantInfra.Services.StrategiesCore
 
             if (config.WritePerformanceMetrics)
             {
-                var sendingDelay = SharedMetricsDefinition.SendingDelay;
+                var sendingDelay = SharedMetricsDefinition.GetSendingDelay(config.StrategiesServiceName, config.Monolith,
+                    config.SendingDelayParams[0], config.SendingDelayParams[1], config.SendingDelayParams[2]);
                 _sender.OnBeforeHandle = data =>
                 {
                     if (data.SwPublishedAt != 0)

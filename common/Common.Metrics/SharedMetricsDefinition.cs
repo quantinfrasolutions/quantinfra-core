@@ -4,66 +4,138 @@ namespace QuantInfra.Common.Metrics;
 
 public static class SharedMetricsDefinition
 {
-    private static readonly Lazy<Histogram> _receiveBarHop = new(() => Prometheus.Metrics.CreateHistogram(
-        "receive_bar_hop",
-        "Time difference between upstream sending a message and the component receiving it, ms",
-        new HistogramConfiguration() { Buckets = Histogram.LinearBuckets(100, 100, 10) }
-    ));
-    public static Histogram ReceiveBarHop => _receiveBarHop.Value;
+    private static readonly Dictionary<string, Histogram> ReceiveMessageHops = new();
+    public static Histogram GetIncomingMessageHop(string serviceName, bool isSingleHost,
+        bool includeServiceName = false,
+        int start = 100, int width = 100, int count = 10)
+    {
+        if (ReceiveMessageHops.TryGetValue(serviceName, out var hist)) return hist;
+
+        hist = Prometheus.Metrics.CreateHistogram(
+            includeServiceName ? $"{serviceName.Replace('-', '_')}_receive_message_hop" : "receive_message_hop",
+            "Time difference between upstream sending a message and the component receiving it, " + (isSingleHost ? "us" : "ms"),
+            new HistogramConfiguration() { Buckets = Histogram.LinearBuckets(start, width, count) }
+        );
+        ReceiveMessageHops[serviceName] = hist;
+        return hist;
+    }
     
-    private static readonly Lazy<Histogram> _processingDelay = new(() => Prometheus.Metrics.CreateHistogram(
-        "processing_delay",
-        "Input disruptor waiting time, us",
-        new HistogramConfiguration() { Buckets = Histogram.LinearBuckets(20, 20, 10) }
-    ));
-    public static Histogram ProcessingDelay => _processingDelay.Value;
-			
-    private static readonly Lazy<Histogram> _processingTime  = new(() => Prometheus.Metrics.CreateHistogram(
-        "processing_time",
-        "Time between input and output disruptor, us",
-        new HistogramConfiguration() { Buckets = Histogram.LinearBuckets(10, 10, 10) }
-    ));
-    public static Histogram ProcessingTime => _processingTime.Value;
+    private static readonly Dictionary<string, Histogram> ProcessingDelays = new();
+    public static Histogram GetProcessingDelayHistogram(string serviceName, bool includeServiceName = false,
+        int start = 20, int width = 20, int count = 10)
+    {
+        if (ProcessingDelays.TryGetValue(serviceName, out var hist)) return hist;
+        
+        hist = Prometheus.Metrics.CreateHistogram(
+            includeServiceName ? $"{serviceName.Replace('-', '_')}_processing_delay" : "processing_delay",
+            "Input disruptor waiting time, us",
+            new HistogramConfiguration() { Buckets = Histogram.LinearBuckets(start, width, count) }
+        );
+        ProcessingDelays.Add(serviceName, hist);
+        return hist;
+    }
     
-    private static readonly Lazy<Histogram> _sendingDelay = new(() => Prometheus.Metrics.CreateHistogram(
-        "sending_delay",
-        "Output disruptor waiting time, us",
-        new HistogramConfiguration() { Buckets = Histogram.LinearBuckets(20, 20, 10) }
-    ));
-    public static Histogram SendingDelay => _sendingDelay.Value;
+    private static readonly Dictionary<string, Histogram> ProcessingTimes = new();
+    public static Histogram GetProcessingTime(string serviceName, bool includeServiceName = false,
+        int start = 20, int width = 20, int count = 10)
+    {
+        if (ProcessingTimes.TryGetValue(serviceName, out var hist)) return hist;
+        
+        hist = Prometheus.Metrics.CreateHistogram(
+            includeServiceName ? $"{serviceName.Replace('-', '_')}_processing_time" : "processing_time",
+            "Time between input and output disruptor, us",
+            new HistogramConfiguration() { Buckets = Histogram.LinearBuckets(start, width, count) }
+        );
+        ProcessingTimes.Add(serviceName, hist);
+        return hist;
+    }
     
-    private static readonly Lazy<Histogram> _totalProcessingTime  = new(() => Prometheus.Metrics.CreateHistogram(
-        "total_processing_time",
-        "Time between receiving a message and sending it downstream, us",
-        new HistogramConfiguration() { Buckets = Histogram.LinearBuckets(100, 100, 10) }
-    ));
-    public static Histogram TotalProcessingTime => _totalProcessingTime.Value;
+    private static readonly Dictionary<string, Histogram> SendingDelays = new();
+    public static Histogram GetSendingDelay(string serviceName, bool includeServiceName = false,
+        int start = 20, int width = 20, int count = 10)
+    {
+        if (SendingDelays.TryGetValue(serviceName, out var hist)) return hist;
+        
+        hist = Prometheus.Metrics.CreateHistogram(
+            includeServiceName ? $"{serviceName.Replace('-', '_')}_sending_delay" : "sending_delay",
+            "Output disruptor waiting time, us",
+            new HistogramConfiguration() { Buckets = Histogram.LinearBuckets(start, width, count) }
+        );
+        SendingDelays.Add(serviceName, hist);
+        return hist;
+    }
     
-    private static readonly Lazy<Counter> _downstreamSenderMessages = new(() => Prometheus.Metrics.CreateCounter(
-        "downstream_sender_processed_messages",
-        "Number of messages processed by the downstream sender",
-        new CounterConfiguration()
-    ));
-    public static Counter DownstreamSenderMessages => _downstreamSenderMessages.Value;
     
-    private static readonly Lazy<Counter> _persistedMessages = new(() => Prometheus.Metrics.CreateCounter(
-        "persisted_messages",
-        "Number of persisted events",
-        new CounterConfiguration()
-    ));
-    public static Counter PersistedMessages => _persistedMessages.Value;
+    private static readonly Dictionary<string, Histogram> TotalProcessingTimes = new();
+    public static Histogram GetTotalProcessingTime(string serviceName, bool includeServiceName = false,
+        int start = 100, int width = 100, int count = 10)
+    {
+        if (TotalProcessingTimes.TryGetValue(serviceName, out var hist)) return hist;
+        
+        hist = Prometheus.Metrics.CreateHistogram(
+            includeServiceName ? $"{serviceName.Replace('-', '_')}_total_processing_time" : "total_processing_time",
+            "Time between receiving a message and sending it downstream, us",
+            new HistogramConfiguration() { Buckets = Histogram.LinearBuckets(start, width, count) }
+        );
+        TotalProcessingTimes.Add(serviceName, hist);
+        return hist;
+    }
     
-    private static readonly Lazy<Counter> _numberOfCommits = new(() => Prometheus.Metrics.CreateCounter(
-        "number_of_commits",
-        "Number of database commits",
-        new CounterConfiguration()
-    ));
-    public static Counter NumberOfCommits => _numberOfCommits.Value;
+    private static readonly Dictionary<string, Counter> DownstreamSenderMessages = new();
+    public static Counter GetDownstreamSenderMessages(string serviceName, bool includeServiceName = false)
+    {
+        if (DownstreamSenderMessages.TryGetValue(serviceName, out var cnt)) return cnt;
+        
+        cnt = Prometheus.Metrics.CreateCounter(
+            includeServiceName ? $"{serviceName.Replace('-', '_')}_downstream_sender_processed_messages" : "downstream_sender_processed_messages",
+            "Number of messages processed by the downstream sender",
+            new CounterConfiguration()
+        );
+        DownstreamSenderMessages.Add(serviceName, cnt);
+        return cnt;
+    }
     
-    private static readonly Lazy<Histogram> _persistTime  = new(() => Prometheus.Metrics.CreateHistogram(
-        "persist_time",
-        "Time required to persist events, us",
-        new HistogramConfiguration() { Buckets = Histogram.LinearBuckets(100, 100, 10) }
-    ));
-    public static Histogram PersistTime => _persistTime.Value;
+    private static readonly Dictionary<string, Counter> PersistedMessages = new();
+    public static Counter GetPersistedMessages(string serviceName, bool includeServiceName = false)
+    {
+        if (PersistedMessages.TryGetValue(serviceName, out var cnt)) return cnt;
+        
+        cnt = Prometheus.Metrics.CreateCounter(
+            includeServiceName ? $"{serviceName.Replace('-', '_')}_persisted_messages" : "persisted_messages",
+            "Number of persisted events",
+            new CounterConfiguration()
+        );
+        PersistedMessages.Add(serviceName, cnt);
+        return cnt;
+    }
+    
+    private static readonly Dictionary<string, Counter> NumberOfCommits = new();
+    public static Counter GetNumberOfCommits(string serviceName, bool includeServiceName = false)
+    {
+        if (NumberOfCommits.TryGetValue(serviceName, out var cnt)) return cnt;
+        
+        cnt = Prometheus.Metrics.CreateCounter(
+            includeServiceName ? $"{serviceName.Replace('-', '_')}_number_of_commits" : "number_of_commits",
+            "Number of database commits",
+            new CounterConfiguration()
+        );
+        NumberOfCommits.Add(serviceName, cnt);
+        return cnt;
+    }
+    
+    
+    private static readonly Dictionary<string, Histogram> PersistTimes = new();
+    public static Histogram GetPersistTime(string serviceName, bool includeServiceName = false,
+        int start = 100, int width = 100, int count = 10)
+    {
+        if (PersistTimes.TryGetValue(serviceName, out var hist)) return hist;
+        
+        hist = Prometheus.Metrics.CreateHistogram(
+            includeServiceName ? $"{serviceName.Replace('-', '_')}_persist_time" : "persist_time",
+            "Time required to persist events, us",
+            new HistogramConfiguration() { Buckets = Histogram.LinearBuckets(start, width, count) }
+        );
+        PersistTimes.Add(serviceName, hist);
+        return hist;
+    }
 }

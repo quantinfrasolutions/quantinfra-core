@@ -9,7 +9,7 @@ using QuantInfra.Domain.Events.Accounts.AccountsService;
 using QuantInfra.Domain.Events.MarketData;
 using QuantInfra.Domain.HostedStrategies;
 using StrategiesCore;
-using MetricsDefinition = StrategiesCore.MetricsDefinition;
+using MetricsDefinition = QuantInfra.Services.StrategiesCore.MetricsDefinition;
 
 namespace QuantInfra.Services.StrategiesCore;
 
@@ -52,10 +52,14 @@ public class Bpl : Disruptor.IEventHandler<IncomingDisruptorMessage>
         if (config.WritePerformanceMetrics)
         {
             _writePerformanceMetrics = true;
-            _receiveBarHop = SharedMetricsDefinition.ReceiveBarHop;
-            _processingDelay = SharedMetricsDefinition.ProcessingDelay;
-            _processingTime = SharedMetricsDefinition.ProcessingTime;
-            _totalMarketDataDelay = MetricsDefinition.TotalMarketDataDelay;
+            _receiveBarHop = SharedMetricsDefinition.GetIncomingMessageHop(config.StrategiesServiceName, config.SingleHost, config.Monolith,
+                config.ReceiveMessageHopHistParams[0], config.ReceiveMessageHopHistParams[1], config.ReceiveMessageHopHistParams[2]);
+            _processingDelay = SharedMetricsDefinition.GetProcessingDelayHistogram(config.StrategiesServiceName, config.Monolith,
+                config.ProcessingDelayParams[0], config.ProcessingDelayParams[1], config.ProcessingDelayParams[2]);
+            _processingTime = SharedMetricsDefinition.GetProcessingTime(config.StrategiesServiceName, config.Monolith,
+                config.ProsessingTimeParams[0], config.ProsessingTimeParams[1], config.ProsessingTimeParams[2]);
+            _totalMarketDataDelay = MetricsDefinition.GetTotalMarketDataDelay(config.StrategiesServiceName, config.Monolith,
+            config.TotalMdDelayParams[0], config.TotalMdDelayParams[1], config.TotalMdDelayParams[2]);
         }
     }
 

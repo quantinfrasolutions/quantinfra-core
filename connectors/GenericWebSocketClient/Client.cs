@@ -3,12 +3,12 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Common.Metrics;
 using GenericWebSocketClient;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 using QuantInfra.Connectors.Common;
-using QuantInfra.Connectors.Common.Metrics;
 
 namespace QuantInfra.GenericWebSocketClient;
 

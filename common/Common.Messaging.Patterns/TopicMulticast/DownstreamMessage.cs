@@ -49,17 +49,13 @@ public class DownstreamMessage : ITransportMessage
         Payload = payload;
     }
 
-    // public static DownstreamMessage CreateSessionStartMessage(string senderCompId, string topicName, long sessionId, long sequenceNumber, string payload) => 
-    //     new(senderCompId, topicName, MessageType.SessionStart, sessionId, sequenceNumber, payload);
-    //
-    // public static DownstreamMessage CreateDataMessage(string senderCompId, string topicName, long sessionId, long sequence, string payload) =>
-    //     new(senderCompId, topicName, MessageType.DataMessage, sessionId, sequence, payload);
-    //
-    // public static DownstreamMessage CreateResponseMessage(string senderCompId, string payload) =>
-    //     new(senderCompId, ResponsesTopicName, MessageType.DataMessage, 0, 0, payload);
-
     public override string ToString()
     {
         return $"{nameof(SenderCompId)}: {SenderCompId}, {nameof(TopicName)}: {TopicName}, {nameof(MessageType)}: {MessageType}, {nameof(SessionId)}: {SessionId}, {nameof(SequenceNumber)}: {SequenceNumber}, {nameof(SendingTimestamp)}: {SendingTimestamp}";
+    }
+
+    public void LogSendingTime(long timestamp)
+    {
+        SendingTimestamp = timestamp;
     }
 }

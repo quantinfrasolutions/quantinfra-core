@@ -19,7 +19,7 @@ class SimpleBpl : BusinessLogicProcessorBase<MockState>
         Disruptor<OutgoingDisruptorMessage> outputDisruptor,
         ReplayingClock clock,
         ILogger<SimpleBpl> logger
-    ) : base(walManager, state, outputDisruptor, clock, logger)
+    ) : base(new(), walManager, state, outputDisruptor, clock, logger)
     {
         _test = test;
     }

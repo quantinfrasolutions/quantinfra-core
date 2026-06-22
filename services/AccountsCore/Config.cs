@@ -24,4 +24,12 @@ public class Config
     public int ParserProcessingGroup { get; set; } = 2;
     public int BplProcessingGroup { get; set; } = 3;
     public bool Monolith { get; set; } = false;
+    
+    public int[] ReceiveMessageHopHistParams { get; set; } = [100, 100, 10];
+    public int[] ProcessingDelayParams { get; set; } = [20, 20, 10];
+    public int[] ProcessingTimeParams { get; set; } = [20, 20, 10];
+    public int[] PersistTimeParams { get; set; } = [100, 100, 10];
+    public int[] BplDelayParams { get; set; } = [20, 20, 10];
+    public int[] BplTimeParams { get; set; } = [20, 20, 10];
+    public int[] StateTimeParams { get; set; } = [20, 20, 10];
 }

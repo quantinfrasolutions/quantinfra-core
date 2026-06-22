@@ -69,8 +69,21 @@ public class Bpl : BusinessLogicProcessorBase<AccountServiceState>
         DisruptorAsyncQueryBus responseBus,
         IEnumerable<IConfigurableLoggingModule> loggingModules,
         ManagementEvents mgmtHandler
-    ) : base(walManager, /*filter,*/ /*finalizer,*/ state, outputDisruptor, clock, loggerFactory.CreateLogger<Bpl>(), config.WritePerformanceMetrics,
-        config.SingleHost)
+    ) : base(
+        new()
+        {
+            ServiceName = config.AccountServiceName, 
+            SingleHost = config.SingleHost,
+            Monolith = config.Monolith,
+            WritePerformanceMetrics = config.WritePerformanceMetrics,
+            ProcessingDelayParams = config.ProcessingDelayParams,
+            ProcessingTimeParams = config.ProcessingTimeParams,
+            ReceiveMessageHopHistParams = config.ReceiveMessageHopHistParams,
+            BplDelayParams = config.BplDelayParams,
+            BplTimeParams = config.BplTimeParams,
+            StateTimeParams = config.StateTimeParams,
+        },
+        walManager, state, outputDisruptor, clock, loggerFactory.CreateLogger<Bpl>())
     {
         _serviceName = config.AccountServiceName;
         _config = config;

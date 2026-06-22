@@ -75,8 +75,10 @@ public sealed class WalManager<TState>: Disruptor.IEventHandler<IncomingDisrupto
 
         if (config.WritePerformanceMetrics)
         {
-            _walWaitTime = MetricsDefinition.WalWaitTime;
-            _walTime = MetricsDefinition.WalTime;
+            _walWaitTime = MetricsDefinition.GetWalWaitTime(config.ServiceName, config.Monolith,
+                config.WalWaitTimeParams[0], config.WalWaitTimeParams[1], config.WalWaitTimeParams[2]);
+            _walTime = MetricsDefinition.GetWalTime(config.ServiceName, config.Monolith,
+                config.WalTimeParams[0], config.WalTimeParams[1], config.WalTimeParams[2]);
         }
     }
 
@@ -303,5 +305,10 @@ public class WalConfig
     public string? PersistStatePeriod { get; set; }
     public long MaxNumberOfEventsInWal { get; set; } = 1024;
     public bool TryRetrieveStateFromPersistentStorage { get; set; }
+    
+    public string ServiceName { get; set; }
+    public bool Monolith { get; set; }
     public bool WritePerformanceMetrics { get; set; }
+    public int[] WalWaitTimeParams { get; set; } = [20, 20, 10];
+    public int[] WalTimeParams { get; set; } = [20, 20, 10];
 }
