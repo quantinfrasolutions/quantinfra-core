@@ -22,7 +22,7 @@ env:
 
 jobs:
   tests:
-    uses: ./unit-tests.yml
+    uses: ./run-unit-tests.yml
     
   publish:
     runs-on: ubuntu-latest
