@@ -18,11 +18,11 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: quantinfrasolutions/trading-engine@${{ GITHUB_REF }}
+  IMAGE_NAME: quantinfrasolutions/trading-engine
 
 jobs:
   tests:
-    uses: ./run-unit-tests.yml
+    uses: ./run-unit-tests.yml@${{ GITHUB_REF }}
     
   publish:
     runs-on: ubuntu-latest
