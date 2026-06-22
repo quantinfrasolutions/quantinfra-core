@@ -22,7 +22,7 @@ env:
 
 jobs:
   tests:
-    uses: ./run-unit-tests.yml@${{ GITHUB_REF }}
+    uses: ./.github/workflows/run-unit-tests.yml
     
   publish:
     runs-on: ubuntu-latest
