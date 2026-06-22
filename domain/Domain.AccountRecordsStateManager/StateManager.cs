@@ -61,7 +61,9 @@ public class StateManager :
             else
             {
                 var existingAcc = _store.AccountRecords[account.AccountId];
-                if (existingAcc.TradingClientConfig != account.TradingClientConfig)
+                // AS cares only about existence/non-existence of the trading client 
+                if ((existingAcc.TradingClientConfig == null && account.TradingClientConfig != null) ||
+                    (existingAcc.TradingClientConfig != null && account.TradingClientConfig == null))
                 {
                     _logger.LogInformation("Updating account record {accountId} {name}", account.AccountId, account.Name);
                     _client.PublishMessage(new TradingClientConfigurationChangedEvt(account.AccountId,

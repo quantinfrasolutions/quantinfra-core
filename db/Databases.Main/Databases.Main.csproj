@@ -30,12 +30,13 @@
       <ProjectReference Include="..\..\common\Common.Strategies\Common.Strategies.csproj" />
       <ProjectReference Include="..\..\common\Common.Trading.Infrastructure\Common.Trading.Infrastructure.csproj" />
       <ProjectReference Include="..\..\common\Common.Utils.Cryptography\Common.Utils.Cryptography.csproj" />
+      <ProjectReference Include="..\..\connectors\Binance\Binance.Common\Binance.Common.csproj" />
+      <ProjectReference Include="..\..\connectors\Ibkr\Ibkr.Interfaces\Ibkr.Interfaces.csproj" />
       <ProjectReference Include="..\..\domain\events\Domain.Events.Accounts.AccountsService\Domain.Events.Accounts.AccountsService.csproj" />
       <ProjectReference Include="..\..\domain\events\Domain.Events.Accounts.Management\Domain.Events.Accounts.Management.csproj" />
       <ProjectReference Include="..\..\domain\events\Domain.Events.Persistence\Domain.Events.Persistence.csproj" />
       <ProjectReference Include="..\..\domain\events\Domain.Events.Strategies.Management\Domain.Events.Strategies.Management.csproj" />
       <ProjectReference Include="..\..\services\AccountsCore.State\AccountsCore.State.csproj" />
-      <ProjectReference Include="..\..\connectors\Connectors.Abstractions.Package\Connectors.Abstractions.Package.csproj" />
     </ItemGroup>
 
     <ItemGroup>
