@@ -206,7 +206,7 @@ public class BarStorage : IEnumerable<IBar>, IBarStorage// : MarketData.BarStora
         if (other._bars.Length < Capacity)
             throw new Exception("Not enough capacity to copy");
             
-        foreach (var b in other._bars.Reverse())
+        foreach (var b in other._bars.AsEnumerable().Reverse())
         {
             _barsRaw.PushFront(b);
         }
