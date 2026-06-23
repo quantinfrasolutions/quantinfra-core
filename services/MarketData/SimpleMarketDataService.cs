@@ -37,7 +37,9 @@ public class SimpleMarketDataService : IHostedService
         else _inputDisruptor.HandleEventsWith(parser).Then(bpl);
         _inputDisruptor.SetDefaultExceptionHandler(new DisruptorExceptionHandler<IncomingDisruptorMessage>(
             exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<IncomingDisruptorMessage>>()));
-        _outputDisruptor.HandleEventsWith(multicast).Then(persister);
+
+        if (config.PersistMarketData) _outputDisruptor.HandleEventsWith(multicast).Then(persister);
+        else _outputDisruptor.HandleEventsWith(multicast);
         _outputDisruptor.SetDefaultExceptionHandler(new DisruptorExceptionHandler<OutgoingDisruptorMessage>(
             exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<OutgoingDisruptorMessage>>()));
     }

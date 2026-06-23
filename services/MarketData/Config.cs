@@ -5,7 +5,7 @@ namespace QuantInfra.Services.MarketData;
 public class Config
 {
     public string MarketDataServiceName { get; set; }
-    public bool PersistMarketData { get; set; }
+    public bool PersistMarketData { get; set; } = true;
     public bool WritePerformanceMetrics { get; set; }
     public Duration ContractPriceUpdateInterval { get; set; } = Duration.FromSeconds(1);
     public bool SingleHost { get; set; } = false;

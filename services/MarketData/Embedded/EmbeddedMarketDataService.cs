@@ -18,6 +18,7 @@ public class EmbeddedMarketDataService : IHostedService
     private readonly IEnumerable<IIncomingTransport> _incomingTransports;
 
     public EmbeddedMarketDataService(
+        Config config,
         Bpl bpl,
         IComponentExceptionHandler exceptionHandler,
         MulticastSender multicast,
@@ -32,11 +33,12 @@ public class EmbeddedMarketDataService : IHostedService
         _inputDisruptor = inputDisruptor;
         _outputDisruptor = outputDisruptor;
         _incomingTransports = incomingTransports;
-
-        // _inputDisruptor.HandleEventsWith(bpl);
+        
         _inputDisruptor.SetDefaultExceptionHandler(new DisruptorExceptionHandler<IncomingDisruptorMessage>(
             exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<IncomingDisruptorMessage>>()));
-        _outputDisruptor.HandleEventsWith(multicast).Then(persister);
+        
+        if (config.PersistMarketData) _outputDisruptor.HandleEventsWith(multicast).Then(persister);
+        else _outputDisruptor.HandleEventsWith(multicast);
         _outputDisruptor.SetDefaultExceptionHandler(new DisruptorExceptionHandler<OutgoingDisruptorMessage>(
             exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<OutgoingDisruptorMessage>>()));
     }
