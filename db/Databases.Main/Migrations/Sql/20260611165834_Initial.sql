@@ -791,9 +791,9 @@ CREATE INDEX "IX_trading_session_intervals_trading_session_id" ON static_data.tr
 
 CREATE INDEX "IX_trading_sessions_exchange_id" ON static_data.trading_sessions (exchange_id);
 
-INSERT INTO public.migrations_history ("MigrationId", "ProductVersion")
-VALUES ('20260611165834_Initial', '9.0.8');
-
-COMMIT;
+-- INSERT INTO public.migrations_history ("MigrationId", "ProductVersion")
+-- VALUES ('20260611165834_Initial', '9.0.8');
+-- 
+-- COMMIT;
 
 

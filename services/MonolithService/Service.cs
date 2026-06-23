@@ -81,10 +81,11 @@ public class Service : IHostedService
             execSvc, mdClients) = await EnsureInfrastructureSetup();
 
         var accSvcComponent = new HostedComponent(accSvcInstance.Name, _logger,
-            () => SetupAccountsService(accSvcInstance),
-            sp => sp.GetRequiredService<IEnumerable<IHostedService>>()
+            component => SetupAccountsService(component, accSvcInstance),
+            // sp => sp.GetRequiredService<IEnumerable<IHostedService>>()
+            sp => [sp.GetRequiredService<AccountsCore.AccountsService>()]
         );
-        await accSvcComponent.StartAsync();
+        await accSvcComponent.StartAsync(CancellationToken.None);
         
         List<Assembly>? strategyAssemblies = null;
         try
@@ -110,7 +111,7 @@ public class Service : IHostedService
         {
             var resolver = new MultipleAssembliesTypeResolver(strategyAssemblies);
             var ssComponents = strSvc.Select(s => new HostedComponent(s.Name, _logger,
-                () => SetupStrategiesService(s, accSvcComponent.Name, resolver),
+                component => SetupStrategiesService(component, s, accSvcComponent.Name, resolver),
                 sp => [sp.GetRequiredService<StrategiesCore.StrategiesService>()]
             )).ToList();
 
@@ -118,7 +119,7 @@ public class Service : IHostedService
         }
 
         var esComponents = execSvc.Select(s => new HostedComponent(s.Name, _logger,
-            () => SetupExecutionService(s),
+            component => SetupExecutionService(component, s),
             sp => sp.GetRequiredService<IEnumerable<IHostedService>>())
         ).ToList();
         foreach (var es in esComponents) _components.Add(es.Name, es);
@@ -126,7 +127,7 @@ public class Service : IHostedService
         if (_config.EnableMarketDataService)
         {
             var mds = new HostedComponent(MdsName, _logger,
-                () => SetupMarketDataService(),
+                _ => SetupMarketDataService(),
                 sp => sp.GetRequiredService<IEnumerable<IHostedService>>()
             );
             _components.Add(mds.Name, mds);
@@ -135,7 +136,7 @@ public class Service : IHostedService
         if (_config.EnableBinanceUsdmMarketDataService)
         {
             var usdmMd = new HostedComponent(UsdmFuturesName, _logger,
-                () => SetupBinanceFuturesUsdmMarketDataClient(UsdmFuturesName),
+                _ => SetupBinanceFuturesUsdmMarketDataClient(UsdmFuturesName),
                 sp => sp.GetRequiredService<IEnumerable<IHostedService>>()
             );
             _components.Add(usdmMd.Name, usdmMd);
@@ -144,13 +145,13 @@ public class Service : IHostedService
         if (_config.EnableBinanceUsdmPublicMarketDataService)
         {
             var usdmMd = new HostedComponent(UsdmFuturesOrderBooksName, _logger,
-                () => SetupBinanceFuturesUsdmMarketDataClient(UsdmFuturesOrderBooksName),
+                _ => SetupBinanceFuturesUsdmMarketDataClient(UsdmFuturesOrderBooksName),
                 sp => sp.GetRequiredService<IEnumerable<IHostedService>>()
             );
             _components.Add(usdmMd.Name, usdmMd);
         }
 
-        await Task.WhenAll(_components.Values.Select(c => c.StartAsync()));
+        await Task.WhenAll(_components.Values.Select(c => c.StartAsync(cancellationToken)));
         _components.Add(accSvcComponent.Name, accSvcComponent);
     }
 
@@ -158,11 +159,11 @@ public class Service : IHostedService
     {
         _logger.LogInformation("Stopping application");
         await Task.WhenAll(_components.Where(kv => kv.Key != AsName && kv.Value.Status == ComponentStatus.Running).ToList()
-            .Select(kv  => kv.Value.StopAsync())
+            .Select(kv  => kv.Value.StopAsync(cancellationToken))
         );
         if (_components.TryGetValue(AsName, out var accSvc) && accSvc.Status == ComponentStatus.Running)
         {
-            await accSvc.StopAsync();
+            await accSvc.StopAsync(cancellationToken);
         }
         _logger.LogInformation("Application stopped");
     }
@@ -172,7 +173,6 @@ public class Service : IHostedService
         {
             await using var scope = _serviceProvider.CreateAsyncScope();
             var context = scope.ServiceProvider.GetRequiredService<MainContext>();
-            await context.Database.EnsureCreatedAsync();
             await context.Database.MigrateAsync();
             _logger.LogInformation("Main database migrated");
         }),
@@ -180,7 +180,6 @@ public class Service : IHostedService
         {
             await using var scope = _serviceProvider.CreateAsyncScope();
             var context = scope.ServiceProvider.GetRequiredService<MDTimescaleContextDesign>();
-            await context.Database.EnsureCreatedAsync();
             await context.Database.MigrateAsync();
             _logger.LogInformation("Market data database migrated");
         })
@@ -257,7 +256,7 @@ public class Service : IHostedService
         return (location, accSvc, strSvc, execSvc, mdClients);
     }
     
-    private IServiceProvider SetupAccountsService(AccountServiceInstance instance)
+    private IServiceProvider SetupAccountsService(HostedComponent component, AccountServiceInstance instance)
     {
         var transportFactory = _serviceProvider.GetRequiredService<TransportFactory>();
         var topology = _serviceProvider.GetRequiredService<Topology>();
@@ -271,6 +270,10 @@ public class Service : IHostedService
                 c.AddNLog();
                 LogManager.Configuration = new NLogLoggingConfiguration(_configuration.GetSection("nlog"));
             })
+            
+            .AddSingleton<IComponentExceptionHandler>(component)
+            .AddSingleton<DisruptorExceptionHandler<IncomingDisruptorMessage>>()
+            .AddSingleton<DisruptorExceptionHandler<OutgoingDisruptorMessage>>()
             
             .ConfigureMainDb(_serviceProvider.GetRequiredService<NpgsqlDataSource>())
             .AddMainDbContext()
@@ -382,7 +385,8 @@ public class Service : IHostedService
     }
 
     private IServiceProvider SetupStrategiesService(
-        StrategiesServiceInstance instance, 
+        HostedComponent component, 
+        StrategiesServiceInstance instance,
         string asName,
         MultipleAssembliesTypeResolver resolver
     )
@@ -394,6 +398,10 @@ public class Service : IHostedService
                 c.AddNLog();
                 LogManager.Configuration = new NLogLoggingConfiguration(_configuration.GetSection("nlog"));
             })
+            
+            .AddSingleton<IComponentExceptionHandler>(component)
+            .AddSingleton<DisruptorExceptionHandler<IncomingDisruptorMessage>>()
+            .AddSingleton<DisruptorExceptionHandler<OutgoingDisruptorMessage>>()
             
             .ReuseInProcessMessaging(_serviceProvider)
             
@@ -457,7 +465,7 @@ public class Service : IHostedService
         return sc.BuildServiceProvider();
     }
 
-    private IServiceProvider SetupExecutionService(ExecutionServiceInstance instance)
+    private IServiceProvider SetupExecutionService(HostedComponent component, ExecutionServiceInstance instance)
     {
         var sp = new ServiceCollection()
             .AddLogging(c =>
@@ -466,6 +474,10 @@ public class Service : IHostedService
                 c.AddNLog();
                 LogManager.Configuration = new NLogLoggingConfiguration(_configuration.GetSection("nlog"));
             })
+            
+            .AddSingleton<IComponentExceptionHandler>(component)
+            .AddSingleton<DisruptorExceptionHandler<IncomingDisruptorMessage>>()
+            .AddSingleton<DisruptorExceptionHandler<OutgoingDisruptorMessage>>()
             
             .ReuseInProcessMessaging(_serviceProvider)
             .AddSingleton<ISecretProvider>(_serviceProvider.GetRequiredService<ISecretProvider>())

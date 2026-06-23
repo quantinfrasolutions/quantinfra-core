@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using AccountsCore;
 using Disruptor.Dsl;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -29,16 +28,10 @@ public class AccountsService : IHostedService
     private readonly Config _config;
     private readonly StateManager _accountRecordsStateManager;
     private readonly AccountsServiceStateManager _strategyRecordsManager;
-    // private readonly DownstreamFilter _filter;
-
     private readonly MulticastSender _sender;
-
-    // private readonly Finalizer _finalizer;
-    // private readonly ManagementNotificationsClient _managementNotificationsClient;
     private readonly Disruptor<IncomingDisruptorMessage> _inputDisruptor;
     private readonly Disruptor<OutgoingDisruptorMessage> _outputDisruptor;
     private readonly Bpl _bpl;
-    // private readonly Router _apiRouter;
     private readonly ILoggerFactory _loggerFactory;
     private readonly WalManager<AccountServiceState> _walManager;
     private readonly ILogger _logger;
@@ -53,19 +46,17 @@ public class AccountsService : IHostedService
 
     public AccountsService(
         Config config,
+        DisruptorExceptionHandler<IncomingDisruptorMessage> incomingExceptionHandler,
+        DisruptorExceptionHandler<OutgoingDisruptorMessage> outgoingExceptionHandler,
         WalManager<AccountServiceState> walManager,
         Serializer serializer,
         Parser parser,
         StateManager accountRecordsStateManager,
         AccountsServiceStateManager strategyRecordsManager,
-        // DownstreamFilter filter,
         MulticastSender sender,
-        // Finalizer finalizer,
-        // ManagementNotificationsClient managementNotificationsClient, must be inside IEnumerable<IIncomingTransport>
         Disruptor<IncomingDisruptorMessage> inputDisruptor,
         Disruptor<OutgoingDisruptorMessage> outputDisruptor,
         Bpl bpl,
-        // Router apiRouter, it must be inside IEnumerable<IIncomingTransport>
         ILoggerFactory loggerFactory, 
         IMarketDataClient mdClient, 
         ISchedulerFactory schedulerFactory,
@@ -82,14 +73,10 @@ public class AccountsService : IHostedService
         _walManager = walManager;
         _accountRecordsStateManager = accountRecordsStateManager;
         _strategyRecordsManager = strategyRecordsManager;
-        // _filter = filter;
         _sender = sender;
-        // _finalizer = finalizer;
-        // _managementNotificationsClient = managementNotificationsClient;
         _inputDisruptor = inputDisruptor;
         _outputDisruptor = outputDisruptor;
         _bpl = bpl;
-        // _apiRouter = apiRouter;
         _loggerFactory = loggerFactory;
         _mdClient = mdClient;
         _schedulerFactory = schedulerFactory;
@@ -102,12 +89,7 @@ public class AccountsService : IHostedService
 
         if (_walManager.WalRollPeriodEvents > _inputDisruptor.BufferSize) throw new InvalidOperationException("Wal roll period should be less than input disruptor buffer size");
         // TODO: the same for the output disruptor
-
-        // _inputDisruptor.ConfigureDisruptor(
-        //     new(_walManager, _config.WalManagerProcessingGroup),
-        //     new(parser, _config.ParserProcessingGroup),
-        //     new(bpl, _config.BplProcessingGroup)
-        // );
+        
         if (config.Monolith)
         {
             _inputDisruptor.HandleEventsWith(serializer).Then(_walManager).Then(bpl);
@@ -116,12 +98,12 @@ public class AccountsService : IHostedService
         {
             _inputDisruptor.HandleEventsWith(_walManager, parser).Then(bpl);
         }
-
-        // _inputDisruptor.HandleEventsWith(_walManager).Then(parser).Then(bpl);
-        _inputDisruptor.SetDefaultExceptionHandler(new FailFastExceptionHandler<IncomingDisruptorMessage>(_logger));
+        
+        // Even in case of the monolith app, if AS fails, let the whole application fail
+        _inputDisruptor.SetDefaultExceptionHandler(incomingExceptionHandler);
         var handlers = _outputDisruptor.HandleEventsWith(_sender);
         if (config.PersistEventsAndProjections) handlers.Then(_persister);
-        _outputDisruptor.SetDefaultExceptionHandler(new FailFastExceptionHandler<OutgoingDisruptorMessage>(_logger));
+        _outputDisruptor.SetDefaultExceptionHandler(outgoingExceptionHandler);
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -133,7 +115,6 @@ public class AccountsService : IHostedService
         await _persister.InitializeAsync();
         var lastPersistedEventId = _persister.LastPersistedEventId;
         _logger.LogInformation($"Persister initialized, lastPersistedEventId={lastPersistedEventId}");
-        // _filter.UpdateLastSentEventId(lastPersistedEventId);
         _sender.UpdateLastSentEventId(lastPersistedEventId);
 
         try
@@ -187,34 +168,15 @@ public class AccountsService : IHostedService
         
         await Task.WhenAll(_incomingTransports.Select(t => t.StartAsync(cancellationToken)));
         _logger.LogInformation("Incoming transports started");
-        // _filter.Start();
-        _logger.LogInformation("DownstreamFilter started");
-        // _finalizer.Start();
-        // _logger.LogInformation("Finalizer started");
-        
-        
-        // await _managementNotificationsClient.StartAsync(cancellationToken);
-        // _logger.LogInformation("ManagementNotificationsClient started");
-        
-        // _apiRouter.Start();
-        // _logger.LogInformation("API server started");
         
         await _mdClient.StartAsync(cancellationToken);
         await _mdClient.SubscribeToLastContractPricesAsync();
         _logger.LogInformation("Market data client started");
         
-        // await _executionServiceClient.StartAsync(cancellationToken);
         var brokerAccounts = _state.AccountRecords.Values
             .Where(a => a.AccountType == AccountType.BrokerAccount && a.TradingClientConfig is not null)
             .ToList();
         _logger.LogInformation($"Subscribing to broker accounts [{string.Join(", ", brokerAccounts.Select(ba => ba.AccountId))}]");
-        // await _executionServiceClient.SubscribeToRequestsTopic(_config.AccountServiceName);
-        // await Task.WhenAll(brokerAccounts.Select(a =>
-        //     _executionServiceClient.SubscribeToExternalAccountExecutions(a.AccountId,
-        //         a.TradingClientConfig!.ExecutionServiceName,
-        //         false, 0)
-        // ));
-        // _logger.LogInformation("Execution service client started");
         
         await ConfigureJobs();
         _logger.LogInformation("Jobs started");
@@ -273,21 +235,14 @@ public class AccountsService : IHostedService
     {
         _logger.LogInformation("Stopping service");
         await Task.WhenAll(_incomingTransports.Select(t => t.StopAsync(cancellationToken)));
-        // _apiRouter.Stop();
+        
         _inputDisruptor.PublishParsedMessage(new StopEvt(), 0);
-        if (_config.PersistEventsAndProjections)
-        {
-            await _persister.StopSemaphore.WaitAsync(cancellationToken);
-        }
-        else
-        {
-            await _sender.StopSemaphore.WaitAsync(cancellationToken);
-        }
+        if (_config.PersistEventsAndProjections) await _persister.StopSemaphore.WaitAsync(cancellationToken);
+        else await _sender.StopSemaphore.WaitAsync(cancellationToken);
         
         _inputDisruptor.Halt();
         _outputDisruptor.Halt();
         
-        // _apiRouter.Dispose();
         await _mdClient.StopAsync(cancellationToken);
         
         _logger.LogInformation("Service stopped");
