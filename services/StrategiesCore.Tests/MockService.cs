@@ -1,4 +1,5 @@
 using Common.Utils.Reflection;
+using Disruptor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NodaTime;
@@ -23,6 +24,8 @@ public static class MockService
         {
             conf.AddConsole();
         })
+        
+        .AddSingleton<IComponentExceptionHandler, FailFastExceptionHandler>()
         
         .AddSingleton<Config>(sp => new() { StrategiesServiceName = "SS1" })
         

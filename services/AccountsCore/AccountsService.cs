@@ -46,8 +46,7 @@ public class AccountsService : IHostedService
 
     public AccountsService(
         Config config,
-        DisruptorExceptionHandler<IncomingDisruptorMessage> incomingExceptionHandler,
-        DisruptorExceptionHandler<OutgoingDisruptorMessage> outgoingExceptionHandler,
+        IComponentExceptionHandler exceptionHandler,
         WalManager<AccountServiceState> walManager,
         Serializer serializer,
         Parser parser,
@@ -100,10 +99,12 @@ public class AccountsService : IHostedService
         }
         
         // Even in case of the monolith app, if AS fails, let the whole application fail
-        _inputDisruptor.SetDefaultExceptionHandler(incomingExceptionHandler);
+        _inputDisruptor.SetDefaultExceptionHandler(new DisruptorExceptionHandler<IncomingDisruptorMessage>(
+            exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<IncomingDisruptorMessage>>()));
         var handlers = _outputDisruptor.HandleEventsWith(_sender);
         if (config.PersistEventsAndProjections) handlers.Then(_persister);
-        _outputDisruptor.SetDefaultExceptionHandler(outgoingExceptionHandler);
+        _outputDisruptor.SetDefaultExceptionHandler(new DisruptorExceptionHandler<OutgoingDisruptorMessage>(
+            exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<OutgoingDisruptorMessage>>()));
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)

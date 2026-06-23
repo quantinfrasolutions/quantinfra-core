@@ -48,8 +48,7 @@ namespace QuantInfra.Services.StrategiesCore
 
         public StrategiesService(
             Config config,
-            DisruptorExceptionHandler<IncomingDisruptorMessage> incomingExceptionHandler,
-            DisruptorExceptionHandler<OutgoingDisruptorMessage> outgoingExceptionHandler,
+            IComponentExceptionHandler exceptionHandler,
             Parser parser,
             StrategiesServiceStateManager strategyRecordsStrategiesServiceStateManager,
             HostedStrategiesRunner runner,
@@ -89,10 +88,12 @@ namespace QuantInfra.Services.StrategiesCore
             // _inputDisruptor.HandleEventsWith(parser).Then(bpl);
             if (config.Monolith) _inputDisruptor.HandleEventsWith(bpl);
             else _inputDisruptor.HandleEventsWith(parser).Then(bpl);
-            
-            _inputDisruptor.SetDefaultExceptionHandler(incomingExceptionHandler);
+
+            _inputDisruptor.SetDefaultExceptionHandler(new DisruptorExceptionHandler<IncomingDisruptorMessage>(
+                exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<IncomingDisruptorMessage>>()));
             _outputDisruptor.HandleEventsWith(sender);
-            _outputDisruptor.SetDefaultExceptionHandler(outgoingExceptionHandler);
+            _outputDisruptor.SetDefaultExceptionHandler(new DisruptorExceptionHandler<OutgoingDisruptorMessage>(
+                exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<OutgoingDisruptorMessage>>()));
 
             if (config.WritePerformanceMetrics)
             {

@@ -19,13 +19,14 @@ public class SimpleMarketDataService : IHostedService
 
     public SimpleMarketDataService(
         Config config,
+        IComponentExceptionHandler exceptionHandler,
         Parser parser,
         Bpl bpl,
         MulticastSender multicast,
         Disruptor<IncomingDisruptorMessage> inputDisruptor,
         Disruptor<OutgoingDisruptorMessage> outputDisruptor,
         Persister persister,
-        ILogger<SimpleMarketDataService> logger
+        ILoggerFactory loggerFactory
     )
     {
         _bpl = bpl;
@@ -34,9 +35,11 @@ public class SimpleMarketDataService : IHostedService
         
         if (config.Monolith) _inputDisruptor.HandleEventsWith(bpl);
         else _inputDisruptor.HandleEventsWith(parser).Then(bpl);
-        _inputDisruptor.SetDefaultExceptionHandler(new FailFastExceptionHandler<IncomingDisruptorMessage>(logger));
+        _inputDisruptor.SetDefaultExceptionHandler(new DisruptorExceptionHandler<IncomingDisruptorMessage>(
+            exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<IncomingDisruptorMessage>>()));
         _outputDisruptor.HandleEventsWith(multicast).Then(persister);
-        _outputDisruptor.SetDefaultExceptionHandler(new FailFastExceptionHandler<OutgoingDisruptorMessage>(logger));
+        _outputDisruptor.SetDefaultExceptionHandler(new DisruptorExceptionHandler<OutgoingDisruptorMessage>(
+            exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<OutgoingDisruptorMessage>>()));
     }
     
     public async Task StartAsync(CancellationToken cancellationToken)

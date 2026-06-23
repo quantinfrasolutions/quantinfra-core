@@ -127,7 +127,7 @@ public class Service : IHostedService
         if (_config.EnableMarketDataService)
         {
             var mds = new HostedComponent(MdsName, _logger,
-                _ => SetupMarketDataService(),
+                component => SetupMarketDataService(component),
                 sp => sp.GetRequiredService<IEnumerable<IHostedService>>()
             );
             _components.Add(mds.Name, mds);
@@ -136,7 +136,7 @@ public class Service : IHostedService
         if (_config.EnableBinanceUsdmMarketDataService)
         {
             var usdmMd = new HostedComponent(UsdmFuturesName, _logger,
-                _ => SetupBinanceFuturesUsdmMarketDataClient(UsdmFuturesName),
+                component => SetupBinanceFuturesUsdmMarketDataClient(component, UsdmFuturesName),
                 sp => sp.GetRequiredService<IEnumerable<IHostedService>>()
             );
             _components.Add(usdmMd.Name, usdmMd);
@@ -145,7 +145,7 @@ public class Service : IHostedService
         if (_config.EnableBinanceUsdmPublicMarketDataService)
         {
             var usdmMd = new HostedComponent(UsdmFuturesOrderBooksName, _logger,
-                _ => SetupBinanceFuturesUsdmMarketDataClient(UsdmFuturesOrderBooksName),
+                component => SetupBinanceFuturesUsdmMarketDataClient(component, UsdmFuturesOrderBooksName),
                 sp => sp.GetRequiredService<IEnumerable<IHostedService>>()
             );
             _components.Add(usdmMd.Name, usdmMd);
@@ -521,7 +521,7 @@ public class Service : IHostedService
         return sp;
     }
 
-    private IServiceProvider SetupMarketDataService()
+    private IServiceProvider SetupMarketDataService(HostedComponent component)
     {
         var transportFactory = _serviceProvider.GetRequiredService<TransportFactory>();
         
@@ -533,6 +533,10 @@ public class Service : IHostedService
                 c.AddNLog();
                 LogManager.Configuration = new NLogLoggingConfiguration(_configuration.GetSection("nlog"));
             })
+            
+            .AddSingleton<IComponentExceptionHandler>(component)
+            .AddSingleton<DisruptorExceptionHandler<IncomingDisruptorMessage>>()
+            .AddSingleton<DisruptorExceptionHandler<OutgoingDisruptorMessage>>()
             
             .AddQuartz()
             .AddQuartzHostedService(options =>
@@ -578,7 +582,7 @@ public class Service : IHostedService
         return sp;
     }
 
-    private IServiceProvider SetupBinanceFuturesUsdmMarketDataClient(string clientName)
+    private IServiceProvider SetupBinanceFuturesUsdmMarketDataClient(HostedComponent component, string clientName)
     {
         var transportFactory = _serviceProvider.GetRequiredService<TransportFactory>();
         
@@ -590,6 +594,10 @@ public class Service : IHostedService
                 c.AddNLog();
                 LogManager.Configuration = new NLogLoggingConfiguration(_configuration.GetSection("nlog"));
             })
+            
+            .AddSingleton<IComponentExceptionHandler>(component)
+            .AddSingleton<DisruptorExceptionHandler<IncomingDisruptorMessage>>()
+            .AddSingleton<DisruptorExceptionHandler<OutgoingDisruptorMessage>>()
 
             .AddQuartz()
             .AddQuartzHostedService()

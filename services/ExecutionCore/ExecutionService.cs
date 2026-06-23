@@ -25,6 +25,7 @@ public class ExecutionService : IHostedService
 
     public ExecutionService(
         Config config,
+        IComponentExceptionHandler exceptionHandler,
         Disruptor<IncomingDisruptorMessage> inputDisruptor,
         Disruptor<OutgoingDisruptorMessage> outputDisruptor,
         Bpl bpl,
@@ -54,9 +55,11 @@ public class ExecutionService : IHostedService
         // );
         if (config.Monolith) _inputDisruptor.HandleEventsWith(bpl);
         else _inputDisruptor.HandleEventsWith(parser).Then(bpl);
-        _inputDisruptor.SetDefaultExceptionHandler(new FailFastExceptionHandler<IncomingDisruptorMessage>(_logger));
+        _inputDisruptor.SetDefaultExceptionHandler(new DisruptorExceptionHandler<IncomingDisruptorMessage>(
+            exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<IncomingDisruptorMessage>>()));
         _outputDisruptor.HandleEventsWith(_sender);
-        _outputDisruptor.SetDefaultExceptionHandler(new FailFastExceptionHandler<OutgoingDisruptorMessage>(_logger));
+        _outputDisruptor.SetDefaultExceptionHandler(new DisruptorExceptionHandler<OutgoingDisruptorMessage>(
+            exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<OutgoingDisruptorMessage>>()));
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)

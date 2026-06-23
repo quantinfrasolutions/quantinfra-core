@@ -19,11 +19,12 @@ public class EmbeddedMarketDataService : IHostedService
 
     public EmbeddedMarketDataService(
         Bpl bpl,
+        IComponentExceptionHandler exceptionHandler,
         MulticastSender multicast,
         Disruptor<IncomingDisruptorMessage> inputDisruptor,
         Disruptor<OutgoingDisruptorMessage> outputDisruptor,
         Persister persister,
-        ILogger<EmbeddedMarketDataService> logger,
+        ILoggerFactory loggerFactory,
         IEnumerable<IIncomingTransport> incomingTransports
     )
     {
@@ -33,9 +34,11 @@ public class EmbeddedMarketDataService : IHostedService
         _incomingTransports = incomingTransports;
 
         // _inputDisruptor.HandleEventsWith(bpl);
-        _inputDisruptor.SetDefaultExceptionHandler(new FailFastExceptionHandler<IncomingDisruptorMessage>(logger));
+        _inputDisruptor.SetDefaultExceptionHandler(new DisruptorExceptionHandler<IncomingDisruptorMessage>(
+            exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<IncomingDisruptorMessage>>()));
         _outputDisruptor.HandleEventsWith(multicast).Then(persister);
-        _outputDisruptor.SetDefaultExceptionHandler(new FailFastExceptionHandler<OutgoingDisruptorMessage>(logger));
+        _outputDisruptor.SetDefaultExceptionHandler(new DisruptorExceptionHandler<OutgoingDisruptorMessage>(
+            exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<OutgoingDisruptorMessage>>()));
     }
     
     public async Task StartAsync(CancellationToken cancellationToken)
