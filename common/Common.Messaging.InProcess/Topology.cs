@@ -36,7 +36,7 @@ public enum MsgType
     RegisterMulticastControlHandler
 }
 
-public class Topology : IEventHandler<DisruptorMessage>
+public sealed class Topology : IEventHandler<DisruptorMessage>
 {
     // private readonly Dictionary<string, List<IListener>> _multicastListeners = new();
     private readonly Node _root = new();

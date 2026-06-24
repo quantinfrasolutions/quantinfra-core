@@ -66,8 +66,16 @@ public class StateManager :
                     (existingAcc.TradingClientConfig != null && account.TradingClientConfig == null))
                 {
                     _logger.LogInformation("Updating account record {accountId} {name}", account.AccountId, account.Name);
-                    _client.PublishMessage(new TradingClientConfigurationChangedEvt(account.AccountId,
-                        account.AccountId, new(account.TradingClientConfig) { TradingClientSecret = null }, processingDt), processingDt);
+                    _client.PublishMessage(
+                        new TradingClientConfigurationChangedEvt(
+                            account.AccountId, account.AccountId, 
+                            account.TradingClientConfig != null
+                                ? new(account.TradingClientConfig) { TradingClientSecret = null }
+                                : null, 
+                            processingDt
+                        ), 
+                        processingDt
+                    );
                 }
             }
         }
