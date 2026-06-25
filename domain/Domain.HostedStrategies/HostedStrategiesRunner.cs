@@ -121,7 +121,7 @@ public sealed class HostedStrategiesRunner :
         _logger.LogInformation("Loading market data");
 
         var barRequests = Aggregator.GetHistoryRequests();
-        var skipHistoryOffset = _config.SkipProcessingOfHistoryBeforeFromNow ?? Duration.Zero;
+        var skipHistoryOffset = _config.SkipProcessingOfHistoryBeforeFromNow;
         var nowUtc = now.InUtc();
         now = Instant.FromUtc(nowUtc.Year, nowUtc.Month, nowUtc.Day, nowUtc.Hour, nowUtc.Minute,
             0); // Round to the previous minute

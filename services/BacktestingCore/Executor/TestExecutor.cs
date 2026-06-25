@@ -1,47 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using BacktestingCore.Analysis;
 using BacktestingCore.Providers;
-using Common.Accounting;
-using Common.Accounting.Yield;
-using Common.Backtesting;
-using Common.EventSourcing;
-using Common.Profiling;
-using Common.Strategies;
-using Common.Strategies.Runner;
-using Common.Trading;
-using Common.Trading.Positions;
-using Domain.Commands.Accounts.AccountsService;
-using Domain.Queries.Accounts.AccountsService;
-using Domain.StaticData;
+using Common.StaticData.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Config;
 using NLog.Extensions.Logging;
 using NodaTime;
-using QuantInfra.Common.Accounts.Abstractions;
+using QuantInfra.Common.Backtesting.Abstractions;
+using QuantInfra.Common.EventSourcing;
+using QuantInfra.Common.Interfaces.Api.Strategies;
 using QuantInfra.Common.MarketData.Abstractions;
-using QuantInfra.Common.StaticData.Abstractions;
 using QuantInfra.Common.Strategies;
-using QuantInfra.Common.Strategies.Api;
+using QuantInfra.Common.Strategies.Abstractions;
 using QuantInfra.Domain.Accounts.Base;
+using QuantInfra.Domain.Commands.Accounts.AccountsService;
 using QuantInfra.Domain.Events.Accounts.Management;
 using QuantInfra.Domain.Events.MarketData;
 using QuantInfra.Domain.Events.Strategies.Management;
 using QuantInfra.Domain.HostedStrategies;
 using QuantInfra.Domain.MarketData;
+using QuantInfra.Domain.Queries.Accounts.AccountsService;
 using QuantInfra.Domain.Queries.MarketData;
 using QuantInfra.Domain.Queries.StaticData;
+using QuantInfra.Domain.StaticData;
 using QuantInfra.Domain.VirtualExecution;
+using QuantInfra.Sdk.Accounting;
+using QuantInfra.Sdk.Accounts;
+using QuantInfra.Sdk.Backtesting;
+using QuantInfra.Sdk.StaticData;
+using QuantInfra.Sdk.Strategies;
+using QuantInfra.Sdk.Trading;
+using QuantInfra.Sdk.Trading.Positions;
+using QuantInfra.Services.BacktestingCore.Analysis;
+using QuantInfra.Services.BacktestingCore.Providers;
 
-namespace BacktestingCore.Executor
+namespace QuantInfra.Services.BacktestingCore.Executor
 {
     public class TestExecutor: 
-        IStrategyTestingAction
+        IBacktestRunner
     {
         private readonly ServiceProvider _serviceProvider;
         private readonly IReadOnlyCollection<CreateStrategyRequest> _strategies;
@@ -57,7 +57,6 @@ namespace BacktestingCore.Executor
             TestStaticDataRepository sdProvider,
             IReadOnlyCollection<CreateStrategyRequest> strategies,
             LoggingConfiguration logConfiguration,
-            IProfiler profiler,
             IHostedStrategiesFactory strategiesFactory
         )
         {
@@ -75,7 +74,8 @@ namespace BacktestingCore.Executor
                 .AddSingleton<ITestMarketDataProvider>(candlesStorage)
                 .AddSingleton<IMarketDataHistoryProvider>(sp => sp.GetRequiredService<ITestMarketDataProvider>())
                 
-                .AddSingleton<HostedStrategiesRunnerConfig>(sp => Options)
+                .AddSingleton<HostedStrategiesRunnerConfig>(_ => new HostedStrategiesRunnerConfig(Duration.Zero,
+                    options.RequestBarAttempts, options.ThrowOnZeroVolumeOrders, options.VirtualAccountSizeStepFraction, false))
                 .AddHostedStrategiesRunner()
 
                 // .AddSingleHostMessaging()
@@ -91,10 +91,8 @@ namespace BacktestingCore.Executor
                 .AddSingleton<IHostedStrategiesFactory>(sf => strategiesFactory)
                 .AddSingleton<TestStaticDataRepository>(sp => sdProvider)
                 .AddSingleton<IStaticDataProvider>(sp => sdProvider)
-                .AddSingleton<IProfiler>(sp => profiler)
                 
                 .UseVirtualExecutorWithSingletonHandlers()
-                .AddSingleton<HostedStrategiesRunnerConfig>(sp => Options)
                 
                 .AddStaticDataQueryHandlers()
                 .AddLastContractPricesStorage()
@@ -105,24 +103,15 @@ namespace BacktestingCore.Executor
 
             _serviceProvider = serviceCollection.BuildServiceProvider();
             _results = _serviceProvider.GetRequiredService<BacktestResultsAgregator>();
-
-            // var bus = _serviceProvider.GetService<BacktestingBus>()!;
-            // bus.InitializeHandlers(_serviceProvider);
-
-            // _serviceProvider.GetService<StrategiesRunner>().CurrentPricesProvider =
-            //     _serviceProvider.GetService<BarsRunner>();
         }
         
         protected TestExecutorOptions Options { get; }
         public CancellationToken? Ct { get; set; }
-        public IActionProgressTracker Tracker { get; set; }
+        // public IActionProgressTracker Tracker { get; set; }
 
 
         public virtual void Run()
         {
-            #if PROFILE
-            var profiler = _serviceProvider.GetService<IProfiler>();
-            #endif
             var eventBus = _serviceProvider.GetRequiredService<IEventBus>();
             var queryBus = _serviceProvider.GetRequiredService<IQueryBus>();
             var commandBus = _serviceProvider.GetRequiredService<ICommandBus>();
@@ -161,7 +150,7 @@ namespace BacktestingCore.Executor
 
             var state = _serviceProvider.GetRequiredService<InMemoryState>();
             var runner = _serviceProvider.GetRequiredService<HostedStrategiesRunner>();
-            runner.Initialize(state.StrategyRecords.Values.ToList(), new List<EsaSubscription>(), state.AccountRecords.Values.ToList());
+            runner.Initialize(state.StrategyRecords.Values.ToList(), state.AccountRecords.Values.ToList());
             
             var candlesStorage = _serviceProvider.GetService<ITestMarketDataProvider>()!;
             runner.LoadMarketData(Options.StartDt, candlesStorage, true);
@@ -175,10 +164,6 @@ namespace BacktestingCore.Executor
 //             
 
             var clock = _serviceProvider.GetRequiredService<IClock>();
-            #if PROFILE
-            using (profiler.Step("ProcessBars"))
-            {
-            #endif
             var btsInitialized = false;
             var nextMtmDt = GetNextMtmDt(Options.StartDt);
             var totalSecondsToTest = (Options.EndDt - Options.StartDt).TotalSeconds;
@@ -207,29 +192,15 @@ namespace BacktestingCore.Executor
                 if (bar == null) break;
                 
                 dt = bar.OpenDt;
-                
-                if (/*!Options.EnableAutomaticBaseTradeSizeManagement &&*/ !btsInitialized) // otherwise, updates will be handled by BarsRunner
-                {
-                    // TODO: support for multiple symbols and synthetics
-                    btsInitialized = true;
-                    // sdProvider.UpdateBaseTradeSize(
-                    //     Options.ContractId,
-                    //     bar.CloseDt,
-                    //     Options.InvestmentEquivalent / sdProvider.GetCalculator(Options.ContractId)
-                    //         .GetValueInSettlementCcy((decimal)bar.Open, 1),
-                    //     (decimal)bar.Open,
-                    //     1
-                    // );
-                }
 
                 if (dt >= nextMtmDt)
                 {
                     commandBus.SendCommand(new RunEndOfDayCmd(string.Empty, nextMtmDt));
                     nextMtmDt = GetNextMtmDt(nextMtmDt);
-                    if (Tracker is not null)
-                    {
-                        Tracker.CurrentProgress = (dt - Options.StartDt).TotalSeconds / totalSecondsToTest;
-                    }
+                    // if (Tracker is not null)
+                    // {
+                    //     Tracker.CurrentProgress = (dt - Options.StartDt).TotalSeconds / totalSecondsToTest;
+                    // }
                 }
                 
                 Contract? contract = null;
@@ -342,9 +313,6 @@ namespace BacktestingCore.Executor
             }
 
             commandBus.SendCommand(new RunEndOfDayCmd(string.Empty, nextMtmDt));
-#if PROFILE
-            }
-#endif
         }
 
         private Instant GetNextMtmDt(Instant lastMtmDt)
@@ -366,27 +334,19 @@ namespace BacktestingCore.Executor
         private readonly List<AccountRecordV6> _accounts = new();
         public IReadOnlyCollection<AccountRecordV6> GetAccountRecords() => _accounts;
 
-        public void PersistTestData(
-            ITestDataPersister? persister = null, 
+        public void PersistTestResults(
+            ITestResultsPersister? persister = null, 
             PersistOptions? options = null,
             bool flush = true
         )
         {
             options ??= new PersistOptions();
-            #if PROFILE
-            var profiler = _serviceProvider.GetService<IProfiler>();
-            using (profiler.Step("SaveResults"))
-            {
-            #endif
             // if (options.SaveStrategies) persister?.SaveStrategyConfigs(_strategies);
             // if (options.SaveDailyReturns) persister?.SaveDailyReturns(Results.Returns);
             // if (options.SavePositions) persister?.SavePositions(Results.PositionCloses);
             // if (options.SaveTrades) persister?.SaveTrades(Results.Trades);
             // if (options.SaveCommissions) persister?.SaveCommissions(Results.Commissions);
             // if (flush) persister?.Flush();
-            #if PROFILE
-            }
-            #endif
         }
         
         public IReadOnlyList<Commission> GetCommissions() => throw new NotImplementedException();// Results.Commissions;

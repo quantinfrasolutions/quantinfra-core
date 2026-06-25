@@ -1,50 +1,29 @@
 using System.Collections.Generic;
 using BacktestingCore.Providers;
-using Common.Backtesting;
-using Common.Profiling;
-using Common.Strategies;
 using NLog.Config;
-using QuantInfra.Common.StaticData.Abstractions;
-using QuantInfra.Common.Strategies.Api;
+using QuantInfra.Common.Strategies.Abstractions;
+using QuantInfra.Sdk.Backtesting;
+using QuantInfra.Sdk.Strategies;
+using QuantInfra.Services.BacktestingCore.Providers;
 
-namespace BacktestingCore.Executor
+namespace QuantInfra.Services.BacktestingCore.Executor
 {
-    public class TestExecutorFactory<T> : ITestExecutorFactory<T>
-        where T : IStrategyTestResult
+    public class TestExecutorFactory(
+        TestExecutorOptions options,
+        TestStaticDataRepository sdProvider,
+        LoggingConfiguration loggingConfiguration,
+        IHostedStrategiesFactory strategiesFactory
+    )
+        : ITestExecutorFactory
     {
-        private readonly TestExecutorOptions _options;
-        private readonly TestStaticDataRepository _sdProvider;
-        private readonly LoggingConfiguration _loggingConfiguration;
-        private readonly IProfiler _profiler;
-        private readonly ITestResultCalculator<T> _resultCalculator;
-        private readonly IHostedStrategiesFactory _strategiesFactory;
-
-        public TestExecutorFactory(
-            TestExecutorOptions options,
-            TestStaticDataRepository sdProvider,
-            LoggingConfiguration loggingConfiguration,
-            IProfiler profiler,
-            ITestResultCalculator<T> resultCalculator, IHostedStrategiesFactory strategiesFactory)
-        {
-            _options = options;
-            _sdProvider = sdProvider;
-            _loggingConfiguration = loggingConfiguration;
-            _profiler = profiler;
-            _resultCalculator = resultCalculator;
-            _strategiesFactory = strategiesFactory;
-        }
-        
-        public ITestExecutor<T> CreateExecutorInstance(IReadOnlyCollection<CreateStrategyRequest> configs, ITestMarketDataProvider candlesStorage, 
-            TestExecutorOptions? options = null
-        ) => new TestExecutorT<T>(
-            options ?? _options,
+        public IBacktestRunner CreateExecutorInstance(IReadOnlyCollection<StrategyConfig> configs, TestExecutorOptions? optionsOverride = null) => 
+            new TestExecutor(
+            optionsOverride ?? options,
             candlesStorage, 
-            _sdProvider,
+            sdProvider,
             configs,
-            _loggingConfiguration,
-            _profiler,
-            _resultCalculator,
-            _strategiesFactory
+            loggingConfiguration,
+            strategiesFactory
         );
     }
 }

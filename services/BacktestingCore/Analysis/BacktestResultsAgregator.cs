@@ -1,19 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Common.Accounting;
-using Common.Accounting.Yield;
-using Common.Backtesting;
-using Common.EventSourcing;
-using Common.Trading;
-using Common.Trading.Positions;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
-using QuantInfra.Domain.Events.Accounts.AccountsService;
+using QuantInfra.Common.EventSourcing;
 using QuantInfra.Domain.Events.Accounts.AccountsService.Primary;
 using QuantInfra.Domain.Events.Accounts.AccountsService.Projections;
+using QuantInfra.Sdk.Accounting;
+using QuantInfra.Sdk.Backtesting;
+using QuantInfra.Sdk.Trading;
+using QuantInfra.Sdk.Trading.Positions;
 
-namespace BacktestingCore.Analysis;
+namespace QuantInfra.Services.BacktestingCore.Analysis;
 
 internal class BacktestResultsAgregator :
     IProjectionWriter<SharePriceHistoryProjectionEvt>,

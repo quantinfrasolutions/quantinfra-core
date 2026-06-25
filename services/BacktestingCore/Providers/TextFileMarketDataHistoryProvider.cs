@@ -1,14 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Common.MarketData;
-using Common.MarketData.Storages;
-using Common.StaticData;
 using NodaTime;
-using NodaTime.Text;
 using QuantInfra.Common.MarketData.Abstractions;
-using QuantInfra.Common.StaticData.Abstractions;
+using QuantInfra.Sdk.MarketData;
+using QuantInfra.Sdk.StaticData;
 
-namespace StrategyTester.Providers;
+namespace QuantInfra.Services.BacktestingCore.Providers;
 
 public class TextFileMarketDataHistoryProvider :
     IMarketDataHistoryProvider

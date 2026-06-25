@@ -1,65 +1,42 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
-using QuantInfra.Common.StaticData.Abstractions;
+using Common.StaticData.Abstractions;
+using QuantInfra.Sdk.StaticData;
 
-namespace BacktestingCore.Providers;
+namespace QuantInfra.Services.BacktestingCore.Providers;
 
-public class TestStaticDataRepository : InMemoryStaticDataRepository
+public class TestStaticDataRepository : IStaticDataProvider
 {
-    public void TryAddAsset(Asset asset)
-    {
-        if (!Assets.ContainsKey(asset.AssetId)) CreateAsset(asset);
-    }
+    private readonly Dictionary<int, Currency> _currencies = new();
+    public Currency? GetCurrency(int id) => _currencies.GetValueOrDefault(id);
 
-    public void TryAddCurrency(Currency currency)
-    {
-        if (!Currencies.ContainsKey(currency.CurrencyId)) CreateCurrency(currency);
-    }
-
-    public void TryAddExchange(Exchange e)
-    {
-        if (!Exchanges.ContainsKey(e.ExchangeId)) CreateExchange(e);
-    }
+    private readonly Dictionary<int, Contract> _contracts = new();
+    private readonly Dictionary<int, Dictionary<string, Contract>> _contractsByExternalId = new();
     
-    public void TryAddTradingSession(TradingSession ts)
+    public Contract? GetContract(int contractId) => _contracts.GetValueOrDefault(contractId);
+
+    public Contract? GetContractByExternalId(int brokerId, string externalContractId) =>
+        _contractsByExternalId.GetValueOrDefault(brokerId)?.GetValueOrDefault(externalContractId);
+
+    private readonly HashSet<int> _fxConversionContracts = new();
+    public IReadOnlyCollection<int> GetFxConversionContractIds() => _fxConversionContracts;
+
+    private readonly Dictionary<int, Dictionary<string, Asset>> _assetsByExternalId = new();
+    public Asset? GetAssetByExternalId(int brokerId, string externalAssetId) =>
+        _assetsByExternalId.GetValueOrDefault(brokerId)?.GetValueOrDefault(externalAssetId);
+
+    public IReadOnlyCollection<Contract> GetContracts(IEnumerable<int> contractIds) =>
+        contractIds.Select(id => _contracts.GetValueOrDefault(id)).Where(c => c != null).ToList()!;
+
+    public (int contractId, bool isDirect) GetFxConversionContract(int fromCcyId, int toCcyId)
     {
-        if (!TradingSessions.ContainsKey(ts.TradingSessionId)) CreateTradingSession(ts);
-    }
-    
-    public void TryAddCommission(CommissionStructure cs)
-    {
-        if (!Commissions.ContainsKey(cs.CommissionId)) CreateCommission(cs);
-    }
-    
-    public void TryAddContractTemplate(ContractTemplate template)
-    {
-        if (!ContractTemplates.ContainsKey(template.TemplateId)) CreateContractTemplate(template);
+        throw new System.NotImplementedException();
     }
 
-    public void TryAddContract(Contract c)
-    {
-        if (!Contracts.ContainsKey(c.ContractId)) CreateContract(c);
-    }
+    private readonly Dictionary<int, Broker> _brokers = new();
+    public Broker? GetBroker(int brokerId) => _brokers.GetValueOrDefault(brokerId);
 
-    public void TryAddFxConversionContract(Contract contract)
-    {
-        FxConvesionContracts.Add(contract);
-        var baseCcyId = contract.Template.BaseCurrency!.CurrencyId;
-        var quoteCcyId = contract.Template.QuoteCurrency!.CurrencyId;
-        DirectConversions.TryAdd(baseCcyId, new());
-        DirectConversions[baseCcyId].Add(quoteCcyId, new(contract.ContractId, true));
-        ReverseConversions.TryAdd(quoteCcyId, new());
-        ReverseConversions[quoteCcyId].Add(baseCcyId, new(contract.ContractId, false));
-    }
-    
-    // public void CleanBaseTradeSizes() => BaseTradeSizes.Clear();
-    public void TryAddConstantStreamValue(ConstantStreamValue csv)
-    {
-        ConstantStreams.Add(csv.StreamId, csv);
-    }
-
-    public Contract? GetContractForConstantStream(int streamId)
-    {
-        // TODO: HACK
-        return Contracts.Values.SingleOrDefault(c => c?.DefaultStream?.StreamId == streamId);
-    }
+    public string? GetContractOrderBookSubscriptionServiceName(int contractId) =>
+        throw new NotSupportedException();
 }

@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Common.Backtesting;
-using Common.MarketData;
+using BacktestingCore.Providers;
 using Microsoft.Extensions.Logging;
 using NodaTime;
+using QuantInfra.Common.Backtesting.Abstractions;
 using QuantInfra.Common.MarketData.Abstractions;
+using QuantInfra.Sdk.MarketData;
 
-namespace BacktestingCore.Providers;
+namespace QuantInfra.Services.BacktestingCore.Providers;
 
 /// <summary>
 /// Provides an in-memory cache of bars for backtesting

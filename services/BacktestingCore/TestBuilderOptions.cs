@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
-using Common.Backtesting;
-using Common.Strategies;
 using NodaTime;
-using QuantInfra.Common.Strategies;
+using QuantInfra.Sdk.Backtesting;
+using QuantInfra.Sdk.Strategies;
 
-namespace BacktestingCore
+namespace QuantInfra.Services.BacktestingCore
 {
 	public class TestBuilderOptions : TestExecutorOptions
 	{

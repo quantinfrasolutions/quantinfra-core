@@ -1,28 +1,25 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Common.EventSourcing;
-using Common.MarketData;
-using Common.Trading;
-using Common.Trading.Orders;
-using Domain.Queries.Accounts.AccountsService;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NodaTime;
-using QuantInfra.Common.Accounts.Abstractions;
-using QuantInfra.Common.Accounts.Abstractions.AccountStates;
-using QuantInfra.Common.MarketData.Abstractions;
-using QuantInfra.Common.Strategies;
+using QuantInfra.Common.EventSourcing;
 using QuantInfra.Domain.Accounts.Base;
-using QuantInfra.Domain.Accounts.State;
+using QuantInfra.Domain.Accounts.Base.State;
 using QuantInfra.Domain.Events.Accounts.Management;
 using QuantInfra.Domain.Events.Strategies.Management;
 using QuantInfra.Domain.MarketData;
+using QuantInfra.Domain.Queries.Accounts.AccountsService;
 using QuantInfra.Domain.Queries.Strategies;
-using QuantInfra.Domain.Strategies.V6;
-using Strategy = QuantInfra.Domain.Strategies.V6.Strategy;
+using QuantInfra.Domain.Strategies;
+using QuantInfra.Sdk.Accounts;
+using QuantInfra.Sdk.Accounts.AccountStates;
+using QuantInfra.Sdk.Strategies;
+using QuantInfra.Sdk.Trading;
+using QuantInfra.Sdk.Trading.Orders;
 
-namespace BacktestingCore.Executor;
+namespace QuantInfra.Services.BacktestingCore.Executor;
 
 internal sealed class InMemoryState : 
     IEventIdProvider,
@@ -36,7 +33,7 @@ internal sealed class InMemoryState :
     IEventHandler<AccountCreatedEvt>,
     IEventHandler<StrategyCreatedEvt>,
     
-    IQueryHandler<GetStrategyRecord, QuantInfra.Common.Strategies.Strategy?>,
+    IQueryHandler<GetStrategyRecord, QuantInfra.Sdk.Strategies.Strategy?>,
     IQueryHandler<GetStrategyState, IStrategyStateReadonly?>,
     IQueryHandler<GetStrategy, IStrategy?>,
 
@@ -56,9 +53,9 @@ internal sealed class InMemoryState :
     private readonly Dictionary<int, AccountRecordV6> _accountRecords = new();
     private readonly Dictionary<int, AccountBaseState> _accountStates = new();
     private readonly Dictionary<int, VirtualAccount> _accounts = new();
-    private readonly Dictionary<int, QuantInfra.Common.Strategies.Strategy> _strategyRecords = new();
+    private readonly Dictionary<int, QuantInfra.Sdk.Strategies.Strategy> _strategyRecords = new();
     private readonly Dictionary<int, StrategyState> _strategyStates = new();
-    private readonly Dictionary<int, Strategy> _strategies = new();
+    private readonly Dictionary<int, Domain.Strategies.Strategy> _strategies = new();
     
 
     public InMemoryState(IClock clock, IEventBus eventBus, IQueryBus queryBus, ILoggerFactory loggerFactory)
@@ -71,7 +68,7 @@ internal sealed class InMemoryState :
     
     public IReadOnlyDictionary<int, AccountRecordV6> AccountRecords => _accountRecords;
     public IReadOnlyDictionary<int, AccountBaseState> AccountStates => _accountStates;
-    public IReadOnlyDictionary<int, QuantInfra.Common.Strategies.Strategy> StrategyRecords => _strategyRecords;
+    public IReadOnlyDictionary<int, QuantInfra.Sdk.Strategies.Strategy> StrategyRecords => _strategyRecords;
     public IReadOnlyDictionary<int, StrategyState> StrategyStates => _strategyStates;
 
     public void Handle(AccountCreatedEvt evt)
@@ -94,7 +91,7 @@ internal sealed class InMemoryState :
         var state = StrategyState.CreateNewState(evt.Strategy, _clock.GetCurrentInstant(), _eventBus, _loggerFactory);
         _strategyStates.Add(evt.StrategyId, state);
 
-        var strategy = new Strategy(state, this, _eventBus, _queryBus, _clock);
+        var strategy = new Domain.Strategies.Strategy(state, this, _eventBus, _queryBus, _clock);
         _strategies.Add(evt.StrategyId, strategy);
     }
 
@@ -104,7 +101,7 @@ internal sealed class InMemoryState :
         .SelectMany(s => s.Orders.Where(o => o.IsVirtual && !o.IsSuspended))
         .ToList();
 
-    public QuantInfra.Common.Strategies.Strategy? Handle(GetStrategyRecord query) => _strategyRecords.GetValueOrDefault(query.StrategyId);
+    public QuantInfra.Sdk.Strategies.Strategy? Handle(GetStrategyRecord query) => _strategyRecords.GetValueOrDefault(query.StrategyId);
     public IStrategyStateReadonly? Handle(GetStrategyState query) => _strategyStates.GetValueOrDefault(query.StrategyId);
     public IStrategy? Handle(GetStrategy query) => _strategies.GetValueOrDefault(query.StrategyId);
     
@@ -147,7 +144,7 @@ internal static class InMemoryStateConfigurationExtensions
         .AddSingleton<IEventHandler<AccountCreatedEvt>>(sp => sp.GetRequiredService<InMemoryState>())
         .AddSingleton<IEventHandler<StrategyCreatedEvt>>(sp => sp.GetRequiredService<InMemoryState>())
         
-        .AddSingleton<IQueryHandler<GetStrategyRecord, QuantInfra.Common.Strategies.Strategy?>>(sp => sp.GetRequiredService<InMemoryState>())
+        .AddSingleton<IQueryHandler<GetStrategyRecord, QuantInfra.Sdk.Strategies.Strategy?>>(sp => sp.GetRequiredService<InMemoryState>())
         .AddSingleton<IQueryHandler<GetStrategyState, IStrategyStateReadonly?>>(sp => sp.GetRequiredService<InMemoryState>())
         .AddSingleton<IQueryHandler<GetStrategy, IStrategy?>>(sp => sp.GetRequiredService<InMemoryState>())
         
