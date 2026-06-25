@@ -41,6 +41,7 @@ public class MarketDataClient : GenericWebSocketClient.Client,
                                 IMarketDataSnapshotsProvider
 {
     private readonly MarketDataClientConfig _config;
+    private readonly Disruptor<OutgoingDisruptorMessage> _outputDisruptor;
     private readonly IBinanceActiveSubscriptionsRepository _repository;
     private readonly IBinanceOrderBookSubscriptionsRepository _obRepository;
     private readonly ILogger<MarketDataClient> _logger;
@@ -77,15 +78,19 @@ public class MarketDataClient : GenericWebSocketClient.Client,
 
     public MarketDataClient(
         MarketDataClientConfig config,
+        Config mdConfig,
         DisruptorConfig disruptorConfig,
         Disruptor<OutgoingDisruptorMessage> outputDisruptor,
         IBinanceActiveSubscriptionsRepository repository, 
         IBinanceOrderBookSubscriptionsRepository obRepository,
         Bpl bpl,
+        MulticastSender multicast,
+        Persister persister,
         ILogger<MarketDataClient> logger
     ) : base(config, logger)
     {
         _config = config;
+        _outputDisruptor = outputDisruptor;
         _enableTransactionLogging = config.EnableLogging;
         _repository = repository;
         _obRepository = obRepository;
@@ -95,6 +100,8 @@ public class MarketDataClient : GenericWebSocketClient.Client,
         _disruptor = new(() => new(), disruptorConfig.InputDisruptorRingBufferSize,
             TaskScheduler.Default);
         _disruptor.HandleEventsWith(this);
+        if (mdConfig.PersistMarketData) outputDisruptor.HandleEventsWith(multicast).Then(persister);
+        else outputDisruptor.HandleEventsWith(multicast);
         
         // if (_config.ParsersCount > 1)
         // {
@@ -159,6 +166,7 @@ public class MarketDataClient : GenericWebSocketClient.Client,
     protected override Task OnBeforeStartAsync()
     {
         _disruptor.Start();
+        _outputDisruptor.Start();
         return _bpl.StartAsync(CancellationToken.None);
     }
 
