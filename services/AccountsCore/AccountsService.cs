@@ -167,6 +167,9 @@ public class AccountsService : IHostedService
         _outputDisruptor.Start();
         _logger.LogInformation("OutputDisruptor started");
         
+        await ConfigureJobs();
+        _logger.LogInformation("Jobs started");
+        
         await Task.WhenAll(_incomingTransports.Select(t => t.StartAsync(cancellationToken)));
         _logger.LogInformation("Incoming transports started");
         
@@ -178,9 +181,6 @@ public class AccountsService : IHostedService
             .Where(a => a.AccountType == AccountType.BrokerAccount && a.TradingClientConfig is not null)
             .ToList();
         _logger.LogInformation($"Subscribing to broker accounts [{string.Join(", ", brokerAccounts.Select(ba => ba.AccountId))}]");
-        
-        await ConfigureJobs();
-        _logger.LogInformation("Jobs started");
         
         _logger.LogInformation("Service started");
     }
@@ -208,7 +208,7 @@ public class AccountsService : IHostedService
         );
         
         
-        var eodExecutionTime = _config.MtmUtcOffset.Plus(_config.MtmJobDelay);
+        var eodExecutionTime = _config.MtmUtcOffset;
 
         var mtmJobKey = new JobKey("mtmJob");
         if (await scheduler.CheckExists(mtmJobKey))
