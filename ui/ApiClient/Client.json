@@ -50,7 +50,7 @@
             "QuantInfra.Common.Interfaces.Api.Infrastructure",
             "QuantInfra.Common.Interfaces.Api.StaticData",
             "QuantInfra.Common.Interfaces.Api.Strategies",
-            "QuantInfra.Common.Strategies",
+            "QuantInfra.Common.Strategies.Abstractions",
             "QuantInfra.Sdk.Accounting",
             "QuantInfra.Sdk.Accounts",
             "QuantInfra.Sdk.StaticData",

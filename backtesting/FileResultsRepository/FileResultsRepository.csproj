@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <LangVersion>default</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>QuantInfra.Backtesting.FileResultsRepository</AssemblyName>
+        <RootNamespace>QuantInfra.Backtesting.FileResultsRepository</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\common\Common.Backtesting.Abstractions\Common.Backtesting.Abstractions.csproj" />
+      <ProjectReference Include="..\..\common\Common.Utils.Collections\Common.Utils.Collections.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="CsvHelper" Version="33.1.0" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.7" />
+    </ItemGroup>
+
+</Project>

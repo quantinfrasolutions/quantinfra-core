@@ -12,7 +12,7 @@ using QuantInfra.Common.Interfaces.Api.Accounts;
 using QuantInfra.Common.Interfaces.Api.Infrastructure;
 using QuantInfra.Common.Interfaces.Api.StaticData;
 using QuantInfra.Common.Interfaces.Api.Strategies;
-using QuantInfra.Common.Strategies;
+using QuantInfra.Common.Strategies.Abstractions;
 using QuantInfra.Sdk.Accounting;
 using QuantInfra.Sdk.Accounts;
 using QuantInfra.Sdk.StaticData;
@@ -3799,7 +3799,7 @@ namespace QuantInfra.Api.Client
 
         /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<ContractListView>> GetContractsAsync(string? ticker, long? exchangeId, System.Collections.Generic.IEnumerable<long>? contractIds, long? commissionId, int? limit, int? offset)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<ContractListView>> GetContractsAsync(string? ticker, long? exchangeId, System.Collections.Generic.IEnumerable<int>? contractIds, long? commissionId, int? limit, int? offset)
         {
             return GetContractsAsync(ticker, exchangeId, contractIds, commissionId, limit, offset, System.Threading.CancellationToken.None);
         }
@@ -3807,7 +3807,7 @@ namespace QuantInfra.Api.Client
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<ContractListView>> GetContractsAsync(string? ticker, long? exchangeId, System.Collections.Generic.IEnumerable<long>? contractIds, long? commissionId, int? limit, int? offset, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<ContractListView>> GetContractsAsync(string? ticker, long? exchangeId, System.Collections.Generic.IEnumerable<int>? contractIds, long? commissionId, int? limit, int? offset, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;

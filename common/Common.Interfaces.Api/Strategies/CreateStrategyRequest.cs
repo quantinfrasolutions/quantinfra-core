@@ -17,8 +17,7 @@ public class CreateStrategyRequest
     public bool UseSignalGroups { get; set; }
     public string StrategyServiceName { get; set; }
 
-    public StrategyConfig ToStrategyConfig(int strategyId = 0) => new StrategyConfig(
-        strategyId, 
+    public StrategyConfig ToStrategyConfig() => new StrategyConfig(
         string.IsNullOrEmpty(Name) ? string.Empty : Name,
         ClassName,
         Params,

@@ -5,7 +5,7 @@ namespace QuantInfra.Common.MarketData;
 
 public class AggregatingBar
 {
-    public AggregatingBar(int streamId, int? contractId, Instant openDt, Instant closeDt, double open, double high, double low, double close, double volume, double dollarValue, int datasourceId, int? tradingSessionId)
+    public AggregatingBar(int streamId, int? contractId, Instant openDt, Instant closeDt, double open, double high, double low, double close, double volume, double dollarValue, int? tradingSessionId)
     {
         StreamId = streamId;
         ContractId = contractId;
@@ -17,7 +17,6 @@ public class AggregatingBar
         Close = close;
         Volume = volume;
         DollarValue = dollarValue;
-        DatasourceId = datasourceId;
         TradingSessionId = tradingSessionId;
     }
 
@@ -31,9 +30,8 @@ public class AggregatingBar
     public double Close { get; set; }
     public double Volume { get; set; }
     public double DollarValue { get; set; }
-    public int DatasourceId { get; init; }
     public int? TradingSessionId { get; init; }
 
     public ExchangeBar ToExchangeBar() => new(StreamId, ContractId, OpenDt, CloseDt, Open, High, Low, Close, 
-        Volume, DollarValue, DatasourceId, TradingSessionId);
+        Volume, DollarValue, TradingSessionId);
 }

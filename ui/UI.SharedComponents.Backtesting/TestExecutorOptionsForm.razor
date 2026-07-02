@@ -1,8 +1,9 @@
-@using Common.Backtesting
-@using Common.Strategies.Runner
+@using Microsoft.Extensions.Logging
 @using NodaTime.Text
+@using QuantInfra.Common.Interfaces.Api
+@using QuantInfra.Sdk.Strategies
 
-<RadzenTemplateForm TItem="TestExecutorOptions">
+<RadzenTemplateForm TItem="TestExecutorOptionsModel" Data="@Value">
     <RadzenStack JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Gap="1rem">
         <RadzenRow>
             <RadzenFieldset Text="Dates">
@@ -11,12 +12,12 @@
                         <RadzenColumn Size="6">
                             <RadzenDatePicker TValue="DateTime" ShowTime="true" ShowSeconds="true" HourFormat="24" 
                                               Value=@(Value.StartDt.ToDateTimeUtc())
-                                              ValueChanged=@(dt => Value.StartDt = dt.ParseInput()) />
+                                              ValueChanged=@(dt => Value.StartDt = dt.ParseInputToInstant()) />
                         </RadzenColumn>
                         <RadzenColumn Size="6">
                             <RadzenDatePicker TValue="DateTime" ShowTime="true" ShowSeconds="true" HourFormat="24" 
                                               Value=@(Value.EndDt.ToDateTimeUtc())
-                                              ValueChanged=@(dt => Value.EndDt = dt.ParseInput()) />
+                                              ValueChanged=@(dt => Value.EndDt = dt.ParseInputToInstant()) />
                         </RadzenColumn>
                     </RadzenRow>
                 </RadzenStack>
@@ -35,7 +36,7 @@
                             </RadzenColumn>
                             <RadzenColumn Size="6">
                                 <RadzenFormField Text="Size step fraction">
-                                    <RadzenNumeric @bind-Value=@Value.VirtualAccountSizeStepFraction Min="0" Step="1" ShowUpDown="false"/>
+                                    <RadzenNumeric @bind-Value=@Value.VirtualAccountSizeStepFraction Min="0" Max="1" Step="0.0001" ShowUpDown="false"/>
                                 </RadzenFormField>
                             </RadzenColumn>
                         </RadzenRow>
@@ -52,18 +53,23 @@
         </RadzenRow>
         <RadzenRow>
             <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenFormField Text="Log level">
+                    <RadzenDropDown TValue="LogLevel" @bind-Value=@Value.LogLevel Data=@(Enum.GetValues(typeof(LogLevel)).Cast<Enum>()) />
+                </RadzenFormField>
                 <RadzenFormField Text="Investment">
                     <RadzenNumeric TValue="decimal" @bind-Value=@Value.Investment Min="0" ShowUpDown="false"/>
                 </RadzenFormField>
                 <RadzenFormField Text="End of day UTC offset">
-                    <RadzenTextBox Value=@DurationPattern.Roundtrip.Format(Value.MtmUtcOffset)
+                    <RadzenTextBox Placeholder="00:00:00:00"
+                                   Value=@DurationPattern.Roundtrip.Format(Value.MtmUtcOffset)
                                    ValueChanged=@(e => Value.MtmUtcOffset = DurationPattern.Roundtrip.Parse(e).Value)/>
                 </RadzenFormField>
                 <RadzenFormField Text="Days in year">
                     <RadzenNumeric TValue="int" @bind-Value=@Value.DaysInYear Min="1" Max="365" Step="1" ShowUpDown="false"/>
                 </RadzenFormField>
                 <RadzenFormField Text="Candles timeframe">
-                    <RadzenTextBox @bind-Value=@Value.CandlesTimeframe/>
+                    <RadzenTextBox Value=@PeriodPattern.Roundtrip.Format(Value.CandlesTimeframe)
+                                   ValueChanged=@(s => Value.CandlesTimeframe = PeriodPattern.Roundtrip.Parse(s).Value)/>
                 </RadzenFormField>
             </RadzenStack>
         </RadzenRow>
@@ -125,65 +131,11 @@
                 </RadzenFieldset>
             </RadzenColumn>
         </RadzenRow>
-        <RadzenRow>
-            <RadzenColumn Size="12">
-                <RadzenFieldset Text="Collect results">
-                    <RadzenStack>
-                        <RadzenRow>
-                            <RadzenColumn Size="12">
-                                <div class="rz-p-12 rz-text-align-center">
-                                    <RadzenCheckBox @bind-Value=@Value.RecordSharePrices Name="RecordSharePrices"/>
-                                    <RadzenLabel Text="Share prices" Component="RecordSharePrices" class="rz-ms-2"/>
-                                </div>
-                            </RadzenColumn>
-                        </RadzenRow>
-                        <RadzenRow>
-                            <RadzenColumn Size="6">
-                                <div class="rz-p-12 rz-text-align-center">
-                                    <RadzenCheckBox @bind-Value=@Value.RecordTrades Name="RecordTrades"/>
-                                    <RadzenLabel Text="Trades" Component="RecordTrades" class="rz-ms-2"/>
-                                </div>
-                            </RadzenColumn>
-                            @if (Value.RecordTrades)
-                            {
-                                <RadzenColumn Size="6">
-                                    <RadzenFormField Variant="Variant.Text" Text="Average number of trades per day">
-                                        <RadzenNumeric @bind-Value=@Value.ExpectedNumberOfTradesPerDay ShowUpDown="false" Min="1" Step="1"/>
-                                    </RadzenFormField>
-                                </RadzenColumn>
-                            }
-                        </RadzenRow>
-                        <RadzenRow>
-                            <RadzenColumn Size="12">
-                                <div class="rz-p-12 rz-text-align-center">
-                                    <RadzenCheckBox @bind-Value=@Value.RecordPositionCloses Name="RecordPositionCloses"/>
-                                    <RadzenLabel Text="Deals" Component="RecordPositionCloses" class="rz-ms-2"/>
-                                </div>
-                            </RadzenColumn>
-                        </RadzenRow>
-                        <RadzenRow>
-                            <RadzenColumn Size="6">
-                                <div class="rz-p-12 rz-text-align-center">
-                                    <RadzenCheckBox @bind-Value=@Value.RecordEndOfDayPositions Name="RecordEndOfDayPositions"/>
-                                    <RadzenLabel Text="End of day reports" Component="RecordEndOfDayPositions" class="rz-ms-2"/>
-                                </div>
-                            </RadzenColumn>
-                            @if (Value.RecordTrades)
-                            {
-                                <RadzenColumn Size="6">
-                                    <RadzenFormField Variant="Variant.Text" Text="Average number of positions at EOD">
-                                        <RadzenNumeric @bind-Value=@Value.ExpectedNumberOfPositionsPerDay ShowUpDown="false" Min="1" Step="1"/>
-                                    </RadzenFormField>
-                                </RadzenColumn>
-                            }
-                        </RadzenRow>
-                    </RadzenStack>
-                </RadzenFieldset>
-            </RadzenColumn>
-        </RadzenRow>
     </RadzenStack>
 </RadzenTemplateForm>
 
 @code {
-    [Parameter, EditorRequired] public TestExecutorOptions Value { get; set; }
+    [Parameter, EditorRequired] public TestExecutorOptionsModel Value { get; set; }
+    
+    
 }

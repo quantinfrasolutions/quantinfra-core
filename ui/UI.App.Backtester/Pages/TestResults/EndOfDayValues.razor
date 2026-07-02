@@ -1,0 +1,20 @@
+@page "/tests/history/{id:guid}/eod"
+@using QuantInfra.UI.Interfaces.Backtesting
+@using UI.SharedComponents.Components.Accounts
+@layout TestResultBase
+
+@inject IUiBacktestResultsRepository Repository 
+
+
+
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    [CascadingParameter] public TestResultBase? TestResultBase { get; set; }
+    
+    protected override void OnInitialized()
+    {
+        TestResultBase!.Id = Id;
+        TestResultBase.Path = "eod";
+    }
+}

@@ -1,0 +1,22 @@
+@page "/tests/history/{id:guid}/deals"
+@using QuantInfra.UI.Interfaces.Backtesting
+@using UI.SharedComponents.Components.Accounts
+@layout TestResultBase
+
+@inject IUiBacktestResultsRepository Repository 
+
+<PositionsHistory SearchFunc=@(f => Repository.GetPositionCloses(Id, f))
+                  UseSimpleAccountSelector="true"
+                  Variant="Variant.Flat" />
+
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    [CascadingParameter] public TestResultBase? TestResultBase { get; set; }
+    
+    protected override void OnInitialized()
+    {
+        TestResultBase!.Id = Id;
+        TestResultBase.Path = "deals";
+    }
+}

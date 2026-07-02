@@ -48,6 +48,7 @@ internal sealed class InMemoryState :
     private readonly IEventBus _eventBus;
     private readonly IQueryBus _queryBus;
     private readonly ILoggerFactory _loggerFactory;
+    private readonly Config _config;
     private readonly IClock _clock;
 
     private readonly Dictionary<int, AccountRecordV6> _accountRecords = new();
@@ -58,8 +59,9 @@ internal sealed class InMemoryState :
     private readonly Dictionary<int, Domain.Strategies.Strategy> _strategies = new();
     
 
-    public InMemoryState(IClock clock, IEventBus eventBus, IQueryBus queryBus, ILoggerFactory loggerFactory)
+    public InMemoryState(Config config, IClock clock, IEventBus eventBus, IQueryBus queryBus, ILoggerFactory loggerFactory)
     {
+        _config = config;
         _clock = clock;
         _eventBus = eventBus;
         _queryBus = queryBus;
@@ -80,7 +82,7 @@ internal sealed class InMemoryState :
         _accountStates.Add(evt.Account.AccountId, state);
         var va = new VirtualAccount(evt.Account, state, 
             this, this, this, this, this,
-            _eventBus, _queryBus, _loggerFactory, LogLevel.Critical); // TODO: loglevel
+            _eventBus, _queryBus, _loggerFactory, _config.LogLevel);
         _accounts.Add(evt.AccountId, va);
         va.CreateAccount(evt.Timestamp);
     }

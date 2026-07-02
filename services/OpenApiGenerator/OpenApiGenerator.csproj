@@ -16,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Api.StaticData\Api.StaticData.csproj" />
       <ProjectReference Include="..\Api\Api.csproj" />
     </ItemGroup>
 

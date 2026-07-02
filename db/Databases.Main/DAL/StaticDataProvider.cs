@@ -154,4 +154,12 @@ public class StaticDataProvider(IServiceProvider serviceProvider) : IStaticDataP
         return context.BinanceUsdmOrderBookSubscriptions
             .SingleOrDefault(s => s.ContractId == contractId)?.ClientName;
     }
+
+    public IReadOnlyCollection<Stream> GetStreams(IEnumerable<int> streamIds)
+    {
+        using var scope = serviceProvider.CreateScope();
+        using var context = scope.ServiceProvider.GetRequiredService<MainContext>();
+        
+        return context.Streams.Where(s => streamIds.Contains(s.StreamId)).ToList();
+    }
 }

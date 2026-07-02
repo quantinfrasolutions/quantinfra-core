@@ -4,8 +4,8 @@
         <TargetFramework>net9.0</TargetFramework>
         <LangVersion>default</LangVersion>
         <Nullable>enable</Nullable>
-        <AssemblyName>QuantInfra.Api</AssemblyName>
-        <RootNamespace>QuantInfra.Api</RootNamespace>
+        <AssemblyName>QuantInfra.Api.Client</AssemblyName>
+        <RootNamespace>QuantInfra.Api.Client</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

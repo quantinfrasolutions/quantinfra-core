@@ -1,0 +1,163 @@
+@page "/tests/history/{id:guid}"
+@page "/tests/history/{id:guid}/summary"
+@using NodaTime.Text
+@using QuantInfra.Sdk.Backtesting
+@layout TestResultBase
+
+<RadzenAccordion Style="width: 100%;">
+    <Items>
+        <RadzenAccordionItem Text="Test" @bind-Selected="@_firstPaneSelected">
+            @if (TestResultBase?.TestUnit != null)
+            {
+                <RadzenTemplateForm Data=@TestResultBase.TestUnit>
+                    <RadzenStack JustifyContent="JustifyContent.SpaceBetween">
+                        <RadzenRow>
+                            <RadzenFormField Variant="Variant.Text" Text="Test ID" Style="min-width: 200px;">
+                                <RadzenTextBox TValue="string" Value=@TestResultBase.TestUnit.TestId.ToString() Disabled="true"/>
+                            </RadzenFormField>
+                            <RadzenFormField Variant="Variant.Text" Text="Action" Style="min-width: 200px;">
+                                <RadzenTextBox TValue="string" Value=@TestResultBase.TestUnit.Action Disabled="true"/>
+                            </RadzenFormField>
+                            <RadzenFormField Variant="Variant.Text" Text="Start" Style="min-width: 200px;">
+                                <RadzenTextBox TValue="string" Value=@InstantPattern.ExtendedIso.Format(TestResultBase.TestUnit.Options.StartDt) Disabled="true"/>
+                            </RadzenFormField>
+                            <RadzenFormField Variant="Variant.Text" Text="End" Style="min-width: 200px;">
+                                <RadzenTextBox TValue="string" Value=@InstantPattern.ExtendedIso.Format(TestResultBase.TestUnit.Options.EndDt) Disabled="true"/>
+                            </RadzenFormField>
+                        </RadzenRow>
+                    </RadzenStack>
+                </RadzenTemplateForm>
+            }
+        </RadzenAccordionItem>
+        <RadzenAccordionItem Text="Parameters">
+            @if (TestResultBase?.TestUnit != null)
+            {
+                <RadzenTemplateForm Data="@TestResultBase.TestUnit.Options">
+                    <RadzenStack JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Gap="1rem">
+                        <RadzenRow>
+                            <RadzenColumn Size="12">
+                                <RadzenFieldset Text="Hosted strategies runner">
+                                    <RadzenStack JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Gap="1rem">
+                                        <RadzenRow>
+                                            <RadzenColumn Size="6">
+                                                <div class="rz-p-12 rz-text-align-center">
+                                                    <RadzenCheckBox Value=@TestResultBase.TestUnit.Options.ThrowOnZeroVolumeOrders Name="ThrowOnZeroVolumeOrders" Disabled="true"/>
+                                                    <RadzenLabel Text="Throw exception on zero volume orders" Component="ThrowOnZeroVolumeOrders" class="rz-ms-2"/>
+                                                </div>
+                                            </RadzenColumn>
+                                            <RadzenColumn Size="6">
+                                                <RadzenFormField Text="Size step fraction">
+                                                    <RadzenNumeric Value=@TestResultBase.TestUnit.Options.VirtualAccountSizeStepFraction Min="0" Max="1" Step="0.0001" ShowUpDown="false" Disabled="true"/>
+                                                </RadzenFormField>
+                                            </RadzenColumn>
+                                        </RadzenRow>
+                                        <RadzenRow>
+                                            <RadzenColumn Size="6">
+                                                <RadzenFormField Text="Request bar attempts">
+                                                    <RadzenNumeric Value=@TestResultBase.TestUnit.Options.RequestBarAttempts Min="1" Step="1" Max="10" ShowUpDown="false" Disabled="true"/>
+                                                </RadzenFormField>
+                                            </RadzenColumn>
+                                        </RadzenRow>
+                                    </RadzenStack>
+                                </RadzenFieldset>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenStack Orientation="Orientation.Horizontal">
+                                <RadzenFormField Text="Log level">
+                                    <RadzenTextBox Value=@TestResultBase.TestUnit.Options.LogLevel.ToString() Disabled="true" />
+                                </RadzenFormField>
+                                <RadzenFormField Text="Investment">
+                                    <RadzenNumeric Value=@TestResultBase.TestUnit.Options.Investment Min="0" ShowUpDown="false" Disabled="true"/>
+                                </RadzenFormField>
+                                <RadzenFormField Text="End of day UTC offset">
+                                    <RadzenTextBox Value=@DurationPattern.Roundtrip.Format(TestResultBase.TestUnit.Options.MtmUtcOffset) Disabled="true" />
+                                </RadzenFormField>
+                                <RadzenFormField Text="Days in year">
+                                    <RadzenNumeric Value=@TestResultBase.TestUnit.Options.DaysInYear ShowUpDown="false" Disabled="true"/>
+                                </RadzenFormField>
+                                <RadzenFormField Text="Candles timeframe">
+                                    <RadzenTextBox Value=@PeriodPattern.Roundtrip.Format(TestResultBase.TestUnit.Options.CandlesTimeframe) Disabled="true"/>
+                                </RadzenFormField>
+                            </RadzenStack>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn Size="12">
+                                <RadzenFieldset Text="Backtest options">
+                                    <RadzenStack AlignItems="AlignItems.Start" JustifyContent="JustifyContent.Center">
+                                        <RadzenRow>
+                                            <RadzenColumn Size="5">
+                                                <div class="rz-p-12 rz-text-align-center">
+                                                    <RadzenCheckBox Value=@TestResultBase.TestUnit.Options.CheckOrdersAtBarOpen Name="CheckOrdersAtBarOpen" Disabled="true"/>
+                                                    <RadzenLabel Text="Check orders at bar open" Component="CheckOrdersAtBarOpen" class="rz-ms-2"/>
+                                                </div>
+                                            </RadzenColumn>
+                                            <RadzenColumn Size="5">
+                                                <RadzenFormField Text="Bar open execution offset">
+                                                    <RadzenTextBox Value=@DurationPattern.Roundtrip.Format(TestResultBase.TestUnit.Options.OpenExecutionOffset) Disabled="true" />
+                                                </RadzenFormField>
+                                            </RadzenColumn>
+                                        </RadzenRow>
+                                        <RadzenRow>
+                                            <RadzenColumn Size="5">
+                                                <div class="rz-p-12 rz-text-align-center">
+                                                    <RadzenCheckBox Value=@TestResultBase.TestUnit.Options.CheckOrdersAtBarClose Name="CheckOrdersAtBarClose" Disabled="true" />
+                                                    <RadzenLabel Text="Check orders at bar close" Component="CheckOrdersAtBarClose" class="rz-ms-2"/>
+                                                </div>
+                                            </RadzenColumn>
+                                            <RadzenColumn Size="5">
+                                                <div class="rz-p-12 rz-text-align-center">
+                                                    <RadzenCheckBox Value=@TestResultBase.TestUnit.Options.LimitCloseCheckToMarketOrdersOnly Name="LimitCloseCheckToMarketOrdersOnly" Disabled="true"/>
+                                                    <RadzenLabel Text="Check only market orders at bar close" Component="LimitCloseCheckToMarketOrdersOnly" class="rz-ms-2"/>
+                                                </div>
+                                            </RadzenColumn>
+                                        </RadzenRow>
+                                        <RadzenRow>
+                                            <RadzenColumn Size="5">
+                                                <div class="rz-p-12 rz-text-align-center">
+                                                    <RadzenCheckBox Value=@TestResultBase.TestUnit.Options.CheckPendingOrdersExecutionUsingHighLow Name="CheckPendingOrdersExecutionUsingHighLow" Disabled="true"/>
+                                                    <RadzenLabel Text="Check pending orders by High/Low" Component="CheckPendingOrdersExecutionUsingHighLow" class="rz-ms-2"/>
+                                                </div>
+                                            </RadzenColumn>
+                                            <RadzenColumn Size="5">
+                                                <RadzenFormField Text="Bar open execution offset">
+                                                    <RadzenTextBox Value=@DurationPattern.Roundtrip.Format(TestResultBase.TestUnit.Options.HighLowExecutionOffset) Disabled="true"/>
+                                                </RadzenFormField>
+                                            </RadzenColumn>
+                                        </RadzenRow>
+                                        <RadzenRow>
+                                            <RadzenColumn Size="5">
+                                                <RadzenFormField Text="Stop orders execution">
+                                                    <RadzenTextBox Value=@TestResultBase.TestUnit.Options.StopOrdersExecution.ToString() Disabled="true" />
+                                                </RadzenFormField>
+                                            </RadzenColumn>
+                                        </RadzenRow>
+                                    </RadzenStack>
+                                </RadzenFieldset>
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenStack>
+                </RadzenTemplateForm>
+            }
+        </RadzenAccordionItem>
+        <RadzenAccordionItem Text="Options">
+            @if (TestResultBase?.TestUnit != null)
+            {
+                <RadzenTextArea Value=@TestResultBase.TestUnit.Data Disabled="true" Style="width: 100%;" Rows="30" />
+            }
+        </RadzenAccordionItem>
+    </Items>
+</RadzenAccordion>
+
+@code {
+    private bool _firstPaneSelected = true;
+    
+    [Parameter] public Guid Id { get; set; }
+    [CascadingParameter] public TestResultBase? TestResultBase { get; set; }
+    
+    protected override void OnInitialized()
+    {
+        TestResultBase!.Id = Id;
+        TestResultBase.Path = "summary";
+    }
+}

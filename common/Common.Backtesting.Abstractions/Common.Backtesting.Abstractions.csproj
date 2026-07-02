@@ -18,7 +18,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Common.Interfaces.Api.Backtesting\Common.Interfaces.Api.Backtesting.csproj" />
+      <ProjectReference Include="..\Common.Interfaces.Api\Common.Interfaces.Api.csproj" />
       <ProjectReference Include="..\Common.MarketData.Abstractions\Common.MarketData.Abstractions.csproj" />
+      <ProjectReference Include="..\Common.Strategies.Abstractions\Common.Strategies.Abstractions.csproj" />
     </ItemGroup>
 
 </Project>

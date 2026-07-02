@@ -2,7 +2,7 @@
 @using UI.Interfaces.Accounts
 @using UI.SharedComponents.Base
 
-@inject IUiAccountsRepository Repository
+@* @inject IUiAccountsRepository Repository *@
 
 
 @if (Filter != null)
@@ -10,7 +10,7 @@
     <EditableView TItem="TradeView"
                   TFilter="TradeFilter"
                   EmptyText="No trades found"
-                  SearchFunc=@Repository.GetTradesHistory
+                  SearchFunc=@(SearchFunc ?? Repository!.GetTradesHistory)
                   Filter=@Filter
                   HideRefreshButton=@HideRefreshButton
                   RunSearchImmediately=@RunSearchImmediately
@@ -22,7 +22,7 @@
         <SearchForm>
             @if (ShowFilter)
             {
-                <TradeFilterForm @bind-Filter=@Filter HideAccountSelector=@SingleAccount/>
+                <TradeFilterForm @bind-Filter=@Filter HideAccountSelector=@SingleAccount UseSimpleAccountSelector=@UseSimpleAccountSelector />
             }
         </SearchForm>
         <Columns>
@@ -113,6 +113,9 @@
     [Parameter] public bool AllowSorting { get; set; }
     [Parameter] public string? DefaultOrderBy { get; set; }
     [Parameter] public string? DefaultOrderByDescending { get; set; }
+    [Parameter] public Func<TradeFilter, Task<IEnumerable<TradeView>>>? SearchFunc { get; set; }
+    [Parameter] public IUiAccountsRepository? Repository { get; set; }
+    [Parameter] public bool UseSimpleAccountSelector { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -121,7 +124,7 @@
         Columns ??= ["AccountId", "TradeId", "Dt", "ClOrdId", "Contract", "OrderId", "StrategyPositionId", "PositionEffect", "Side", "Volume", "Price", "CommRate", "Commission"];
     }
 
-    private EditableView<TradeView,TradeFilter> _view;
+    private EditableView<TradeView, TradeFilter> _view;
     public Task Refresh() => _view.RunSearch();
 }
 

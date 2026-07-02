@@ -1,4 +1,5 @@
 ﻿using QuantInfra.Sdk.StaticData;
+using Stream = QuantInfra.Sdk.StaticData.Stream;
 
 namespace Common.StaticData.Abstractions;
 
@@ -13,4 +14,5 @@ public interface IStaticDataProvider
     (int contractId, bool isDirect) GetFxConversionContract(int fromCcyId, int toCcyId);
     Broker? GetBroker(int brokerId);
     string? GetContractOrderBookSubscriptionServiceName(int contractId);
+    IReadOnlyCollection<Stream> GetStreams(IEnumerable<int> streamIds);
 }

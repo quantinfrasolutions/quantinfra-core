@@ -60,6 +60,6 @@ namespace QuantInfra.Common.MarketData
 		public double? Volume => this["Volume".GetHashCode()];
 
         public ExchangeBar ToExchangeBar(int streamId, int? contractId) => new ExchangeBar(streamId, contractId,
-            OpenDt, CloseDt, Open ?? 0, High ?? 0, Low ?? 0, Close ?? 0, Volume ?? 0, 0, 0, TradingSessionId);
+            OpenDt, CloseDt, Open ?? 0, High ?? 0, Low ?? 0, Close ?? 0, Volume ?? 0, 0, TradingSessionId);
     }
 }

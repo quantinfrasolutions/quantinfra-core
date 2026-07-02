@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using QuantInfra.Api;
+using QuantInfra.Api.Client;
 using Radzen;
 using UI.ApiWrapper;
 using UI.App.Platform;
@@ -13,9 +13,14 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddLogging();
 builder.Services.AddSingleton<ILogger>(sp => sp.GetService<ILoggerFactory>()!.CreateLogger("Logger"));
 builder.Services.AddRadzenComponents();
-builder.Services.AddApiRepository();
-builder.Services.ConfigureApiServiceWrapper(builder.Configuration, replaceBaseUri: builder.HostEnvironment.BaseAddress);
-builder.Services.AddScopedApiWrapper();
+builder.Services
+    .ConfigureApiServiceWrapper(builder.Configuration, replaceBaseUri: builder.HostEnvironment.BaseAddress)
+    .AddScopedApiWrapper()
+    .AddApiRepository()
+    .UseApiStaticDataRepository()
+    .UseApiAccountsRepository()
+    .UseApiStrategiesRepository()
+    .UseApiInfrastructureRepository();
 
 builder.Services.AddRadzenCookieThemeService(options =>
 {

@@ -7,15 +7,15 @@ namespace Common.Utils.Reflection;
 public class SingleAssemblyTypeResolver : ITypeResolver
 {
     Assembly _assembly;
-    Assembly[] _assemblies;
+    Assembly[] _strategyAssemblies;
 
     public SingleAssemblyTypeResolver(Assembly assembly)
     {
         _assembly = assembly;
-        _assemblies = new Assembly[] { _assembly };
+        _strategyAssemblies = new Assembly[] { _assembly };
     }
 
-    public IEnumerable<Assembly> LoadedAssemblies => _assemblies;
+    public IEnumerable<Assembly> LoadedStrategyAssemblies => _strategyAssemblies;
 
     public Type? ResolveType(string name)
     {

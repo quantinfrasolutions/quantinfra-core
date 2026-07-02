@@ -111,7 +111,7 @@ public static class ConfigurationExtensions
         .AddInputDisruptor()
         .AddOutputDisruptor()
         
-        .AddSingleton<List<Assembly>>(sp => sp.GetRequiredService<ITypeResolver>().LoadedAssemblies.ToList()) // TODO
+        .AddSingleton<List<Assembly>>(sp => sp.GetRequiredService<ITypeResolver>().LoadedStrategyAssemblies.ToList()) // TODO
             
         .AddSingleton<StateManagerConfig>(sp =>
         {

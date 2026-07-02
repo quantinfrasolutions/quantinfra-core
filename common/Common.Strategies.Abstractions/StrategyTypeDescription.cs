@@ -1,4 +1,4 @@
-namespace QuantInfra.Common.Strategies;
+namespace QuantInfra.Common.Strategies.Abstractions;
 
 public class StrategyTypeDescription
 {

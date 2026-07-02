@@ -2,15 +2,13 @@
 @using UI.Interfaces.Accounts
 @using UI.SharedComponents.Base
 
-@inject IUiAccountsRepository Repository
-
 
 @if (Filter != null)
 {
     <EditableView TItem="PositionView"
                   TFilter="PositionHistoryFilter"
                   EmptyText="No trades found"
-                  SearchFunc=@Repository.GetPositionsHistory
+                  SearchFunc=@(SearchFunc ?? Repository.GetPositionsHistory)
                   Filter=@Filter
                   HideRefreshButton=@HideRefreshButton
                   RunSearchImmediately=@RunSearchImmediately
@@ -21,7 +19,9 @@
         <SearchForm>
             @if (ShowFilter)
             {
-                <PositionHistoryFilterForm @bind-Filter=@Filter HideAccountSelector=@(!HideAccount)/>
+                <PositionHistoryFilterForm @bind-Filter=@Filter 
+                                           HideAccountSelector=@(!HideAccount)
+                                           UseSimpleAccountSelector=@UseSimpleAccountSelector />
             }
         </SearchForm>
         <Columns>
@@ -62,6 +62,9 @@
     [Parameter] public bool AllowSorting { get; set; }
     [Parameter] public string? DefaultOrderBy { get; set; }
     [Parameter] public string? DefaultOrderByDescending { get; set; }
+    [Parameter] public IUiAccountsRepository? Repository { get; set; }
+    [Parameter] public Func<PositionHistoryFilter, Task<IEnumerable<PositionView>>>? SearchFunc { get; set; }
+    [Parameter] public bool UseSimpleAccountSelector { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {

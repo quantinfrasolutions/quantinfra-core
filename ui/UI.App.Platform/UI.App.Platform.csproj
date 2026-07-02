@@ -26,16 +26,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <_ContentIncludedByDefault Remove="Pages\Books\Book.razor" />
-      <_ContentIncludedByDefault Remove="Pages\Books\BookDetails\BookBase.razor" />
-      <_ContentIncludedByDefault Remove="Pages\Books\BookDetails\Composition.razor" />
-      <_ContentIncludedByDefault Remove="Pages\Books\BookDetails\SharePrice.razor" />
-      <_ContentIncludedByDefault Remove="Pages\Books\BookDetails\Simulation.razor" />
-      <_ContentIncludedByDefault Remove="Pages\Books\BookDetails\Summary.razor" />
-      <_ContentIncludedByDefault Remove="Pages\Books\Books.razor" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Folder Include="wwwroot\js\" />
     </ItemGroup>
 

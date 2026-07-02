@@ -1,0 +1,53 @@
+@page "/tests/history/{id:guid}/returns"
+@using QuantInfra.Sdk.Accounting
+@using QuantInfra.UI.Interfaces.Backtesting
+@using UI.SharedComponents.Accounts
+@layout TestResultBase
+
+@inject IUiBacktestResultsRepository Repository 
+
+@if (_singleStrategy is not null || _multipleStrategies is not null)
+{
+    <SharePriceChart SingleAccount=@_singleStrategy MultipleAccounts=@_multipleStrategies/>
+}
+
+@code {
+    private IReadOnlyList<SharePriceHistory>? _singleStrategy;
+    private IReadOnlyDictionary<int, IReadOnlyList<SharePriceHistory>>? _multipleStrategies;
+    private bool _dataLoaded = false;
+    
+    [Parameter] public Guid Id { get; set; }
+    [CascadingParameter] public TestResultBase? TestResultBase { get; set; }
+    
+    protected override void OnInitialized()
+    {
+        TestResultBase!.Id = Id;
+        TestResultBase.Path = "returns";
+        Task.Run(LoadData);
+    }
+
+    private async Task LoadData()
+    {
+        if (Id != Guid.Empty && !_dataLoaded)
+        {
+            var data = (await Repository.GetReturns(Id))
+                .GroupBy(r => r.AccountId)
+                .ToDictionary(
+                    gr => gr.Key,
+                    gr => (IReadOnlyList<SharePriceHistory>)gr.OrderBy(r => r.Dt).ToList()
+                );
+
+            if (data.Count == 1)
+            {
+                _singleStrategy = data.Values.Single();
+            }
+            else if (data.Count > 1)
+            {
+                _multipleStrategies = data;
+            }
+
+            _dataLoaded = true;
+            StateHasChanged();
+        }
+    }
+}

@@ -1,0 +1,83 @@
+<RadzenTemplateForm TItem="PersistOptionsModel" Data="@Value">
+    <RadzenStack JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Gap="1rem">
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <div class="rz-p-12 rz-text-align-center">
+                    <RadzenCheckBox @bind-Value=@Value.SaveStrategies Name="RecordStrategies"/>
+                    <RadzenLabel Text="Strategies returns" Component="RecordStrategies" class="rz-ms-2"/>
+                </div>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <div class="rz-p-12 rz-text-align-center">
+                    <RadzenCheckBox @bind-Value=@Value.SaveDailyReturns Name="RecordSharePrices"/>
+                    <RadzenLabel Text="Daily returns" Component="RecordSharePrices" class="rz-ms-2"/>
+                </div>
+            </RadzenColumn>
+        </RadzenRow>
+        @if (Value.SaveDailyReturns)
+        {
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <div class="rz-p-12 rz-text-align-center">
+                        <RadzenCheckBox @bind-Value=@Value.DoNotSaveZeroDailyReturns Name="SkipZeroReturns"/>
+                        <RadzenLabel Text="Skip zero returns" Component="SkipZeroReturns" class="rz-ms-2"/>
+                    </div>
+                </RadzenColumn>
+            </RadzenRow>
+        }
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <div class="rz-p-12 rz-text-align-center">
+                    <RadzenCheckBox @bind-Value=@Value.SaveMetrics Name="RecordMetrics"/>
+                    <RadzenLabel Text="Metrics" Component="RecordMetrics" class="rz-ms-2"/>
+                </div>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="6">
+                <div class="rz-p-12 rz-text-align-center">
+                    <RadzenCheckBox @bind-Value=@Value.SaveTrades Name="RecordTrades"/>
+                    <RadzenLabel Text="Trades" Component="RecordTrades" class="rz-ms-2"/>
+                </div>
+            </RadzenColumn>
+            @* @if (Value.RecordTrades) *@
+            @* { *@
+            @*     <RadzenColumn Size="6"> *@
+            @*         <RadzenFormField Variant="Variant.Text" Text="Average number of trades per day"> *@
+            @*             <RadzenNumeric @bind-Value=@Value.ExpectedNumberOfTradesPerDay ShowUpDown="false" Min="1" Step="1"/> *@
+            @*         </RadzenFormField> *@
+            @*     </RadzenColumn> *@
+            @* } *@
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <div class="rz-p-12 rz-text-align-center">
+                    <RadzenCheckBox @bind-Value=@Value.SavePositions Name="RecordPositionCloses"/>
+                    <RadzenLabel Text="Deals" Component="RecordPositionCloses" class="rz-ms-2"/>
+                </div>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="6">
+                <div class="rz-p-12 rz-text-align-center">
+                    <RadzenCheckBox @bind-Value=@Value.SaveEndOfDayValues Name="RecordEndOfDayPositions"/>
+                    <RadzenLabel Text="End of day reports" Component="RecordEndOfDayPositions" class="rz-ms-2"/>
+                </div>
+            </RadzenColumn>
+            @* @if (Value.RecordTrades) *@
+            @* { *@
+            @*     <RadzenColumn Size="6"> *@
+            @*         <RadzenFormField Variant="Variant.Text" Text="Average number of positions at EOD"> *@
+            @*             <RadzenNumeric @bind-Value=@Value.ExpectedNumberOfPositionsPerDay ShowUpDown="false" Min="1" Step="1"/> *@
+            @*         </RadzenFormField> *@
+            @*     </RadzenColumn> *@
+            @* } *@
+        </RadzenRow>
+    </RadzenStack>
+</RadzenTemplateForm>
+
+@code {
+    [Parameter, EditorRequired] public PersistOptionsModel Value { get; set; }
+}

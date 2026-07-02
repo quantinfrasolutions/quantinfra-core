@@ -7,5 +7,5 @@ namespace Common.Utils.Reflection;
 public interface ITypeResolver
 {
     Type? ResolveType(string name);
-    IEnumerable<Assembly> LoadedAssemblies { get; }
+    IEnumerable<Assembly> LoadedStrategyAssemblies { get; }
 }

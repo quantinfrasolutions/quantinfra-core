@@ -17,7 +17,7 @@ public class HostedStrategiesFactory : IHostedStrategiesFactory
         _loggerFactory = loggerFactory;
 
         _strategyClasses = typeResolver
-            .LoadedAssemblies
+            .LoadedStrategyAssemblies
             .SelectMany(a => a
                 .GetTypes()
                 .Where(t =>
@@ -52,7 +52,7 @@ public class HostedStrategiesFactory : IHostedStrategiesFactory
             .ToList();            
 	}
 
-    public AbstractHostedStrategy CreateHostedStrategy(StrategyConfig config)
+    public AbstractHostedStrategy CreateHostedStrategy(Strategy config)
     {
         var type = _resolver.ResolveType(config.ClassName);
         var ahs = (AbstractHostedStrategy)Activator.CreateInstance(

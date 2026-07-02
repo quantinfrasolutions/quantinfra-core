@@ -1,33 +1,33 @@
-@using Common.Backtesting
-@using UI.SharedComponents.Accounts
-
-<RadzenTabs>
-    <Tabs>
-        <RadzenTabsItem Text="Share price">
-            <SharePriceChart MultipleAccounts=@Data.Returns />
-        </RadzenTabsItem>
-        <RadzenTabsItem Text="Deals">
-            <PositionsHistory Data=@Data.PositionCloses />
-        </RadzenTabsItem>
-        <RadzenTabsItem Text="Trades">
-            <TradesHistory Data=@Data.Trades />
-        </RadzenTabsItem>
-        <RadzenTabsItem Text="EOD balances">
-            <EndOfDayBalances Aggregated=@Data.EndOfDayBalancesAggregated 
-                              Data=@Data.EndOfDayBalances 
-                              Positions=@Data.PositionCloses 
-                              PositionValues=@Data.PositionValues />
-        </RadzenTabsItem>
-        <RadzenTabsItem Text="EOD positions">
-            <EndOfDayPositions Data=@Data.EndOfDayPositions Values=@Data.PositionValues />
-        </RadzenTabsItem>
-        <RadzenTabsItem Text="Assets & Cash flow">
-            <AssetsCashFlowReport Data=@Data TestStartDt=@Options?.StartDt />
-        </RadzenTabsItem>
-    </Tabs>
-</RadzenTabs>
-
-@code {
-    [Parameter, EditorRequired] public ActionResult Data { get; set; }
-    [Parameter] public TestExecutorOptions? Options { get; set; }
-}
+@* @using QuantInfra.Sdk.Backtesting *@
+@* @using UI.SharedComponents.Accounts *@
+@* @using UI.SharedComponents.Components.Accounts *@
+@* <RadzenTabs> *@
+@*     <Tabs> *@
+@*         <RadzenTabsItem Text="Share price"> *@
+@*             <SharePriceChart MultipleAccounts=@Data.Returns /> *@
+@*         </RadzenTabsItem> *@
+@*         <RadzenTabsItem Text="Deals"> *@
+@*             <PositionsHistory Data=@Data.PositionCloses /> *@
+@*         </RadzenTabsItem> *@
+@*         <RadzenTabsItem Text="Trades"> *@
+@*             <TradesHistory Data=@Data.Trades /> *@
+@*         </RadzenTabsItem> *@
+@*         <RadzenTabsItem Text="EOD balances"> *@
+@*             <EndOfDayBalances Aggregated=@Data.EndOfDayBalancesAggregated  *@
+@*                               Data=@Data.EndOfDayBalances  *@
+@*                               Positions=@Data.PositionCloses  *@
+@*                               PositionValues=@Data.PositionValues /> *@
+@*         </RadzenTabsItem> *@
+@*         <RadzenTabsItem Text="EOD positions"> *@
+@*             <EndOfDayPositions Data=@Data.EndOfDayPositions Values=@Data.PositionValues /> *@
+@*         </RadzenTabsItem> *@
+@*         <RadzenTabsItem Text="Assets & Cash flow"> *@
+@*             <AssetsCashFlowReport Data=@Data TestStartDt=@Options?.StartDt /> *@
+@*         </RadzenTabsItem> *@
+@*     </Tabs> *@
+@* </RadzenTabs> *@
+@* *@
+@* @code { *@
+@*     [Parameter, EditorRequired] public ActionResult Data { get; set; } *@
+@*     [Parameter] public TestExecutorOptions? Options { get; set; } *@
+@* } *@

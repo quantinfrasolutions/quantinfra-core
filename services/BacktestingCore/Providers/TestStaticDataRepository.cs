@@ -20,6 +20,7 @@ public class TestStaticDataRepository : IStaticDataProvider
         _contractsByExternalId.GetValueOrDefault(brokerId)?.GetValueOrDefault(externalContractId);
 
     private readonly HashSet<int> _fxConversionContracts = new();
+    private readonly Dictionary<int, Dictionary<int, Tuple<int, bool>>> _fxConversions = new();
     public IReadOnlyCollection<int> GetFxConversionContractIds() => _fxConversionContracts;
 
     private readonly Dictionary<int, Dictionary<string, Asset>> _assetsByExternalId = new();
@@ -31,7 +32,8 @@ public class TestStaticDataRepository : IStaticDataProvider
 
     public (int contractId, bool isDirect) GetFxConversionContract(int fromCcyId, int toCcyId)
     {
-        throw new System.NotImplementedException();
+        var tup = _fxConversions[fromCcyId][toCcyId];
+        return (tup.Item1, tup.Item2);
     }
 
     private readonly Dictionary<int, Broker> _brokers = new();
@@ -39,4 +41,59 @@ public class TestStaticDataRepository : IStaticDataProvider
 
     public string? GetContractOrderBookSubscriptionServiceName(int contractId) =>
         throw new NotSupportedException();
+
+    private readonly Dictionary<int, Stream> _streams = new();
+    private Dictionary<int, int?> _streamsToContracts = new();
+    public IReadOnlyCollection<Stream> GetStreams(IEnumerable<int> streamIds) =>
+        streamIds.Select(id => _streams.GetValueOrDefault(id)).Where(s => s != null).ToList()!;
+
+    private readonly Dictionary<int, ConstantStreamValue> _constantStreams = new();
+    public IReadOnlyDictionary<int, ConstantStreamValue> ConstantStreams => _constantStreams;
+
+    public Contract? GetContractForConstantStream(int csStreamId)
+    {
+        if (_streamsToContracts.TryGetValue(csStreamId, out var contractId)
+            && contractId is not null && _contracts.TryGetValue(contractId.Value, out var contract)
+        ) return contract;
+        return null;
+    }
+
+    public void TryAddContract(Contract contract)
+    {
+        if (!_contracts.TryAdd(contract.ContractId, contract)) return;
+        if (contract.DefaultStream is not null) TryAddStream(contract.DefaultStream, contract.ContractId);
+        if (contract.Template.BaseCurrency is not null) TryAddCurrency(contract.Template.BaseCurrency);
+        if (contract.Template.QuoteCurrency is not null) TryAddCurrency(contract.Template.QuoteCurrency);
+        TryAddCurrency(contract.Template.SettlementCurrency);
+        // foreach (var ts in contract.Template.TradingSessions) TryAddTradingSession(ts);
+    }
+
+    public void TryAddFxConversionContract(Contract contract)
+    {
+        TryAddContract(contract);
+        _fxConversionContracts.Add(contract.ContractId);
+
+        var baseCcyId = contract.Template.BaseCurrency!.CurrencyId;
+        var settlCcyId = contract.Template.SettlementCurrency!.CurrencyId;
+        _fxConversions.TryAdd(baseCcyId, new());
+        _fxConversions[baseCcyId].TryAdd(settlCcyId, new(contract.ContractId, true));
+        _fxConversions.TryAdd(settlCcyId, new());
+        _fxConversions[settlCcyId].TryAdd(baseCcyId, new (contract.ContractId, false));
+    }
+
+    public void TryAddStream(Stream stream, int? contractId)
+    {
+        if (_streams.TryAdd(stream.StreamId, stream))
+            _streamsToContracts.Add(stream.StreamId, contractId);
+    }
+
+    public void TryAddConstantStreamValue(ConstantStreamValue csv)
+    {
+        _constantStreams.TryAdd(csv.StreamId, csv);
+    }
+
+    public void TryAddCurrency(Currency currency)
+    {
+        _currencies.TryAdd(currency.CurrencyId, currency);
+    }
 }

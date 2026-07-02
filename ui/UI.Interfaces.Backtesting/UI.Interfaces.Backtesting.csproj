@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <LangVersion>default</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>QuantInfra.UI.Interfaces.Backtesting</AssemblyName>
+        <RootNamespace>QuantInfra.UI.Interfaces.Backtesting</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\common\Common.Interfaces.Api.Backtesting\Common.Interfaces.Api.Backtesting.csproj" />
+    </ItemGroup>
+
+</Project>

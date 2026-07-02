@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using QuantInfra.Api;
+using QuantInfra.Api.Client;
 using Radzen;
 using UI.Interfaces.Accounts;
 using UI.Interfaces.Infrastructure;
@@ -96,22 +97,25 @@ public sealed partial class ApiRepository
 
 public static class Extensions
 {
-    public static IServiceCollection AddApiRepository(this IServiceCollection sc) => sc
-        .AddScoped<ApiRepository>()
+    public static IServiceCollection AddApiRepository(this IServiceCollection services) => services
+        .AddScoped<ApiRepository>();
+    
+    public static IServiceCollection UseApiStaticDataRepository(this IServiceCollection sc) => sc
         .AddScoped<IUiAssetsRepository>(sp => sp.GetRequiredService<ApiRepository>())
         .AddScoped<IUiCurrenciesRepository>(sp => sp.GetRequiredService<ApiRepository>())
         .AddScoped<IUiBrokersRepository>(sp => sp.GetRequiredService<ApiRepository>())
         .AddScoped<IUiContractsRepository>(sp => sp.GetRequiredService<ApiRepository>())
         .AddScoped<IUiExchangesRepository>(sp => sp.GetRequiredService<ApiRepository>())
         .AddScoped<IUiStreamsRepository>(sp => sp.GetRequiredService<ApiRepository>())
-        .AddScoped<IUiAccountsRepository>(sp => sp.GetRequiredService<ApiRepository>())
+        .AddScoped<IUiCommissionsRepository>(sp => sp.GetRequiredService<ApiRepository>());
+    
+    public static IServiceCollection UseApiAccountsRepository(this IServiceCollection sc) => sc
+        .AddScoped<IUiAccountsRepository>(sp => sp.GetRequiredService<ApiRepository>());
+    
+    public static IServiceCollection UseApiStrategiesRepository(this IServiceCollection sc) => sc
         .AddScoped<IUiStrategiesRepository>(sp => sp.GetRequiredService<ApiRepository>())
-        .AddScoped<IUiStrategyClassesRepository>(sp => sp.GetRequiredService<ApiRepository>())
-        // .AddScoped<IUiBooksRepository>(sp => sp.GetRequiredService<ApiRepository>())
-        // .AddScoped<IIbkrTradingClient>(sp => sp.GetRequiredService<ApiRepository>())
-        // .AddScoped<IBinanceTradingClient>(sp => sp.GetRequiredService<ApiRepository>())
-        // .AddScoped<IUiDatafeedsRepository>(sp => sp.GetRequiredService<ApiRepository>())
-        .AddScoped<IUiCommissionsRepository>(sp => sp.GetRequiredService<ApiRepository>())
-        // .AddScoped<IUiAccountReportsRepository>(sp => sp.GetRequiredService<ApiRepository>())
+        .AddScoped<IUiStrategyClassesRepository>(sp => sp.GetRequiredService<ApiRepository>());
+        
+    public static IServiceCollection UseApiInfrastructureRepository(this IServiceCollection sc) => sc
         .AddScoped<IUiInfrastructureRepository>(sp => sp.GetRequiredService<ApiRepository>());
 }

@@ -171,7 +171,7 @@ namespace QuantInfra.Common.MarketData
                 else _tradingSessionClose = barClosingTs;
 
                 _aggregation = new(bar.StreamId, bar.ContractId, barOpeningDt, Instant.Min(_tradingSessionClose, barClosingTs),
-                    bar.Open, bar.High, bar.Low, bar.Close, 0, 0, bar.DatasourceId, bar.TradingSessionId);                
+                    bar.Open, bar.High, bar.Low, bar.Close, 0, 0, bar.TradingSessionId);                
             }            
             
             if (

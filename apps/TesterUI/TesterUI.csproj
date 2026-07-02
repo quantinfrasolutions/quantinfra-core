@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>QuantInfra.Core.Apps.TesterUI</AssemblyName>
+        <RootNamespace>QuantInfra.Core.Apps.TesterUI</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="appsettings.Development.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\backtesting\FileResultsRepository\FileResultsRepository.csproj" />
+      <ProjectReference Include="..\..\backtesting\LocalTestServerWrapper\LocalTestServerWrapper.csproj" />
+      <ProjectReference Include="..\..\common\Common.Utils.ExecutableAppBase\Common.Utils.ExecutableAppBase.csproj" />
+      <ProjectReference Include="..\..\db\Databases.Backtesting.Sqlite\Databases.Backtesting.Sqlite.csproj" />
+      <ProjectReference Include="..\..\db\Databases.Main\Databases.Main.csproj" />
+      <ProjectReference Include="..\..\services\Api.Backtesting\Api.Backtesting.csproj" />
+      <ProjectReference Include="..\..\services\Api.StaticData\Api.StaticData.csproj" />
+      <ProjectReference Include="..\..\ui\UI.App.Backtester\UI.App.Backtester.csproj" />
+      <ProjectReference Include="..\StrategyTesterCli\StrategyTesterCli.csproj" />
+    </ItemGroup>
+
+</Project>

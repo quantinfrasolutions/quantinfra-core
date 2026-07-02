@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace QuantInfra.Api
+namespace QuantInfra.Api.Client
 {
     public static class ConfigurationExtensions
 	{
@@ -21,10 +21,6 @@ namespace QuantInfra.Api
                 if (!string.IsNullOrEmpty(replaceBaseUri)) config.Endpoint = replaceBaseUri;
                 return config;
             });
-        
-        public static IServiceCollection AddSingletonApiWrapper(
-            this IServiceCollection serviceCollection
-        ) => serviceCollection.AddSingleton<ServiceWrapper>();
         
         public static IServiceCollection AddScopedApiWrapper(
             this IServiceCollection serviceCollection

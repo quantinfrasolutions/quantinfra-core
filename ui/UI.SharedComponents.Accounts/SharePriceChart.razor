@@ -38,23 +38,18 @@
                 Bottom = 0,
             }
         };
+        
+        _chartOptions.XAxis = new()
+        {
+            Type = AxisType.Time,
+            BoundaryGap = false,
+        };
 
         if (SingleAccount is not null)
         {
-            _chartOptions.XAxis = new()
-            {
-                Type = AxisType.Time,
-            };
-
             _chartOptions.Tooltip = new()
             {
                 Trigger = TooltipTrigger.Axis,
-                Formatter =
-                    @"
-                    <b>{c0}</b><br/>
-                    Yield: <b>{c1}%</b><br/>
-                    Daily return: <b>{c2}%</b><br/>
-                ",
             };
 
             _chartOptions.YAxisList =
@@ -74,56 +69,59 @@
                 },
             ];
 
-            _chartOptions.Dataset = new()
-            {
-                Dimensions = ["dt", "yield", "dailyReturn"],
-                Source = SingleAccount.Select(i =>
-                    new SeriesData<DateTime, decimal, decimal>(
-                        i.Dt.ToDateTimeUtc(),
-                        Math.Round((i.SharePrice - 1) * 100, 2),
-                        Math.Round(i.DailyReturn * 100, 2)
-                    )
-                ),
-            };
-
             _chartOptions.Series =
             [
                 new LineSeries()
                 {
-                    DatasetIndex = 0,
-                    DataGroupId = "yield",
                     YAxisIndex = 0,
                     Symbol = "none",
+                    Name = "Yield",
+                    Data = new List<SeriesData<DateTime, decimal>>(SingleAccount
+                        .Select(i => new SeriesData<DateTime, decimal>(
+                            i.Dt.ToDateTimeUtc(),
+                            Math.Round((i.SharePrice - 1) * 100, 2)
+                        )
+                    ))
                 },
                 new BarSeries()
                 {
-                    DatasetIndex = 0,
-                    DataGroupId = "dailyReturn",
                     YAxisIndex = 1,
+                    Name = "Daily return",
+                    Data = new List<SeriesData<DateTime, decimal>>(SingleAccount
+                        .Select(i => new SeriesData<DateTime, decimal>(
+                            i.Dt.ToDateTimeUtc(),
+                            Math.Round(i.DailyReturn * 100, 2)
+                        )
+                    ))
                 },
             ];
-            // _data = GetDataForSingleChart(SingleAccount);
         }
 
         else if (MultipleAccounts is not null)
         {
-            throw new NotImplementedException();
-            // if (MultipleAccounts.Count == 1)
-            // {
-            //     _data = GetDataForSingleChart(MultipleAccounts.Values.First());
-            // }
-            // else
-            // {
-            //     _data = new()
-            //     {
-            //         Dts = MultipleAccounts.Values.First().Select(sp => sp.Dt.ToUnixTimeMilliseconds()).ToList(),
-            //         Data = MultipleAccounts.Select(kv => new Series()
-            //         {
-            //             name = $"{kv.Key}",
-            //             data = kv.Value.Select(sp => Math.Round((sp.SharePrice - 1) * 100, 2)).ToList(),
-            //         }).ToList(),
-            //     };
-            // }
+            _chartOptions.Tooltip = new()
+            {
+                Trigger = TooltipTrigger.Item,
+            };
+
+            _chartOptions.YAxis = new YAxis()
+            {
+                Type = AxisType.Value,
+                Name = "Yield, %",
+                Id = "yield"
+            };
+
+            _chartOptions.Series = MultipleAccounts.Select(kv => (ISeries)new LineSeries()
+            {
+                Symbol = "none",
+                Name = kv.Key.ToString(),
+                Data = new List<SeriesData<DateTime, decimal>>(kv.Value
+                    .Select(i => new SeriesData<DateTime, decimal>(
+                            i.Dt.ToDateTimeUtc(),
+                            Math.Round((i.SharePrice - 1) * 100, 2)
+                        )
+                    ))
+            }).ToList();
         }
     }
 }

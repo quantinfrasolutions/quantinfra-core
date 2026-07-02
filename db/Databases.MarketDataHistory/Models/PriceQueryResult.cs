@@ -32,7 +32,7 @@ namespace Databases.MarketDataHistory.Models
 
 		public QuantInfra.Sdk.MarketData.ExchangeBar ToExchangeBar(int? contractId = null) => new(
 			(int)StreamId, contractId,
-			OpenDt, CloseDt, Open, High, Low, Close, FaceVolume, DollarValue, 0, // TODO 
+			OpenDt, CloseDt, Open, High, Low, Close, FaceVolume, DollarValue, 
 			TradingSessionId
 		);
 	}

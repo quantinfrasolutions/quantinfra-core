@@ -3,6 +3,7 @@ using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
+using QuantInfra.Core.Services.Api.StaticData;
 using QuantInfra.Services.Api;
 
 namespace OpenApiGenerator;
@@ -20,6 +21,7 @@ public class Program
                 options.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
             })
             .AddApplicationPart(typeof(AccountsController).Assembly)
+            .AddApplicationPart(typeof(StaticDataController).Assembly)
             .AddControllersAsServices();
         // Add services to the container.
         builder.Services.AddAuthorization();

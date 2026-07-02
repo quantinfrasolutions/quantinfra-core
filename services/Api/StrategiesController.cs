@@ -7,6 +7,7 @@ using QuantInfra.Common.Interfaces.Api.Management;
 using QuantInfra.Common.Interfaces.Api.MarketData;
 using QuantInfra.Common.Interfaces.Api.Strategies;
 using QuantInfra.Common.Strategies;
+using QuantInfra.Common.Strategies.Abstractions;
 using QuantInfra.Databases.Main;
 using QuantInfra.Sdk.MarketData;
 using QuantInfra.Sdk.Strategies;

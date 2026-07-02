@@ -1,0 +1,90 @@
+@using QuantInfra.Common.Interfaces.Api.Backtesting
+@using QuantInfra.UI.Interfaces.Backtesting
+@using UI.SharedComponents.Base
+@using UI.SharedComponents.Components
+
+@inherits LayoutComponentBase
+@layout MainLayout
+@inject IUiTestUnitsRepository Repository
+@inject NavigationManager NavigationManager
+
+<RadzenCard class="details-form-card">
+    <ItemNavigationTabsView TKey="Guid"
+                            TItem="TestUnitStatusRecord"
+                            Load=@Repository.GetTestUnitStatus
+                            Id=@Id
+                            BasePath=@($"/tests/history/{Id}")
+                            Tabs=@_tabs
+                            SelectedTabPath=@Path
+                            ItemLoaded=@OnTestUnitLoaded
+                            @ref=_nav>
+        <ChildContent>
+            <CascadingValue Value=@this>
+                @Body
+            </CascadingValue>
+        </ChildContent>
+    </ItemNavigationTabsView>
+</RadzenCard>
+
+@code {
+    [Parameter]
+    public Guid Id
+    {
+        get => _id;
+        set
+        {
+            _id = value;
+            StateHasChanged();
+        }
+    }
+
+    [Parameter] public string Path { get; set; } = "summary";
+    [Parameter] public EventCallback<TestUnitStatusRecord> TestUnitLoaded { get; set; }
+    
+    private ItemNavigationTabsView<Guid, TestUnitStatusRecord> _nav;
+    private Guid _id;
+    public TestUnitStatusRecord? TestUnit => _nav.Item;
+
+    public Task Reload() => _nav.LoadItem();
+
+    private async Task OnTestUnitLoaded(TestUnitStatusRecord unit)
+    {
+        _tabs.Clear();
+        
+        _tabs.Add(new() { Text = "Summary", Path = "summary" });
+
+        if (unit.PersistOptions.SaveStrategies)
+        {
+            _tabs.Add(new() { Text = "Strategies", Path = "strategies" });
+        }
+
+        if (unit.PersistOptions.SaveDailyReturns)
+        {
+            _tabs.Add(new() { Text = "Returns", Path = "returns" });
+        }
+
+        if (unit.PersistOptions.SaveTrades)
+        {
+            _tabs.Add(new() { Text = "Trades", Path = "trades" });
+        }
+        
+        if (unit.PersistOptions.SavePositions)
+        {
+            _tabs.Add(new() { Text = "Deals", Path = "deals" });
+        }
+        
+        // if (unit.PersistOptions.SaveEndOfDayValues)
+        // {
+        //     _tabs.Add(new() { Text = "End of day values", Path = "eod" });
+        // }
+
+        if (!string.IsNullOrEmpty(Path) && _tabs.All(t => t.Path != Path))
+        {
+            NavigationManager.NavigateTo($"/accounts/{Id}");
+        }
+        
+        await TestUnitLoaded.InvokeAsync(unit);
+    }
+    
+    private List<NavigationTabsItem> _tabs = new();
+}

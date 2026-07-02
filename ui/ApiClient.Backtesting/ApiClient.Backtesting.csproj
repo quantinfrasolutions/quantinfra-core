@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <LangVersion>default</LangVersion>
+        <Nullable>enable</Nullable>
+        <AssemblyName>QuantInfra.Api.Client.Backtesting</AssemblyName>
+        <RootNamespace>QuantInfra.Api.Client.Backtesting</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.8" />
+      <PackageReference Include="Microsoft.Net.Http.Headers" Version="2.2.8" />
+      <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.3.1" />
+      <PackageReference Include="System.Text.Json" Version="9.0.6" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\common\Common.Backtesting.Abstractions\Common.Backtesting.Abstractions.csproj" />
+      <ProjectReference Include="..\..\common\Common.Interfaces.Api.Backtesting\Common.Interfaces.Api.Backtesting.csproj" />
+      <ProjectReference Include="..\..\common\Common.Messaging.Json\Common.Messaging.Json.csproj" />
+      <ProjectReference Include="..\..\common\Common.Strategies.Abstractions\Common.Strategies.Abstractions.csproj" />
+    </ItemGroup>
+    
+
+</Project>

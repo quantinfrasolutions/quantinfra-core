@@ -6,6 +6,7 @@ public static class InstantExtensions
 {
     public static long ToApiFormat(this Instant instant) => instant.ToUnixTimeMilliseconds();
     public static long? ToApiFormat(this Instant? instant) => instant?.ToUnixTimeMilliseconds();
+    public static Instant FromApiFormat(this long ts) => Instant.FromUnixTimeMilliseconds(ts);
     public static Instant? FromApiFormat(this long? ts) => ts.HasValue ? Instant.FromUnixTimeMilliseconds(ts.Value) : null;
     
     public static long? ParseInput(this DateTime? dt)
@@ -16,8 +17,13 @@ public static class InstantExtensions
     
     public static long ParseInput(this DateTime dt)
     {
+        return dt.ParseInputToInstant().ToUnixTimeMilliseconds();
+    }
+
+    public static Instant ParseInputToInstant(this DateTime dt)
+    {
         if (dt.Kind != DateTimeKind.Utc) dt = DateTime.SpecifyKind(dt, DateTimeKind.Utc);
-        return Instant.FromDateTimeUtc(dt).ToUnixTimeMilliseconds();
+        return Instant.FromDateTimeUtc(dt);
     }
     
     public static DateTime ToDateTimeUtc(this long ts) => Instant.FromUnixTimeMilliseconds(ts).ToDateTimeUtc();

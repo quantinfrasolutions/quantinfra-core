@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>default</LangVersion>
+        <AssemblyName>QuantInfra.Backtesting.ParquetBarsStorage</AssemblyName>
+        <RootNamespace>QuantInfra.Backtesting.ParquetBarsStorage</RootNamespace>
+        <TargetFramework>net9.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Parquet.Net" Version="5.5.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\common\Common.MarketData.Abstractions\Common.MarketData.Abstractions.csproj" />
+      <ProjectReference Include="..\..\common\Common.MarketData\Common.MarketData.csproj" />
+    </ItemGroup>
+
+</Project>

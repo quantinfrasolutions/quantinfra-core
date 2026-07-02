@@ -1,0 +1,48 @@
+﻿@inherits LayoutComponentBase
+
+@inject CookieThemeService CookieThemeService
+
+<HeadContent>
+    <RadzenTheme Theme="material" />
+</HeadContent>
+
+<RadzenLayout Style="grid-template-areas: 'rz-header' 'rz-sidebar rz-body'">
+    <RadzenHeader>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
+            <RadzenSidebarToggle Click="@(() => sidebar1Expanded = !sidebar1Expanded)" />
+            <RadzenLabel Text="QuantInfra Backtester" />
+            <RadzenAppearanceToggle Variant="Variant.Text" />
+        </RadzenStack>
+    </RadzenHeader>
+    <RadzenSidebar @bind-Expanded="@sidebar1Expanded">
+        <RadzenPanelMenu Multiple="true">
+            <RadzenPanelMenuItem Text="Tests" Icon="experiment" Expanded="true">
+                <RadzenPanelMenuItem Text="New test" Icon="add" Path="tests/new"/>
+                <RadzenPanelMenuItem Text="History" Icon="history" Path="tests/history"/>
+            </RadzenPanelMenuItem>
+            <RadzenPanelMenuItem Text="Static data" Icon="database" Expanded="false">
+                <RadzenPanelMenuItem Text="Assets" Icon="inventory_2" Path="static-data/assets"/>
+                <RadzenPanelMenuItem Text="Currencies" Icon="universal_currency" Path="static-data/currencies"/>
+                <RadzenPanelMenuItem Text="Commissions" Icon="toll" Path="static-data/commissions"/>
+                <RadzenPanelMenuItem Text="Contracts" Icon="contract" Path="static-data/contracts"/>
+                <RadzenPanelMenuItem Text="Datafeeds" Icon="rss_feed" Path="static-data/datafeeds"/>
+                <RadzenPanelMenuItem Text="Exchanges" Icon="account_balance" Path="static-data/exchanges"/>
+                <RadzenPanelMenuItem Text="Brokers" Icon="business_center" Path="static-data/brokers"/>
+                <RadzenPanelMenuItem Text="Streams" Icon="cast_connected" Path="static-data/streams"/>
+            </RadzenPanelMenuItem>
+            <RadzenPanelMenuItem Text="Settings" Icon="settings" Path="settings" />
+        </RadzenPanelMenu>
+    </RadzenSidebar>
+    <RadzenBody>
+        <div class="rz-p-4">
+            @Body
+        </div>
+    </RadzenBody>
+</RadzenLayout>
+
+<RadzenComponents />
+
+
+@code {
+    bool sidebar1Expanded = true;    
+}

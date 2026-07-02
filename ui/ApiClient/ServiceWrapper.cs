@@ -4,10 +4,9 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Net.Http.Headers;
 using NodaTime.Serialization.SystemTextJson;
-using QuantInfra.Api.Client;
 using QuantInfra.Common.Messaging.Json;
 
-namespace QuantInfra.Api
+namespace QuantInfra.Api.Client
 {
     public class ServiceWrapper
 	{

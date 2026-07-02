@@ -1,4 +1,4 @@
-﻿namespace QuantInfra.Api
+﻿namespace QuantInfra.Api.Client
 {
 	public class ServiceWrapperConfig
 	{

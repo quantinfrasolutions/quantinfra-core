@@ -1,5 +1,6 @@
 using QuantInfra.Common.Interfaces.Api.Strategies;
 using QuantInfra.Common.Strategies;
+using QuantInfra.Common.Strategies.Abstractions;
 using UI.Interfaces;
 using UI.Interfaces.Strategies;
 

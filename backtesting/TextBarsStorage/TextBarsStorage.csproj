@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <LangVersion>10</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>QuantInfra.Backtesting.TextBarsStorage</AssemblyName>
+        <RootNamespace>QuantInfra.Backtesting.TextBarsStorage</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\common\Common.MarketData.Abstractions\Common.MarketData.Abstractions.csproj" />
+      <ProjectReference Include="..\..\services\BacktestingCore\BacktestingCore.csproj" />
+    </ItemGroup>
+
+</Project>

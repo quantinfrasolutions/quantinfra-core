@@ -1,0 +1,35 @@
+@using QuantInfra.Common.Interfaces.Api.Backtesting
+@using QuantInfra.UI.Interfaces.Backtesting
+@using UI.SharedComponents.Backtesting
+@using UI.SharedComponents.Base
+@inject IUiTestUnitsRepository Repository
+
+@layout MainLayout
+@page "/tests/history"
+
+<EditableView TItem="TestUnitListView"
+              TFilter="TestUnitsFilter"
+              EmptyText="No tests run"
+              SearchFunc="@Repository.GetTestsHistory"
+              Filter="@Filter"
+              RunSearchImmediately="true"
+              Variant=@Variant
+              HideActionsColumn="false">
+    <SearchForm>
+        <TestUnitsFilterForm @bind-Filter=@Filter />
+    </SearchForm>
+    <Columns>
+        <RadzenDataGridColumn TItem="TestUnitListView" Property=@nameof(TestUnitListView.TestId) Width="100px" Title="Id" />
+        <RadzenDataGridColumn TItem="TestUnitListView" Property=@nameof(TestUnitListView.Action) Width="160px" Title="Action" />
+        <RadzenDataGridColumn TItem="TestUnitListView" Property=@nameof(TestUnitListView.CreatedAt) Width="160px" Title="Created at" />
+        <RadzenDataGridColumn TItem="TestUnitListView" Property=@nameof(TestUnitListView.Status) Width="120px" Title="Status" />
+    </Columns>
+    <CustomItemButtons Context="unit">
+        <RadzenLink Icon="search" Path=@($"/tests/history/{unit.TestId}")/>
+    </CustomItemButtons>
+</EditableView>
+
+@code {
+    [Parameter] public TestUnitsFilter Filter { get; set; } = new();
+    [Parameter] public Variant Variant { get; set; } = Variant.Filled;
+}

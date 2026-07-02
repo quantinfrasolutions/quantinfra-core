@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>preview</LangVersion>
+        <AssemblyName>QuantInfra.Core.Apps.StrategyTesterCli</AssemblyName>
+        <RootNamespace>QuantInfra.Core.Apps.StrategyTesterCli</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="ConsoleAppFramework" Version="5.7.13">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.7" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="9.0.7" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.7" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.7" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\backtesting\FileResultsRepository\FileResultsRepository.csproj" />
+      <ProjectReference Include="..\..\db\Databases.Backtesting.Sqlite\Databases.Backtesting.Sqlite.csproj" />
+      <ProjectReference Include="..\..\db\Databases.Main\Databases.Main.csproj" />
+      <ProjectReference Include="..\..\services\LocalTestServer\LocalTestServer.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(UseLocalSdkReference)' == 'true'">
+        <ProjectReference Include="..\..\..\quantinfra-standard-indicators\QuantInfra.StandardIndicators.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(UseLocalSdkReference)' != 'true'">
+        <PackageReference Include="QuantInfra.Sdk.StandardIndicators" Version="0.9.0-beta3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="appsettings.Development.json">
+        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+        <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+      </None>
+    </ItemGroup>
+
+</Project>

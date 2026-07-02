@@ -4,7 +4,7 @@ namespace QuantInfra.Common.Strategies.Abstractions;
 
 public interface IHostedStrategiesFactory
 {
-    AbstractHostedStrategy CreateHostedStrategy(StrategyConfig config);
+    AbstractHostedStrategy CreateHostedStrategy(Strategy config);
     // AbstractHostedExecutionStrategy CreateHostedExecutionStrategy();
     IEnumerable<StrategyTypeDescription> SupportedStrategyClasses { get; }
 }

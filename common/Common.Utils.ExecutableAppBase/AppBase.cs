@@ -37,9 +37,10 @@ public class AppBase
     {
         if (_runConfig.GetChildren().Select(i => i.Key).Contains("file"))
         {
-            var filePath = Path.Join(Directory.GetCurrentDirectory(), _runConfig.GetValue("file", "appsettings.json"));
-            Console.WriteLine($"Using configuration file: {filePath}");
-            _builder.Configuration.AddJsonFile(filePath, optional: false);
+            var filePath = _runConfig.GetValue("file", "appsettings.json");
+            var fullPath = Path.IsPathFullyQualified(filePath) ? filePath : Path.Join(Directory.GetCurrentDirectory(), filePath);
+            Console.WriteLine($"Using configuration file: {fullPath}");
+            _builder.Configuration.AddJsonFile(fullPath, optional: false);
         }
 
         return this;

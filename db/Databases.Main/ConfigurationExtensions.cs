@@ -73,6 +73,10 @@ namespace QuantInfra.Databases.Main
 		public static IServiceCollection UseMainDbStaticDataProvider(this IServiceCollection sc) => sc
 			.AddSingleton<IStaticDataProvider, StaticDataProvider>();
 		
+		public static IServiceCollection UseMainDbStaticDataRepositoryReadOnly(this IServiceCollection sc) => sc
+			.AddSingleton<StaticDataRepository>()
+			.AddSingleton<IStaticDataRepositoryReadOnly>(sp => sp.GetRequiredService<StaticDataRepository>());
+		
 		public static IServiceCollection UseMainDbEventsRepository(this IServiceCollection sc) => sc
 			.AddScoped<EventPersister>()
 			.AddSingleton<EventPersisterFactory>()

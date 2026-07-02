@@ -1,4 +1,5 @@
 using QuantInfra.Common.Strategies;
+using QuantInfra.Common.Strategies.Abstractions;
 
 namespace UI.Interfaces.Strategies;
 
