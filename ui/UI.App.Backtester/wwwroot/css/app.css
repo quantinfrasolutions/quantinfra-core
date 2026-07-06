@@ -90,3 +90,11 @@ code {
 .details-form-card {
     padding: 0 !important;
 }
+
+.create-item-form .rz-col-12 > .rz-form-field {
+    width: 100%;
+}
+
+.rz-tabview.full-width-tabs > .rz-tabview-panels > .rz-tabview-panel {
+    padding: var(--rz-tabs-padding) 0;
+}

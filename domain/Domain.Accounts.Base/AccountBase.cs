@@ -667,8 +667,8 @@ public class AccountBase : Processor, IAccount
                         equityValueInAccountCcy = valueInAccountCcy;
 
                         values.TryAdd(settlCcyId, new());
-                        values[settlCcyId].Holdings += p.TotalOpenPayments;
-                        values[settlCcyId].UnrealizedPnL += value - p.TotalOpenPayments;
+                        values[settlCcyId].Holdings += p.TotalOpenPayments * p.Side.GetSign();
+                        values[settlCcyId].UnrealizedPnL += value - (p.TotalOpenPayments * p.Side.GetSign());
                         break;
                     case SecurityType.CFD or SecurityType.Futures:
                         // For futures and CFDs there is no upfront payment, and the balance doesn't decrease.

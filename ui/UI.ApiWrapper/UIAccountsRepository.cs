@@ -92,7 +92,9 @@ public partial class ApiRepository : IUiAccountsRepository
                 filter?.HistoryOpenDtTo,
                 filter?.AccountId,
                 filter?.ContractId,
-                filter?.TradeId
+                filter?.TradeId,
+                filter?.Limit,
+                filter?.Offset
             ));
 
     public Task<IEnumerable<TradeView>> GetTradesHistory(TradeFilter filter) =>

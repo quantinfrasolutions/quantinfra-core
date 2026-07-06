@@ -32,8 +32,6 @@
       <AdditionalFiles Include="Pages\StaticData\Brokers.razor" />
       <AdditionalFiles Include="Pages\StaticData\Commissions.razor" />
       <AdditionalFiles Include="Pages\StaticData\Contracts.razor" />
-      <AdditionalFiles Include="Pages\StaticData\Currencies.razor" />
-      <AdditionalFiles Include="Pages\StaticData\Datafeeds.razor" />
       <AdditionalFiles Include="Pages\StaticData\Exchanges.razor" />
       <AdditionalFiles Include="Pages\StaticData\Streams.razor" />
     </ItemGroup>

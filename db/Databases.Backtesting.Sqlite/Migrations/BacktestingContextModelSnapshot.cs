@@ -29,15 +29,9 @@ namespace QuantInfra.Databases.Backtesting.Sqlite.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("action");
 
-                    b.Property<string>("ContractOverrides")
-                        .IsRequired()
+                    b.Property<string>("ContractOverride")
                         .HasColumnType("string")
-                        .HasColumnName("contract_overrides");
-
-                    b.Property<string>("ContractsMap")
-                        .IsRequired()
-                        .HasColumnType("TEXT")
-                        .HasColumnName("contracts_map");
+                        .HasColumnName("contract_override");
 
                     b.Property<string>("CreatedAt")
                         .IsRequired()

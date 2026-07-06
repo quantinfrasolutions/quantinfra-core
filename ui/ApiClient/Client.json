@@ -46,6 +46,7 @@
         "additionalNamespaceUsages": [
             "QuantInfra.Common.Accounts.Abstractions",
             "QuantInfra.Common.Infrastructure.Abstractions",
+            "QuantInfra.Common.Interfaces.Api",
             "QuantInfra.Common.Interfaces.Api.Accounts",
             "QuantInfra.Common.Interfaces.Api.Infrastructure",
             "QuantInfra.Common.Interfaces.Api.StaticData",

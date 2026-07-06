@@ -1,0 +1,125 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using QuantInfra.Common.Interfaces.Api.StaticData
+@using QuantInfra.Sdk.StaticData
+@using UI.Interfaces.StaticData
+@using UI.SharedComponents.Components.StaticData.Assets
+@using UI.SharedComponents.Components.StaticData.Brokers
+@using UI.SharedComponents.Components.StaticData.Exchanges
+
+@inject IUiStaticDataRepository Repository
+
+<CreateItemForm TItem="CreateCommissionRequest"
+                CreateFunc="@Repository.CreateCommission"
+                OnCompleted="@OnCompleted">
+    <Fields Context="request">
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Name" Variant="Variant.Text">
+                    <ChildContent>
+                        <RadzenTextBox @bind-Value=@request.Name Name="Name"/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.Name)" class="rz-message rz-messages-error" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Fixed per share" Variant="Variant.Text">
+                    <ChildContent>
+                        <RadzenNumeric @bind-Value=@request.FixedPerShare Name="FixedPerShare" ShowUpDown="false"/>
+                    </ChildContent>
+                    <Helper>
+                        <RadzenCustomValidator Validator=@(() => request.FixedPerShare != 0 || request.Floating != 0) Component="FixedPerShare" Text="Either fixed or floating is required"/>
+                        <ValidationMessage For="@(() => request.FixedPerShare)" class="rz-message rz-messages-error" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        
+        @if (request.FixedPerShare != 0)
+        {
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenFormField Text="Currency" Variant="Variant.Text">
+                        <ChildContent>
+                            <CurrenciesSelector @bind-Value=@request.CurrencyId Required="true"/>
+                        </ChildContent>
+                        <Helper>
+                            <ValidationMessage For="@(() => request.CurrencyId)" class="rz-message rz-messages-error" />
+                        </Helper>
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+        }
+        
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Floating" Variant="Variant.Text">
+                    <ChildContent>
+                        <RadzenNumeric @bind-Value=@request.Floating Name="Floating" ShowUpDown="false"/>
+                    </ChildContent>
+                    <Helper>
+                        <RadzenCustomValidator Validator=@(() => request.FixedPerShare != 0 || request.Floating != 0) Component="Floating" Text="Either fixed or floating is required."/>
+                        <ValidationMessage For="@(() => request.Floating)" class="rz-message rz-messages-error" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Type" Variant="Variant.Text">
+                    <RadzenDropDown @bind-Value=@request.CommissionStructureType
+                                    Data="@(Enum.GetValues(typeof(CommissionStructureType)).Cast<Enum>())"/>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        
+        @if (request.CommissionStructureType == CommissionStructureType.Broker)
+        {
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenFormField Text="Currency" Variant="Variant.Text">
+                        <ChildContent>
+                            <BrokersSelector @bind-Value=@request.BrokerId Required="true" />
+                        </ChildContent>
+                        <Helper>
+                            <ValidationMessage For="@(() => request.BrokerId)" class="rz-message rz-messages-error" />
+                        </Helper>
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+        }
+        
+        @if (request.CommissionStructureType == CommissionStructureType.Exchange)
+        {
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenFormField Text="Currency" Variant="Variant.Text">
+                        <ChildContent>
+                            <ExchangesSelector @bind-Value=@request.ExchangeId Required="true"/>
+                        </ChildContent>
+                        <Helper>
+                            <ValidationMessage For="@(() => request.ExchangeId)" class="rz-message rz-messages-error" />
+                        </Helper>
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+        }
+        
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Description" Variant="Variant.Text">
+                    <RadzenTextBox @bind-Value=@request.Description/>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+    </Fields>
+</CreateItemForm>
+
+@code {
+    [Parameter] public EventCallback OnCompleted { get; set; }
+}

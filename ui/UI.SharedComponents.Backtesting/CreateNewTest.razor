@@ -13,14 +13,16 @@
                     <RadzenAccordionItem Text="Select action">
                         <RadzenStack>
                             <RadzenRow>
-                                <RadzenFormField Variant="Variant.Text" Text="Action">
-                                    <RadzenDropDown TValue="string" Data="@_actions" @bind-Value=@_model.Action Disabled=@(_isLoading || _actionsLoading) />
-                                </RadzenFormField>
+                                <RadzenColumn Size="12" Style="min-width: 150px; max-width: 250px;">
+                                    <RadzenFormField Variant="Variant.Text" Text="Action">
+                                        <RadzenDropDown TValue="string" Data="@_actions" @bind-Value=@_model.Action Disabled=@(_isLoading || _actionsLoading)/>
+                                    </RadzenFormField>
+                                </RadzenColumn>
                             </RadzenRow>
                         </RadzenStack>
                     </RadzenAccordionItem>
                     <RadzenAccordionItem Text="Configure parameters">
-                        <TestExecutorOptionsForm Value=@_model.TestExecutorOptions />
+                        <TestExecutorOptionsForm Value=@_model.TestExecutorOptions Disabled=@(_isLoading || _isRunning)/>
                     </RadzenAccordionItem>
                     <RadzenAccordionItem Text="Test action options">
                         <RadzenStack>
@@ -38,8 +40,9 @@
                             </RadzenRow>
                             <RadzenRow>
                                 <RadzenTextArea @bind-Value=@_model.Data
-                                                @bind-Value:after=@(() => _validationSuccessful = false) 
-                                                Style="width: 100%; height: 30rem;"/>
+                                                @bind-Value:after=@(() => _validationSuccessful = false)
+                                                Style="width: 100%; height: 30rem;"
+                                                Disabled=@(_isLoading || _isRunning)/>
                             </RadzenRow>
                             @if (_validationError != null)
                             {
@@ -57,6 +60,24 @@
                                     </RadzenAlert>
                                 </RadzenRow>
                             }
+                        </RadzenStack>
+                    </RadzenAccordionItem>
+                    <RadzenAccordionItem Text="Contract overrides">
+                        <RadzenStack>
+                            <RadzenRow>
+                                <RadzenColumn Size="12">
+                                    <div>
+                                        <RadzenCheckBox TValue="bool" Value="@(_model.ContractOverride != null)" ValueChanged="@OnUseOverrideChanged" Name="UseOverride"
+                                                        Disabled=@(_isLoading || _isRunning)/>
+                                        <RadzenLabel Text="Use contracts override" Component="UseOverride" class="rz-ms-2"/>
+                                    </div>
+                                </RadzenColumn>
+                            </RadzenRow>
+                            <RadzenRow>
+                                <RadzenColumn Size="12">
+                                    <ContractOverrideForm Contract="@_model.ContractOverride" Disabled=@(_isLoading || _isRunning) />
+                                </RadzenColumn>
+                            </RadzenRow>
                         </RadzenStack>
                     </RadzenAccordionItem>
                     <RadzenAccordionItem Text="Run">
@@ -283,6 +304,12 @@
      private async Task SaveOptionsAsync()
      {
          await Storage.SetAsync(NewTestStorageKey, _model);
+     }
+
+     private void OnUseOverrideChanged(bool value)
+     {
+         if (value) _model.ContractOverride = new();
+         else _model.ContractOverride = null;
      }
 
 }

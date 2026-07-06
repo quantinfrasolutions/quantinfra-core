@@ -1,0 +1,45 @@
+﻿@using QuantInfra.Common.Interfaces.Api.StaticData
+@using QuantInfra.Sdk.StaticData
+@using UI.Interfaces.StaticData
+@using UI.SharedComponents.Base
+
+@inject IUiStaticDataRepository Repository
+
+@typeparam TValue
+
+<SearchSelector TItem="AssetView"
+                TValue="int"
+                ValueProperty="@nameof(AssetView.AssetId)"
+                ValueSelector="@(a => a.AssetId)"
+                SearchFunc="@DoSearch"
+                Value="@NullableUtils.AsInt(Value)"
+                ValueChanged="@(v => NullableUtils.OnInnerValueChanged(v, Required, ValueChanged))"
+                IsRequired="@Required"
+                @bind-Loading="@_isLoading">
+    <ValueTemplate Context="asset">
+        (@asset.AssetId) @asset.Name
+    </ValueTemplate>
+</SearchSelector>
+
+@code {
+    private bool _isLoading;
+    
+    [Parameter] public TValue Value { get; set; }
+    [Parameter] public EventCallback<TValue> ValueChanged { get; set; }
+
+    [Parameter] public bool Required { get; set; } = true;
+    
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+
+    private async Task<IEnumerable<AssetView>> DoSearch(string? filter)
+    {
+        List<Task<IEnumerable<AssetView>>> tasks = [Repository.GetAssets(new() { Name = filter, AssetType = AssetType.Currency })];
+        if (int.TryParse(filter, out var assetId))
+        {
+            tasks.Add(Repository.GetAssets(new() { Id = assetId, AssetType = AssetType.Currency  }));
+        }
+
+        return (await Task.WhenAll(tasks)).SelectMany(t => t);
+    }
+}

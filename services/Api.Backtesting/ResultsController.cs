@@ -37,7 +37,7 @@ public class ResultsController(ITestUnitsRepository unitsRepository, ITestResult
         var contractIds = trades.Select(t => t.ContractId).Distinct().ToList();
         var tickers = await GetTickers(unit, contractIds);
 
-        return trades.Select(t => new TradeView(t, string.Empty, tickers.GetValueOrDefault(t.ContractId)!));
+        return trades.Select(t => new TradeView(t, string.Empty, tickers.GetValueOrDefault(t.ContractId, t.ContractId.ToString())!));
     }
 
     [HttpGet("{unitId:guid}/deals")]
@@ -53,7 +53,7 @@ public class ResultsController(ITestUnitsRepository unitsRepository, ITestResult
         var tickers = await GetTickers(unit, contractIds);
 
         return positions.Select(p =>
-            new PositionView(p, string.Empty, tickers.GetValueOrDefault(p.ContractId)!, PositionChangeType.Close));
+            new PositionView(p, string.Empty, tickers.GetValueOrDefault(p.ContractId, p.ContractId.ToString())!, PositionChangeType.Close));
     }
 
     [HttpGet("{unitId:guid}/eod-balances")]
@@ -70,7 +70,7 @@ public class ResultsController(ITestUnitsRepository unitsRepository, ITestResult
             ? (await sdRepository.GetCurrenciesAsync(currencyIds)).ToDictionary(c => c.CurrencyId, c => c.Asset.Name)
             : new Dictionary<int, string>();
 
-        return values.Select(v => new BalanceValueView(v, currencies.GetValueOrDefault(v.CurrencyId)));
+        return values.Select(v => new BalanceValueView(v, currencies.GetValueOrDefault(v.CurrencyId, v.CurrencyId.ToString())));
     }
 
     // [HttpGet("{unitId:guid}/end-of-day")]
@@ -91,17 +91,16 @@ public class ResultsController(ITestUnitsRepository unitsRepository, ITestResult
 
     private async Task<IReadOnlyDictionary<int, string>> GetTickers(TestUnit unit, IEnumerable<int> contractIds)
     {
-        var tickers = unit.ContractsMap.ToDictionary(kv => kv.Key, kv => unit.ContractOverrides[kv.Value].Ticker);
-        var defaultContractIds = contractIds.Except(tickers.Keys).ToList();
-        if (defaultContractIds.Any() && sdRepository is not null)
+        var enumerated = contractIds.ToList();
+        if (enumerated.Any() && sdRepository is not null)
         {
-            var defaultContracts = await sdRepository.GetContractsAsync(new()
+            var contracts = await sdRepository.GetContractsAsync(new()
             {
-                ContractIds = defaultContractIds,
+                ContractIds = enumerated,
                 Limit = -1,
             });
-            foreach (var contract in defaultContracts) tickers.Add(contract.ContractId, contract.Ticker);
+            return contracts.ToDictionary(c => c.ContractId, c => c.Ticker);
         }
-        return tickers;
+        return new Dictionary<int, string>();
     }
 }

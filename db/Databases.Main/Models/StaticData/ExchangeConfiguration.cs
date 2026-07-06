@@ -20,8 +20,15 @@ namespace QuantInfra.Databases.Main.Models.StaticData
         public static void CreateRelations(ModelBuilder modelBuilder)
 		{
 			modelBuilder.HasSequence<int>("exchanges_seq", "static_data")
-				.StartsAt(100);
-        }
+				.StartsAt(120);
+
+			modelBuilder.Entity<Exchange>().HasData(
+				new Exchange
+				{
+					ExchangeId = 119,
+					Name = "Binance USD-m Futures",
+				});
+		}
 	}
 }
 

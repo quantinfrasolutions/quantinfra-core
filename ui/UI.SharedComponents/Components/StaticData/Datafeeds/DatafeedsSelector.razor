@@ -1,0 +1,39 @@
+@using QuantInfra.Sdk.StaticData
+@using UI.Interfaces.StaticData
+@using UI.SharedComponents.Base
+
+@inject IUiStaticDataRepository Repository
+
+@typeparam TValue
+
+<SearchSelector TItem="Datafeed"
+                TValue="int"
+                ValueProperty="@nameof(Datafeed.DatafeedId)"
+                ValueSelector="@(a => a.DatafeedId)"
+                SearchFunc="@DoSearch"
+                Value="@NullableUtils.AsInt(Value)"
+                ValueChanged="@(v => NullableUtils.OnInnerValueChanged(v, Required, ValueChanged))"
+                IsRequired="@Required"
+                @bind-Loading="@_isLoading"
+                PreloadData="true">
+    <ValueTemplate Context="datafeed">
+        (@datafeed.DatafeedId) @datafeed.Name
+    </ValueTemplate>
+</SearchSelector>
+
+@code {
+    private bool _isLoading;
+    
+    [Parameter] public TValue Value { get; set; }
+    [Parameter] public EventCallback<TValue> ValueChanged { get; set; }
+
+    [Parameter] public bool Required { get; set; } = true;
+    
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+
+    private Task<IEnumerable<Datafeed>> DoSearch(string? filter)
+    {
+        return Repository.GetDatafeeds(new() { Limit = int.MaxValue });
+    }
+}

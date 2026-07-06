@@ -1,4 +1,6 @@
 @using QuantInfra.Common.Interfaces.Api
+@using UI.SharedComponents.Base
+@using UI.SharedComponents.Components.StaticData.Contracts
 
 <RadzenStack Gap="1rem">
     @if (Editable && AllowAddDeleteItems)
@@ -26,7 +28,7 @@
                     <IdNameView Id=@bs.Id Name=@bs.Name />
                 </Template>
                 <EditTemplate Context="bs">
-                    <UI.SharedComponents.Components.StaticData.ContractsSelector @bind-Value=@bs.Id @bind-Label=@bs.Name />
+                    <ContractsSelector @bind-Value=@bs.Id @bind-Label=@bs.Name />
                 </EditTemplate>
             </RadzenDataGridColumn>
             @if (Editable)

@@ -1,15 +1,23 @@
+using System.Text.Json.Serialization;
 using NodaTime;
 using QuantInfra.Sdk.StaticData.Synthetics;
+using Stream = QuantInfra.Sdk.StaticData.Stream;
 
 namespace QuantInfra.Common.Interfaces.Api.StaticData;
 
 public class ContractListView
 {
-    public ContractListView(int contractId, string ticker, ContractTemplateListView template, LocalDate? firstTradingDate, LocalDate? expirationDate, SyntheticContractType? syntheticContractType, bool? synthRequiresBarRecalculationAtRollover, string? externalContractId, int? assetId, string? assetName, string? description)
+    [JsonConstructor] public ContractListView() { }
+    
+    public ContractListView(int contractId, string ticker, ContractTemplateListView template, Stream? defaultStream,
+        LocalDate? firstTradingDate, LocalDate? expirationDate, SyntheticContractType? syntheticContractType,
+        bool? synthRequiresBarRecalculationAtRollover, string? externalContractId, int? assetId, string? assetName,
+        string? description)
     {
         ContractId = contractId;
         Ticker = ticker;
         Template = template;
+        DefaultStreamId = defaultStream?.StreamId;
         FirstTradingDate = firstTradingDate;
         ExpirationDate = expirationDate;
         SyntheticContractType = syntheticContractType;
@@ -23,6 +31,7 @@ public class ContractListView
     public int ContractId { get; init; }
     public string Ticker { get; init; }
     public ContractTemplateListView Template { get; init; }
+    public int? DefaultStreamId { get; init; }
     public LocalDate? FirstTradingDate { get; init; }
     public LocalDate? ExpirationDate { get; init; }
     public SyntheticContractType? SyntheticContractType { get; init; }

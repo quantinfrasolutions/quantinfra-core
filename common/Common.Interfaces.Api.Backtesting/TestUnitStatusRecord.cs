@@ -16,20 +16,19 @@ public class TestUnitStatusRecord : QuantInfra.Sdk.Backtesting.TestUnit
         string action,
         TestExecutorOptions options,
         PersistOptions persistOptions,
-        IReadOnlyDictionary<string, Contract> contractOverrides,
-        IReadOnlyDictionary<int, string> contractsMap,
+        ContractOverride?  contractOverride,
         Instant createdAt,
         string data,
         TestUnitStatus status,
         string? statusMessage
-    ) : base(testId, action, options, persistOptions, contractOverrides, contractsMap, createdAt, data)
+    ) : base(testId, action, options, persistOptions, contractOverride, createdAt, data)
     {
         Status = status;
         StatusMessage = statusMessage;
     }
     
     public TestUnitStatusRecord(TestUnit unit) : this(unit.TestId, unit.Action, unit.Options,
-        unit.PersistOptions, unit.ContractOverrides, unit.ContractsMap, unit.CreatedAt, unit.Data, TestUnitStatus.Queued, null)
+        unit.PersistOptions, unit.ContractOverride, unit.CreatedAt, unit.Data, TestUnitStatus.Queued, null)
     { }
 
     public TestUnitStatus Status { get; set; }

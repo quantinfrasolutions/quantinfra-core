@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using NodaTime;
 using QuantInfra.Sdk.StaticData.Synthetics;
 
@@ -5,12 +6,12 @@ namespace QuantInfra.Common.Interfaces.Api.StaticData;
 
 public class CreateContractRequest
 {
-    public string Ticker { get; set; }
+    [Required(ErrorMessage = "Ticker is required")] public string Ticker { get; set; }
         
-    public int? TemplateId { get; set; }
+    [Required(ErrorMessage = "Contract template is required")] public int TemplateId { get; set; }
         
-    public LocalDate? FirstTradingDate { get; init; }
-    public LocalDate? ExpirationDate { get; init; }
+    public string? FirstTradingDate { get; set; }
+    public string? ExpirationDate { get; set; }
         
     public SyntheticContractType? SyntheticContractType { get; set; }
     public bool? SynthRequiresBarRecalculationAtRollover { get; set; }

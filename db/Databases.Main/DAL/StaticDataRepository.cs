@@ -57,6 +57,7 @@ public class StaticDataRepository(IServiceProvider serviceProvider) : IStaticDat
                     c.Template.Broker.BrokerId, c.Template.Broker.Name,
                     c.Template.DaysInYear, c.Template.Description
                 ),
+                c.Streams.SingleOrDefault(s => s.DatafeedId == c.DefaultDatafeedId),
                 c.FirstTradingDate, c.ExpirationDate, c.SyntheticContractType,
                 c.SynthRequiresBarRecalculationAtRollover, c.ExternalContractId,
                 c.Asset.AssetId, c.Asset.Name, c.Description

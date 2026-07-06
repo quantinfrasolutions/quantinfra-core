@@ -43,10 +43,4 @@
       <Folder Include="Migrations\Sql\" />
     </ItemGroup>
 
-    <ItemGroup>
-      <None Update="Migrations\Sql\20260611165834_Initial.sql">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
-
 </Project>

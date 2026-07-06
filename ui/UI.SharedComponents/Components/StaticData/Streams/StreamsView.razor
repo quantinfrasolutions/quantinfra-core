@@ -1,0 +1,42 @@
+﻿@using QuantInfra.Common.Interfaces.Api.StaticData
+@using QuantInfra.Sdk.StaticData
+@using UI.Interfaces.StaticData
+@using UI.SharedComponents.Base
+
+@inject IUiStaticDataRepository Repository
+
+<EditableView TItem="StreamListView"
+             TFilter="StreamsFilter"
+             EmptyText="No streams found"
+             SearchFunc="@Repository.GetStreams"
+             Filter="@Filter"
+             RunSearchImmediately="false"
+             Variant=@Variant
+             HideActionsColumn=@(!EnableActions)
+             AllowSelectRow=@AllowSelect>
+    <SearchForm>
+        <StreamFilterForm @bind-Filter=@Filter />
+    </SearchForm>
+    <CreateButton>
+        <CreateStreamButton ShowButton="true" />
+    </CreateButton>
+    <Columns>
+        <RadzenDataGridColumn TItem="StreamListView" Property=@nameof(StreamListView.StreamId) Width="100px" Title="Id" />
+        <RadzenDataGridColumn TItem="StreamListView" Property=@nameof(StreamListView.Ticker) Width="200px" Title="Name" />
+        <RadzenDataGridColumn TItem="StreamListView" Property=@nameof(StreamListView.ContractId) Width="80px" Title="Contract ID" />
+        <RadzenDataGridColumn TItem="StreamListView" Property=@nameof(StreamListView.ContractName) Width="120px" Title="Contract" />
+        <RadzenDataGridColumn TItem="StreamListView" Property=@nameof(StreamListView.DatafeedId) Width="80px" Title="Datafeed ID" />
+        <RadzenDataGridColumn TItem="StreamListView" Property=@nameof(StreamListView.DatafeedName) Width="120px" Title="Datafeed" />
+        <RadzenDataGridColumn TItem="StreamListView" Property="ConstantStreamValue.Value" Width="80px" Title="Constant stream value" />
+        <RadzenDataGridColumn TItem="StreamListView" Property="ConstantStreamValue.CronExpression" Width="200px" Title="Constant stream cron" />
+    </Columns>
+</EditableView>
+
+@code {
+    [Parameter] public StreamsFilter Filter { get; set; } = new();
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public bool AllowEdit { get; set; }
+    [Parameter] public bool AllowSelect { get; set; }
+    [Parameter] public Variant Variant { get; set; } = Variant.Filled;
+    [Parameter] public bool EnableActions { get; set; } = true;
+}

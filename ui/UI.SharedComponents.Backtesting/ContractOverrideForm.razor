@@ -1,0 +1,173 @@
+@using System.Globalization
+@using QuantInfra.Common.Interfaces.Api.Backtesting
+@using QuantInfra.Sdk.StaticData
+
+@if (Contract is not null)
+{
+    <RadzenTemplateForm TItem="ContractOverrideModel" Data="@Contract">
+        <RadzenStack>
+            
+            <RadzenRow>
+                <RadzenColumn Size="3" Style="min-width: 150px; max-width: 250px;">
+                    <div>
+                        <RadzenSelectBar @bind-Value=@Contract.OverrideAllContracts TValue="bool" Disabled=@Disabled>
+                            <Items>
+                                <RadzenSelectBarItem Text="All" Value="true" />
+                                <RadzenSelectBarItem Text="Unknown" Value="false" />
+                            </Items>
+                        </RadzenSelectBar>
+                    </div>
+                </RadzenColumn>
+                <RadzenColumn Size="9">
+                    @if (Contract.OverrideAllContracts)
+                    {
+                        <RadzenText TextStyle="TextStyle.Caption">Contracts not configured in static data will use the data below. Commission for existing contracts will be overridden.</RadzenText>
+                    }
+                    else
+                    {
+                        <RadzenText TextStyle="TextStyle.Caption">Contracts not configured in static data will use the data below. Existing contracts will use commission defined for them in static data.</RadzenText>
+                    }
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow>
+                <RadzenColumn Size="3" Style="min-width: 150px; max-width: 250px;">
+                    <RadzenFormField Variant="Variant.Text" Text="Security type">
+                        <ChildContent>
+                            <RadzenDropDown @bind-Value=@Contract.SecurityType Data=@(Enum.GetValues(typeof(SecurityType)).Cast<Enum>())
+                                            Disabled=@Disabled/>
+                        </ChildContent>
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="3" Style="min-width: 150px; max-width: 250px;">
+                    <RadzenFormField Variant="Variant.Text" Text="PnL calculator type">
+                        <ChildContent>
+                            <RadzenDropDown @bind-Value=@Contract.PlCalculatorType Data=@(Enum.GetValues(typeof(PLCalculatorType)).Cast<Enum>())
+                                            Disabled=@Disabled/>
+                        </ChildContent>
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="3" Style="min-width: 150px; max-width: 250px;">
+                    <RadzenFormField Variant="Variant.Text" Text="Tick size">
+                        <ChildContent>
+                            <RadzenNumeric @bind-Value=@Contract.TickSize ShowUpDown="false" Name="TickSize" Min="0.00000001m"
+                                           Disabled=@Disabled/>
+                        </ChildContent>
+                        <Helper>
+                            <RadzenRequiredValidator Text="Tick size is required" Component="TickSize"/>
+                        </Helper>
+                    </RadzenFormField>
+                </RadzenColumn>
+
+                @if (Contract.PlCalculatorType == PLCalculatorType.DefaultFutures)
+                {
+                    <RadzenColumn Size="3" Style="min-width: 150px; max-width: 250px;">
+                        <RadzenFormField Variant="Variant.Text" Text="Tick value">
+                            <ChildContent>
+                                <RadzenNumeric @bind-Value=@Contract.TickValue ShowUpDown="false" Name="TickValue" Min="0.00000001m" Disabled=@Disabled/>
+                            </ChildContent>
+                            <Helper>
+                                <RadzenRequiredValidator Text="Tick value is required" Component="TickValue"/>
+                            </Helper>
+                        </RadzenFormField>
+                    </RadzenColumn>
+                }
+            </RadzenRow>
+
+            <RadzenRow>
+                <RadzenColumn Size="3" Style="min-width: 150px; max-width: 250px;">
+                    <RadzenFormField Variant="Variant.Text" Text="Min size">
+                        <ChildContent>
+                            <RadzenNumeric @bind-Value=@Contract.MinSize ShowUpDown="false" Name="MinSize" Disabled=@Disabled/>
+                        </ChildContent>
+                        <Helper>
+                            <RadzenRequiredValidator Component="Decimals" Text="Required"/>
+                        </Helper>
+                    </RadzenFormField>
+                </RadzenColumn>
+
+                <RadzenColumn Size="3" Style="min-width: 150px; max-width: 250px;">
+                    <RadzenFormField Variant="Variant.Text" Text="Min size money">
+                        <ChildContent>
+                            <RadzenNumeric @bind-Value=@Contract.MinSizeMoney ShowUpDown="false" Name="MinSizeMoney" Disabled=@Disabled/>
+                        </ChildContent>
+                    </RadzenFormField>
+                </RadzenColumn>
+
+                <RadzenColumn Size="3" Style="min-width: 150px; max-width: 250px;">
+                    <RadzenFormField Variant="Variant.Text" Text="Max size">
+                        <ChildContent>
+                            <RadzenNumeric @bind-Value=@Contract.MaxSize ShowUpDown="false" Name="MaxSize" Disabled=@Disabled/>
+                        </ChildContent>
+                        <Helper>
+                            <RadzenRequiredValidator Component="MaxSize" Text="Required"/>
+                        </Helper>
+                    </RadzenFormField>
+                </RadzenColumn>
+
+                <RadzenColumn Size="3" Style="min-width: 150px; max-width: 250px;">
+                    <RadzenFormField Variant="Variant.Text" Text="Max size money">
+                        <ChildContent>
+                            <RadzenNumeric @bind-Value=@Contract.MaxSizeMoney ShowUpDown="false" Name="MaxSizeMoney" Disabled=@Disabled/>
+                        </ChildContent>
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow>
+                <RadzenColumn Size="3" Style="min-width: 150px; max-width: 250px;">
+                    <RadzenFormField Variant="Variant.Text" Text="Size Increment">
+                        <ChildContent>
+                            <RadzenNumeric @bind-Value=@Contract.SizeIncrement ShowUpDown="false" Name="SizeIncrement" Disabled=@Disabled/>
+                        </ChildContent>
+                        <Helper>
+                            <RadzenRequiredValidator Component="SizeIncrement" Text="Required"/>
+                        </Helper>
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="3" Style="min-width: 150px; max-width: 250px;">
+                    <RadzenFormField Text="Settl currency precision" Variant="Variant.Text">
+                        <ChildContent>
+                            <RadzenNumeric @bind-Value=@Contract.SettlementCurrencyDecimals Name="Decimals" Min="0" Max="18" Step="1" ShowUpDown="false" Disabled=@Disabled/>
+                        </ChildContent>
+                        <Helper>
+                            <RadzenRequiredValidator Component="Decimals" Text="Required"/>
+                        </Helper>
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenFieldset Text="Commission">
+                        <RadzenStack>
+                            <RadzenRow>
+                                <RadzenColumn Size="3" Style="min-width: 150px; max-width: 250px;">
+                                    <RadzenFormField Text="Fixed per share" Variant="Variant.Text">
+                                        <ChildContent>
+                                            <RadzenNumeric @bind-Value=@Contract.CostPerShare ShowUpDown="false"
+                                                           Step=@Math.Pow(10, -Contract.SettlementCurrencyDecimals).ToString(CultureInfo.InvariantCulture)
+                                                           Disabled=@Disabled/>
+                                        </ChildContent>
+                                    </RadzenFormField>
+                                </RadzenColumn>
+                            
+                                <RadzenColumn Size="3" Style="min-width: 150px; max-width: 250px;">
+                                    <RadzenFormField Text="Floating" Variant="Variant.Text">
+                                        <ChildContent>
+                                            <RadzenNumeric @bind-Value=@Contract.FloatingCost ShowUpDown="false" Disabled=@Disabled/>
+                                        </ChildContent>
+                                    </RadzenFormField>
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenStack>
+                    </RadzenFieldset>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenStack>
+    </RadzenTemplateForm>
+}
+
+@code {
+    [Parameter] public ContractOverrideModel? Contract { get; set; } = new();
+    [Parameter] public bool Disabled { get; set; }
+}

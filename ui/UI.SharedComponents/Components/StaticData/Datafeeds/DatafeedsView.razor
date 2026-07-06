@@ -1,0 +1,34 @@
+﻿@using QuantInfra.Common.Interfaces.Api
+@using QuantInfra.Sdk.StaticData
+@using UI.Interfaces.StaticData
+@using UI.SharedComponents.Base
+
+@inject IUiStaticDataRepository Repository
+
+<EditableView TItem="Datafeed"
+             TFilter="PagingFilter"
+             EmptyText="No datafeeds found"
+             SearchFunc="@Repository.GetDatafeeds"
+             Filter="@Filter"
+             RunSearchImmediately="true"
+             SearchButtonText="Refresh"
+             Variant=@Variant
+             HideActionsColumn=@(!EnableActions)>
+    <SearchForm />
+    <CreateButton>
+        <CreateDatafeedButton ShowButton="true" />
+    </CreateButton>
+    <Columns>
+        <RadzenDataGridColumn TItem="Datafeed" Property=@nameof(Datafeed.DatafeedId) Width="100px" Title="Id" />
+        <RadzenDataGridColumn TItem="Datafeed" Property=@nameof(Datafeed.Name) Width="200px" Title="Name" />
+    </Columns>
+</EditableView>
+
+@code {
+    [Parameter] public PagingFilter Filter { get; set; } = new();
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public bool AllowEdit { get; set; }
+    [Parameter] public bool AllowSelect { get; set; }
+    [Parameter] public Variant Variant { get; set; } = Variant.Filled;
+    [Parameter] public bool EnableActions { get; set; } = true;
+}

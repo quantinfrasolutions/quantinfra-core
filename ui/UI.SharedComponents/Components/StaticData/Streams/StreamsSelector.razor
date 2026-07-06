@@ -1,0 +1,44 @@
+﻿@using QuantInfra.Common.Interfaces.Api.StaticData
+@using UI.Interfaces.StaticData
+@using UI.SharedComponents.Base
+
+@inject IUiStaticDataRepository Repository
+
+@typeparam TValue
+
+<SearchSelector TItem="StreamListView"
+                TValue="int"
+                ValueProperty="@nameof(StreamListView.StreamId)"
+                ValueSelector="@(a => a.StreamId)"
+                SearchFunc="@DoSearch"
+                Value="@NullableUtils.AsInt(Value)"
+                ValueChanged="@(v => NullableUtils.OnInnerValueChanged(v, Required, ValueChanged))"
+                IsRequired="@Required"
+                @bind-Loading="@_isLoading">
+    <ValueTemplate Context="stream">
+        (@stream.StreamId) @stream.Ticker
+    </ValueTemplate>
+</SearchSelector>
+
+@code {
+    private bool _isLoading;
+    
+    [Parameter] public TValue Value { get; set; }
+    [Parameter] public EventCallback<TValue> ValueChanged { get; set; }
+
+    [Parameter] public bool Required { get; set; } = true;
+    
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+
+    private async Task<IEnumerable<StreamListView>> DoSearch(string? filter)
+    {
+        List<Task<IEnumerable<StreamListView>>> tasks = [Repository.GetStreams(new() { Ticker = filter })];
+        if (int.TryParse(filter, out var streamId))
+        {
+            tasks.Add(Repository.GetStreams(new() { StreamIds = [streamId] }));
+        }
+
+        return (await Task.WhenAll(tasks)).SelectMany(t => t);
+    }
+}

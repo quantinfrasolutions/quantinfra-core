@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Xml.Serialization;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
@@ -12,6 +13,9 @@ public class Program
 {
     public static void Main(string[] args)
     {
+        CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+        CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
+        
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services

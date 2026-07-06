@@ -1,4 +1,6 @@
-﻿using QuantInfra.Backtesting.FileResultsRepository;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using QuantInfra.Backtesting.FileResultsRepository;
 using QuantInfra.Backtesting.LocalTestServerWrapper;
 using QuantInfra.Common.Utils.ExecutableAppBase;
 using QuantInfra.Core.Services.Api.StaticData;
@@ -19,6 +21,8 @@ var host = new AppBase(args)
     .ConfigureServices((builder, services, configuration) =>
     {
         services
+            .Configure<QuantInfra.Core.Apps.TesterUI.Config>(conf => configuration.GetSection("app").Bind(conf))
+                
             .ConfigureLocalTestServer(configuration)
             
             .AddSingleton<QuantInfra.Databases.Backtesting.Sqlite.Config>(sp =>
@@ -51,31 +55,19 @@ var host = new AppBase(args)
 
 host.UseBlazorFrameworkFiles();
 host.UseStaticFiles();
-host.MapGet("/api/debug/routes", (IEnumerable<EndpointDataSource> sources) =>
-
-    sources.SelectMany(s => s.Endpoints)
-
-        .OfType<RouteEndpoint>()
-
-        .Select(e => new
-
-        {
-
-            Route = e.RoutePattern.RawText,
-
-            Methods = e.Metadata
-
-                .OfType<HttpMethodMetadata>()
-
-                .FirstOrDefault()
-
-                ?.HttpMethods,
-
-            DisplayName = e.DisplayName
-
-        }));
 host.MapFallbackToFile("index.html");
 
 await QuantInfra.Core.Apps.StrategyTesterCli.Helpers.MigrateSqliteAsync(host.Services);
+if (host.Services.GetService<IOptions<QuantInfra.Core.Apps.TesterUI.Config>>()?.Value?.MigrateMainDb == true)
+{
+    await Task.Run(async () =>
+    {
+        await using var scope = host.Services.CreateAsyncScope();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        var context = scope.ServiceProvider.GetRequiredService<MainContext>();
+        await context.Database.MigrateAsync();
+        logger.LogInformation("Main database migrated");
+    });
+}
 
 host.Run();

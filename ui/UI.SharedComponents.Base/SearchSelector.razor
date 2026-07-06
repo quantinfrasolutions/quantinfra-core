@@ -1,128 +1,94 @@
-﻿@using Radzen.Blazor.Rendering
-
-@typeparam TKey
+﻿@typeparam TValue
 @typeparam TItem where TItem : class
 
-<style type="text/css">
-    .my-popup {
-        display: none;
-        position: absolute;
-        overflow: hidden;
-        /*height: 360px;*/
-        width: 600px;
-        border: var(--rz-panel-border);
-        background-color: var(--rz-panel-background-color);
-        box-shadow: var(--rz-panel-shadow);
-        border-radius: var(--rz-border-radius)
-    }
- </style>
-
-<RadzenFormField Text=@Text Variant="Variant.Text">
-    <ChildContent>
-        <RadzenTextBox Value=@(SomethingSelected ? IdNameView.GetLabel(Value, Label) : string.Empty) Disabled="true" Name="Value" @ref=_textBox />
-        @if (Required)
-        {
-            <RadzenRequiredValidator Component="Value" Text=@($"{Text} is required") Style="position: absolute"/>
-        }
-    </ChildContent>
-    <End>
-        @if (!Required && SomethingSelected)
-        {
-            <RadzenButton Icon="close" Variant="Variant.Text" Click=@Clean Disabled=@Disabled />
-        }
-        <RadzenButton Icon="find_in_page" Variant="Variant.Text" Click=@ShowSearch @ref=_button Disabled=@Disabled />
-    </End>
-</RadzenFormField>
-
-<Popup @ref=popup class="my-popup" Close="@OnPopupClosed">
-    <RadzenStack JustifyContent="JustifyContent.SpaceBetween">
-        @Selector
-        @if (_selectedItem != null)
-        {
-            <RadzenRow JustifyContent="JustifyContent.End">
-                <RadzenCard Variant="Variant.Flat">
-                    <RadzenButton Text="Select" Variant="Variant.Text" Click=@ConfirmSelect/>
-                </RadzenCard>
-            </RadzenRow>
-        }
-    </RadzenStack>
-</Popup>
+<RadzenDropDown TValue="TValue" 
+                Data="@_data"
+                Value="@Value"
+                ValueChanged="@ValueChanged"
+                ValueProperty="@ValueProperty"
+                Disabled="@Loading"
+                AllowClear="@(!IsRequired)"
+                AllowFiltering=@(!PreloadData)
+                FilterPlaceholder=@FilterPlaceholder
+                LoadData="Callback"
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
+    <Template>
+        @ValueTemplate((TItem)context)
+    </Template>
+    <ValueTemplate>
+        @ValueTemplate((TItem)context)
+    </ValueTemplate>
+</RadzenDropDown>
 
 
 @code {
-    private RadzenButton _button;
-    private RadzenTextBox _textBox;
-    private Popup popup;
+    private List<TItem> _data = new();
+
+    [Parameter]
+    public TValue Value { get; set; }
+
+    [Parameter] public EventCallback<TValue> ValueChanged { get; set; }
     
-    @* ReSharper disable once CSharpWarnings::CS8618 *@
-    [Parameter, EditorRequired] public Func<TItem, TKey> KeySelector { get; set; }
-    @* ReSharper disable once CSharpWarnings::CS8618 *@
-    [Parameter, EditorRequired] public Func<TItem, string> LabelSelector { get; set; }
-    @* ReSharper disable once CSharpWarnings::CS8618 *@
-    [Parameter, EditorRequired] public RenderFragment Selector { get; set; }
-    @* ReSharper disable once CSharpWarnings::CS8618 *@
-    [Parameter, EditorRequired] public string Text { get; set; }
+    [Parameter] public bool Loading { get; set; }
+    [Parameter] public EventCallback<bool> LoadingChanged { get; set; }
     
-    [Parameter] public TKey? Value { get; set; }
-    [Parameter] public EventCallback<TKey?> ValueChanged { get; set; }
-    
-    [Parameter] public bool SomethingSelected { get; set; }
-    
-    [Parameter] public string Label { get; set; } = default!;
-    [Parameter] public EventCallback<string> LabelChanged { get; set; }
-    
-    [Parameter] public EventCallback<TItem> ItemChanged { get; set; }
-    
-    [Parameter] public bool Required { get; set; } = true;
-    [Parameter] public bool Disabled { get; set; }
+    [Parameter, EditorRequired] public string ValueProperty { get; set; }
+    [Parameter, EditorRequired] public Func<TItem, TValue> ValueSelector { get; set; }
+    [Parameter, EditorRequired] public RenderFragment<TItem> ValueTemplate { get; set; }
+    [Parameter, EditorRequired] public Func<string?, Task<IEnumerable<TItem>>> SearchFunc { get; set; }
+    [Parameter] public string FilterPlaceholder { get; set; } = "Start typing";
+    [Parameter] public bool PreloadData { get; set; }
+    [Parameter] public bool IsRequired { get; set; }
+
+    SemaphoreSlim _semaphore = new(1);
 
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
-        
-    }
-
-
-    public void OnSomethingSelected(TItem c)
-    {
-        _selectedItem = c;
-        StateHasChanged();
-    }
-
-    private async Task ConfirmSelect()
-    {
-        if (_selectedItem != null)
+        if (PreloadData)
         {
-            SomethingSelected = true;
-            Value = KeySelector(_selectedItem);
-            Label = LabelSelector(_selectedItem);
-            
-            await ValueChanged.InvokeAsync(Value);
-            await LabelChanged.InvokeAsync(Label);
-            await ItemChanged.InvokeAsync(_selectedItem);
-            
-            await popup.CloseAsync();
+            await _semaphore.WaitAsync();
+            try
+            {
+                await LoadData(null);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
+        await _semaphore.WaitAsync();
+        var comparer = EqualityComparer<TValue>.Default;
+        if (Value is not null && !comparer.Equals(Value, default(TValue)) && !_data.Any(x => comparer.Equals(ValueSelector(x), Value)))
+        {
+            try
+            {
+                await LoadData(Value.ToString());
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
     }
-    
-    private async Task Clean()
+
+    private async Task LoadData(string? filter)
     {
-        if (Required) return;
-        
-        SomethingSelected = false;
-        Value = default;
-        Label = string.Empty;
-        
-        await ValueChanged.InvokeAsync(Value);
-        await LabelChanged.InvokeAsync(Label);
-        await ItemChanged.InvokeAsync(null);
+        Loading = true;
+        await LoadingChanged.InvokeAsync(Loading);
+        try
+        {
+            _data = (await SearchFunc(filter)).ToList();
+        }
+        catch { }
+        finally
+        {
+            Loading = false;
+            await LoadingChanged.InvokeAsync(Loading);
+        }
     }
-    
-    private TItem? _selectedItem = null;
-    private Task ShowSearch() => popup.ToggleAsync(_textBox.Element);
-    
-    private void OnPopupClosed()
-    {
-        _selectedItem = null;
-    }
+
+    private Task Callback(LoadDataArgs args) => LoadData(args.Filter);
+
 }

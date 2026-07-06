@@ -4,32 +4,32 @@
 
 @typeparam TValue
 
-<SearchSelector TKey="int?"
-                TItem="AccountListModel"
-                Text="Account"
-                Required=@Required
-                @ref=_selector
-                KeySelector="@(c => c.AccountId)"
-                LabelSelector="@(c => c.Name)"
-                Value=@(Value as int?)
-                ValueChanged=@OnValueChanged
-                SomethingSelected="@(Value is Guid? && Value as Guid? != Guid.Empty)"
-                Disabled=@Disabled
-                >
-    <Selector>
-        <AccountsView AllowSelect="true" 
-                      ValueChanged=@_selector.OnSomethingSelected 
-                      Variant="Variant.Flat" 
-                      RunSearchImmediately=@(AccountType != null || AccountTypes?.Count > 0)
-                      StrategyId=@StrategyId
-                      AccountType=@AccountType 
-                      AccountTypes=@AccountTypes 
-                      EnableActions="false"/>
-    </Selector>
-</SearchSelector>
+@* <SearchSelector TKey="int?" *@
+@*                 TItem="AccountListModel" *@
+@*                 Text="Account" *@
+@*                 Required=@Required *@
+@*                 @ref=_selector *@
+@*                 KeySelector="@(c => c.AccountId)" *@
+@*                 LabelSelector="@(c => c.Name)" *@
+@*                 Value=@(Value as int?) *@
+@*                 ValueChanged=@OnValueChanged *@
+@*                 SomethingSelected="@(Value is Guid? && Value as Guid? != Guid.Empty)" *@
+@*                 Disabled=@Disabled *@
+@*                 > *@
+@*     <Selector> *@
+@*         <AccountsView AllowSelect="true"  *@
+@*                       ValueChanged=@_selector.OnSomethingSelected  *@
+@*                       Variant="Variant.Flat"  *@
+@*                       RunSearchImmediately=@(AccountType != null || AccountTypes?.Count > 0) *@
+@*                       StrategyId=@StrategyId *@
+@*                       AccountType=@AccountType  *@
+@*                       AccountTypes=@AccountTypes  *@
+@*                       EnableActions="false"/> *@
+@*     </Selector> *@
+@* </SearchSelector> *@
 
 @code {
-    private SearchSelector<int?, AccountListModel> _selector;
+    // private SearchSelector<int?, AccountListModel> _selector;
     
     [Parameter] public TValue Value { get; set; }
     [Parameter] public EventCallback<TValue> ValueChanged { get; set; }

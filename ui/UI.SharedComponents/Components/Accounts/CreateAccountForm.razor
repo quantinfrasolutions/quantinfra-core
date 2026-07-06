@@ -1,7 +1,7 @@
 ﻿@using QuantInfra.Common.Accounts.Abstractions
 @using QuantInfra.Sdk.Accounts
 @using UI.Interfaces.Accounts
-@using UI.SharedComponents.Components.StaticData
+@using UI.SharedComponents.Components.StaticData.Brokers
 @using UI.SharedComponents.Infrastructure
 
 @inject IUiAccountsRepository Repository
@@ -33,7 +33,7 @@
             </RadzenRow>
         }
         <RadzenRow>
-            <CurrenciesSelector @bind-Value=@_account.CurrencyId/>
+            @* <CurrenciesSelector @bind-Value=@_account.CurrencyId/> *@
         </RadzenRow>
         <RadzenRow>
             <RadzenFormField Text="Position tracking" Variant="Variant.Text">

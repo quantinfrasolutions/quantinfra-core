@@ -1,6 +1,9 @@
 @using NodaTime.Text
 @using QuantInfra.Common.Interfaces.Api.MarketData
 @using QuantInfra.Sdk.MarketData
+@using UI.SharedComponents.Components.StaticData
+@using UI.SharedComponents.Components.StaticData.Contracts
+@using UI.SharedComponents.Components.StaticData.Streams
 
 <RadzenStack Gap="1rem">
     @if (Editable && AllowAddDeleteItems)
@@ -41,11 +44,11 @@
                 <EditTemplate Context="bs">
                     @if (bs.BsView.IdType == IdType.Stream)
                     {
-                        <UI.SharedComponents.Components.StaticData.StreamsSelector @bind-Value=@bs.BsView.Id @bind-Label=@bs.BsView.Ticker />
+                        <StreamsSelector @bind-Value=@bs.BsView.Id @bind-Label=@bs.BsView.Ticker />
                     }
                     else if (bs.BsView.IdType == IdType.Contract)
                     {
-                        <UI.SharedComponents.Components.StaticData.ContractsSelector @bind-Value=@bs.BsView.Id @bind-Label=@bs.BsView.Ticker/>
+                        <ContractsSelector @bind-Value=@bs.BsView.Id @bind-Label=@bs.BsView.Ticker/>
                     }
                 </EditTemplate>
             </RadzenDataGridColumn>

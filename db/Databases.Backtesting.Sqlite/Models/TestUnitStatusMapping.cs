@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
 using QuantInfra.Common.Interfaces.Api.Backtesting;
+using QuantInfra.Sdk.Backtesting;
 using QuantInfra.Sdk.StaticData;
 
 namespace QuantInfra.Databases.Backtesting.Sqlite.Models;
@@ -71,10 +72,8 @@ public class TestUnitStatusMapping
             o.Property(x => x.SaveStrategies).HasColumnName("save_strategies").IsRequired();
             o.Property(x => x.SaveMetrics).HasColumnName("save_metrics").IsRequired();
         });
-        builder.Property(s => s.ContractOverrides).HasColumnName("contract_overrides").HasColumnType("string").IsRequired()
-            .HasConversion(new JsonValueConverter<IReadOnlyDictionary<string, Contract>>());
-        builder.Property(s => s.ContractsMap).HasColumnName("contracts_map").IsRequired()
-            .HasConversion(new JsonValueConverter<IReadOnlyDictionary<int, string>>());
+        builder.Property(s => s.ContractOverride).HasColumnName("contract_override").HasColumnType("string")
+            .HasConversion(new JsonValueConverter<ContractOverride?>());
         builder.Property(s => s.Data).HasColumnName("data");
         builder.Property(s => s.Status).HasColumnName("status").HasColumnType("text").IsRequired();
         builder.Property(s => s.StatusMessage).HasColumnName("status_message");

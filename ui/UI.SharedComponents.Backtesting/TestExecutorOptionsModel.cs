@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Logging;
 using NodaTime;
+using QuantInfra.Common.Interfaces.Api.Backtesting;
 using QuantInfra.Sdk.Backtesting;
 using QuantInfra.Sdk.Strategies;
 
@@ -45,5 +46,26 @@ public class TestExecutorOptionsModel
         StopOrdersExecution = StopOrdersExecution,
         OpenExecutionOffset = OpenExecutionOffset,
         HighLowExecutionOffset = HighLowExecutionOffset,
+    };
+
+    public static TestExecutorOptionsModel FromTestUnit(TestUnitStatusRecord testUnit) => new()
+    {
+        StartDt = testUnit.Options.StartDt,
+        EndDt = testUnit.Options.EndDt,
+        LogLevel = testUnit.Options.LogLevel,
+        Investment = testUnit.Options.Investment,
+        CandlesTimeframe = testUnit.Options.CandlesTimeframe,
+        MtmUtcOffset = testUnit.Options.MtmUtcOffset,
+        RequestBarAttempts = testUnit.Options.RequestBarAttempts,
+        ThrowOnZeroVolumeOrders = testUnit.Options.ThrowOnZeroVolumeOrders,
+        VirtualAccountSizeStepFraction = testUnit.Options.VirtualAccountSizeStepFraction,
+        DaysInYear = testUnit.Options.DaysInYear,
+        CheckPendingOrdersExecutionUsingHighLow = testUnit.Options.CheckPendingOrdersExecutionUsingHighLow,
+        CheckOrdersAtBarOpen = testUnit.Options.CheckOrdersAtBarOpen,
+        CheckOrdersAtBarClose = testUnit.Options.CheckOrdersAtBarClose,
+        LimitCloseCheckToMarketOrdersOnly = testUnit.Options.LimitCloseCheckToMarketOrdersOnly,
+        StopOrdersExecution = testUnit.Options.StopOrdersExecution,
+        OpenExecutionOffset = testUnit.Options.OpenExecutionOffset,
+        HighLowExecutionOffset = testUnit.Options.HighLowExecutionOffset,
     };
 }

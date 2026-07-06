@@ -34,7 +34,7 @@ namespace QuantInfra.Databases.Main.Migrations
                 .StartsAt(100000L);
 
             modelBuilder.HasSequence<int>("brokers_seq", "static_data")
-                .StartsAt(100L);
+                .StartsAt(102L);
 
             modelBuilder.HasSequence<int>("commissions_seq", "static_data")
                 .StartsAt(1000L);
@@ -46,10 +46,10 @@ namespace QuantInfra.Databases.Main.Migrations
                 .StartsAt(100000L);
 
             modelBuilder.HasSequence<int>("datafeeds_seq", "static_data")
-                .StartsAt(100L);
+                .StartsAt(101L);
 
             modelBuilder.HasSequence<int>("exchanges_seq", "static_data")
-                .StartsAt(100L);
+                .StartsAt(120L);
 
             modelBuilder.HasSequence("position_history_id_seq", "history")
                 .StartsAt(100000000L);
@@ -68,56 +68,6 @@ namespace QuantInfra.Databases.Main.Migrations
 
             modelBuilder.HasSequence<int>("ts_intervals_seq", "static_data")
                 .StartsAt(10000L);
-
-            modelBuilder.Entity("Common.Trading.Positions.PositionValue", b =>
-                {
-                    b.Property<int>("AccountId")
-                        .HasColumnType("integer")
-                        .HasColumnName("account_id");
-
-                    b.Property<long>("PositionId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("position_id");
-
-                    b.Property<Instant>("Dt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("dt");
-
-                    b.Property<decimal>("EquityValueInAccountCcy")
-                        .HasColumnType("numeric")
-                        .HasColumnName("equity_value_in_account_ccy");
-
-                    b.Property<decimal>("FxRate")
-                        .HasColumnType("numeric")
-                        .HasColumnName("fx_rate");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("numeric")
-                        .HasColumnName("price");
-
-                    b.Property<decimal>("SignedValue")
-                        .HasColumnType("numeric")
-                        .HasColumnName("signed_value");
-
-                    b.Property<decimal>("SignedValueInAccountCcy")
-                        .HasColumnType("numeric")
-                        .HasColumnName("signed_value_in_account_ccy");
-
-                    b.Property<string>("account_service_name")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("account_service_name");
-
-                    b.Property<long>("event_id")
-                        .HasColumnType("bigint")
-                        .HasColumnName("event_id");
-
-                    b.HasKey("AccountId", "PositionId", "Dt");
-
-                    b.HasIndex("account_service_name", "event_id");
-
-                    b.ToTable("end_of_day_positions", "events");
-                });
 
             modelBuilder.Entity("QuantInfra.Connectors.Binance.Common.BinanceUsdmMarketDataSubscription", b =>
                 {
@@ -1470,6 +1420,20 @@ namespace QuantInfra.Databases.Main.Migrations
                         .IsUnique();
 
                     b.ToTable("brokers", "static_data");
+
+                    b.HasData(
+                        new
+                        {
+                            BrokerId = 100,
+                            BrokerType = "Ibkr",
+                            Name = "Interactive Brokers"
+                        },
+                        new
+                        {
+                            BrokerId = 101,
+                            BrokerType = "BinanceUsdmFutures",
+                            Name = "Binance USD-m Futures"
+                        });
                 });
 
             modelBuilder.Entity("QuantInfra.Sdk.StaticData.CommissionStructure", b =>
@@ -1510,7 +1474,7 @@ namespace QuantInfra.Databases.Main.Migrations
                         .HasColumnType("text")
                         .HasColumnName("name");
 
-                    b.Property<int>("currency_id")
+                    b.Property<int?>("currency_id")
                         .HasColumnType("integer");
 
                     b.HasKey("CommissionId");
@@ -1766,6 +1730,13 @@ namespace QuantInfra.Databases.Main.Migrations
                         .IsUnique();
 
                     b.ToTable("datafeeds", "static_data");
+
+                    b.HasData(
+                        new
+                        {
+                            DatafeedId = 100,
+                            Name = "Default datafeed"
+                        });
                 });
 
             modelBuilder.Entity("QuantInfra.Sdk.StaticData.Exchange", b =>
@@ -1789,6 +1760,14 @@ namespace QuantInfra.Databases.Main.Migrations
                     b.HasKey("ExchangeId");
 
                     b.ToTable("exchanges", "static_data");
+
+                    b.HasData(
+                        new
+                        {
+                            ExchangeId = 119,
+                            Name = "Binance USD-m Futures",
+                            TimezoneName = "UTC"
+                        });
                 });
 
             modelBuilder.Entity("QuantInfra.Sdk.StaticData.FxConversionContract", b =>
@@ -1895,6 +1874,56 @@ namespace QuantInfra.Databases.Main.Migrations
                     b.ToTable("trading_session_intervals", "static_data");
                 });
 
+            modelBuilder.Entity("QuantInfra.Sdk.Trading.Positions.PositionValue", b =>
+                {
+                    b.Property<int>("AccountId")
+                        .HasColumnType("integer")
+                        .HasColumnName("account_id");
+
+                    b.Property<long>("PositionId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("position_id");
+
+                    b.Property<Instant>("Dt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("dt");
+
+                    b.Property<decimal>("EquityValueInAccountCcy")
+                        .HasColumnType("numeric")
+                        .HasColumnName("equity_value_in_account_ccy");
+
+                    b.Property<decimal>("FxRate")
+                        .HasColumnType("numeric")
+                        .HasColumnName("fx_rate");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric")
+                        .HasColumnName("price");
+
+                    b.Property<decimal>("SignedValue")
+                        .HasColumnType("numeric")
+                        .HasColumnName("signed_value");
+
+                    b.Property<decimal>("SignedValueInAccountCcy")
+                        .HasColumnType("numeric")
+                        .HasColumnName("signed_value_in_account_ccy");
+
+                    b.Property<string>("account_service_name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("account_service_name");
+
+                    b.Property<long>("event_id")
+                        .HasColumnType("bigint")
+                        .HasColumnName("event_id");
+
+                    b.HasKey("AccountId", "PositionId", "Dt");
+
+                    b.HasIndex("account_service_name", "event_id");
+
+                    b.ToTable("end_of_day_positions", "events");
+                });
+
             modelBuilder.Entity("contract_template_trading_sessions", b =>
                 {
                     b.Property<int>("contract_template_id")
@@ -1923,21 +1952,6 @@ namespace QuantInfra.Databases.Main.Migrations
                     b.HasIndex("commission_id");
 
                     b.ToTable("contract_templates_commissions", "static_data");
-                });
-
-            modelBuilder.Entity("Common.Trading.Positions.PositionValue", b =>
-                {
-                    b.HasOne("QuantInfra.Databases.Main.Models.Entities.AccountModel", null)
-                        .WithMany()
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("QuantInfra.Databases.Main.Models.Events.Event", null)
-                        .WithMany("EndOfDayPositions")
-                        .HasForeignKey("account_service_name", "event_id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("QuantInfra.Connectors.Binance.Common.BinanceUsdmMarketDataSubscription", b =>
@@ -2407,8 +2421,7 @@ namespace QuantInfra.Databases.Main.Migrations
                     b.HasOne("QuantInfra.Sdk.StaticData.Currency", "Currency")
                         .WithMany()
                         .HasForeignKey("currency_id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Currency");
                 });
@@ -2558,6 +2571,21 @@ namespace QuantInfra.Databases.Main.Migrations
                     b.HasOne("QuantInfra.Sdk.StaticData.TradingSession", null)
                         .WithMany("Days")
                         .HasForeignKey("TradingSessionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("QuantInfra.Sdk.Trading.Positions.PositionValue", b =>
+                {
+                    b.HasOne("QuantInfra.Databases.Main.Models.Entities.AccountModel", null)
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("QuantInfra.Databases.Main.Models.Events.Event", null)
+                        .WithMany("EndOfDayPositions")
+                        .HasForeignKey("account_service_name", "event_id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

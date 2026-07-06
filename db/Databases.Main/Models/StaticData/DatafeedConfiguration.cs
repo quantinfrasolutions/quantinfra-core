@@ -19,10 +19,17 @@ namespace QuantInfra.Databases.Main.Models.StaticData
         public static void CreateRelations(ModelBuilder modelBuilder)
 		{
 			modelBuilder.HasSequence<int>("datafeeds_seq", "static_data")
-				.StartsAt(100);
+				.StartsAt(101);
 			
 			modelBuilder.Entity<Datafeed>().HasIndex(d => d.Name).IsUnique();
-        }
+
+			modelBuilder.Entity<Datafeed>().HasData(
+				new Datafeed
+				{
+					DatafeedId = 100,
+					Name = "Default datafeed",
+				});
+		}
 	}
 }
 

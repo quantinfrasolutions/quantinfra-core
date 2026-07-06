@@ -1,0 +1,90 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using QuantInfra.Common.Interfaces.Api.StaticData
+@using UI.Interfaces.StaticData
+@using UI.SharedComponents.Components.StaticData.Contracts
+@using UI.SharedComponents.Components.StaticData.Datafeeds
+
+@inject IUiStaticDataRepository Repository
+
+<CreateItemForm TItem="CreateStreamRequest"
+                CreateFunc="@Repository.CreateStream"
+                OnCompleted="@OnCompleted"
+                @bind-IsLoading=@_isLoading>
+    <Fields Context="request">
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Ticker" Variant="Variant.Text">
+                    <ChildContent>
+                        <RadzenTextBox @bind-Value=@request.Ticker Disabled=@_isLoading />
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.Ticker)" class="rz-message rz-messages-error" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Datafeed" Variant="Variant.Text">
+                    <ChildContent>
+                        <DatafeedsSelector TValue="int" @bind-Value=@request.DatafeedId Required="true"/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.DatafeedId)" class="rz-message rz-messages-error" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Contract" Variant="Variant.Text">
+                    <ChildContent>
+                        <ContractsSelector TValue="int?" @bind-Value=@request.ContractId Required="false"/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.ContractId)" class="rz-message rz-messages-error" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenCheckBox TValue="bool" @bind-Value=@_isConstantValue Name="isConstantValue" Disabled="@(_isLoading)"/>
+                <RadzenLabel Text="Has constant value" Component="isConstantValue" Style="margin-left: 8px; vertical-align: middle;"/>
+            </RadzenColumn>
+        </RadzenRow>
+        @if (_isConstantValue)
+        {
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenFormField Text="Value" Variant="Variant.Text">
+                        <ChildContent>
+                            <RadzenNumeric TValue="decimal?" @bind-Value=@request.ConstantValue ShowUpDown="false" />
+                        </ChildContent>
+                        <Helper>
+                            <ValidationMessage For="@(() => request.ConstantValue)" class="rz-message rz-messages-error" />
+                        </Helper>
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+            @* <RadzenRow> *@
+            @*     <RadzenColumn Size="12"> *@
+            @*         <RadzenFormField Text="Value" Variant="Variant.Text"> *@
+            @*             <ChildContent> *@
+            @*                 <RadzenTextBox @bind-Value=@request.ConstantValueCron /> *@
+            @*             </ChildContent> *@
+            @*             <Helper> *@
+            @*                 <ValidationMessage For="@(() => request.ConstantValueCron)" class="rz-message rz-messages-error" /> *@
+            @*             </Helper> *@
+            @*         </RadzenFormField> *@
+            @*     </RadzenColumn> *@
+            @* </RadzenRow> *@
+        }
+    </Fields>
+</CreateItemForm>
+
+@code {
+    private bool _isLoading;
+    private bool _isConstantValue;
+    [Parameter] public EventCallback OnCompleted { get; set; }
+}

@@ -2,7 +2,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using QuantInfra.Api;
 using QuantInfra.Api.Client;
+using QuantInfra.Common.Interfaces.Api;
 using Radzen;
+using UI.Interfaces;
 using UI.Interfaces.Accounts;
 using UI.Interfaces.Infrastructure;
 using UI.Interfaces.StaticData;
@@ -36,6 +38,11 @@ public sealed partial class ApiRepository
          {
              await func();
              _notificationService.Notify(NotificationSeverity.Success, successMessage);
+         }
+         catch (SwaggerException<ValidationProblemDetails> ex)
+         {
+             _notificationService.Notify(NotificationSeverity.Error, errorMessage);
+             throw new ValidationException(ex.Result);
          }
          catch (Exception ex)
          {
@@ -101,13 +108,7 @@ public static class Extensions
         .AddScoped<ApiRepository>();
     
     public static IServiceCollection UseApiStaticDataRepository(this IServiceCollection sc) => sc
-        .AddScoped<IUiAssetsRepository>(sp => sp.GetRequiredService<ApiRepository>())
-        .AddScoped<IUiCurrenciesRepository>(sp => sp.GetRequiredService<ApiRepository>())
-        .AddScoped<IUiBrokersRepository>(sp => sp.GetRequiredService<ApiRepository>())
-        .AddScoped<IUiContractsRepository>(sp => sp.GetRequiredService<ApiRepository>())
-        .AddScoped<IUiExchangesRepository>(sp => sp.GetRequiredService<ApiRepository>())
-        .AddScoped<IUiStreamsRepository>(sp => sp.GetRequiredService<ApiRepository>())
-        .AddScoped<IUiCommissionsRepository>(sp => sp.GetRequiredService<ApiRepository>());
+        .AddScoped<IUiStaticDataRepository>(sp => sp.GetRequiredService<ApiRepository>());
     
     public static IServiceCollection UseApiAccountsRepository(this IServiceCollection sc) => sc
         .AddScoped<IUiAccountsRepository>(sp => sp.GetRequiredService<ApiRepository>());

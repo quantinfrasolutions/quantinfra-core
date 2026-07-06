@@ -1,0 +1,50 @@
+﻿@using QuantInfra.Common.Interfaces.Api.StaticData
+@using QuantInfra.Sdk.StaticData
+@using UI.Interfaces.StaticData
+@using UI.SharedComponents.Base
+
+@inject IUiStaticDataRepository Repository
+
+<EditableView TItem="AssetView"
+             TFilter="AssetFilter"
+             EmptyText="No assets found"
+             SearchFunc="@Repository.GetAssets"
+             Filter="@Filter"
+             RunSearchImmediately="false"
+             Variant=@Variant
+             HideActionsColumn=@(!EnableActions)
+             AllowSelectRow=@AllowSelect
+             SelectionMode="DataGridSelectionMode.Single"
+             SelectAction=@ValueChanged>
+    <SearchForm>
+        <AssetsFilterForm @bind-Filter=@Filter />
+    </SearchForm>
+    <CreateButton>
+        <CreateAssetButton ShowButton="true" />
+    </CreateButton>
+    <Columns>
+        <RadzenDataGridColumn TItem="AssetView" Property=@nameof(AssetView.AssetId) Width="100px" Title="Id" />
+        <RadzenDataGridColumn TItem="AssetView" Property=@nameof(AssetView.Name) Width="200px" Title="Name" />
+        <RadzenDataGridColumn TItem="AssetView" Property=@nameof(AssetView.AssetType) Width="200px" Title="Type" />
+        <RadzenDataGridColumn TItem="AssetView" Width="200px" Title="Decimals">
+            <Template Context="asset">
+                <span>@asset.Decimals</span>
+                @if (asset.DecimalOverridesExist)
+                {
+                    <span> (overrides)</span>
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="AssetView" Property=@nameof(AssetView.Description) MinWidth="200px" Title="Description" />
+    </Columns>
+</EditableView>
+
+@code {
+    [Parameter] public AssetFilter Filter { get; set; } = new();
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public bool AllowEdit { get; set; }
+    [Parameter] public bool AllowSelect { get; set; }
+    [Parameter] public Variant Variant { get; set; } = Variant.Filled;
+    [Parameter] public bool EnableActions { get; set; } = true;
+    [Parameter] public EventCallback<AssetView> ValueChanged { get; set; }
+}

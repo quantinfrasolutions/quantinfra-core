@@ -3,29 +3,29 @@
 
 @typeparam TValue
 
-<SearchSelector TKey="string"
-                TItem="ExecutionServiceListView"
-                Text="Execution service"
-                Required="true"
-                @ref=_selector
-                KeySelector="@(c => c.Name)"
-                LabelSelector="@(c => c.Name)"
-                Value=@(Value as string)
-                ValueChanged=@OnValueChanged
-                SomethingSelected="@(Value is string s && !string.IsNullOrEmpty(s))"
-                Disabled=@Disabled
->
-    <Selector>
-        <ESInstancesView AllowSelect="true" 
-                         ValueChanged=@_selector.OnSomethingSelected 
-                         Variant="Variant.Flat" 
-                         RunSearchImmediately="true" 
-                         EnableActions="false"/>
-    </Selector>
-</SearchSelector>
+@* <SearchSelector TKey="string" *@
+@*                 TItem="ExecutionServiceListView" *@
+@*                 Text="Execution service" *@
+@*                 Required="true" *@
+@*                 @ref=_selector *@
+@*                 KeySelector="@(c => c.Name)" *@
+@*                 LabelSelector="@(c => c.Name)" *@
+@*                 Value=@(Value as string) *@
+@*                 ValueChanged=@OnValueChanged *@
+@*                 SomethingSelected="@(Value is string s && !string.IsNullOrEmpty(s))" *@
+@*                 Disabled=@Disabled *@
+@* > *@
+@*     <Selector> *@
+@*         <ESInstancesView AllowSelect="true"  *@
+@*                          ValueChanged=@_selector.OnSomethingSelected  *@
+@*                          Variant="Variant.Flat"  *@
+@*                          RunSearchImmediately="true"  *@
+@*                          EnableActions="false"/> *@
+@*     </Selector> *@
+@* </SearchSelector> *@
 
 @code {
-    private SearchSelector<string, ExecutionServiceListView> _selector;
+    // private SearchSelector<string, ExecutionServiceListView> _selector;
     
     [Parameter] public TValue Value { get; set; }
     [Parameter] public EventCallback<TValue> ValueChanged { get; set; }

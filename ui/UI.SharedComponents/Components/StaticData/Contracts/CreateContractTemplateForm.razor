@@ -1,0 +1,244 @@
+﻿@using Microsoft.AspNetCore.Components.Forms
+@using QuantInfra.Common.Interfaces.Api.StaticData
+@using QuantInfra.Sdk.StaticData
+@using UI.Interfaces.StaticData
+@using UI.SharedComponents.Components.StaticData.Assets
+@using UI.SharedComponents.Components.StaticData.Brokers
+@using UI.SharedComponents.Components.StaticData.Datafeeds
+@using UI.SharedComponents.Components.StaticData.Exchanges
+@inject IUiStaticDataRepository Repository
+
+<CreateItemForm TItem="CreateContractTemplateRequest"
+                CreateFunc="@Repository.CreateContractTemplate"
+                OnCompleted="@OnCompleted">
+    <Fields Context="request">
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Variant="Variant.Text" Text="Name">
+                    <ChildContent>
+                        <RadzenTextBox @bind-Value=@request.Name Name="Name"/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.Name)" class="rz-message rz-messages-error" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Variant="Variant.Text" Text="Description">
+                    <RadzenTextBox @bind-Value=@request.Description/>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Variant="Variant.Text" Text="Security type">
+                    <ChildContent>
+                        <RadzenDropDown @bind-Value=@request.SecurityType Data=@(Enum.GetValues(typeof(SecurityType)).Cast<Enum>())/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.SecurityType)" class="rz-message rz-messages-error" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Variant="Variant.Text" Text="PnL calculator type">
+                    <ChildContent>
+                        <RadzenDropDown @bind-Value=@request.PlCalculatorType Data=@(Enum.GetValues(typeof(PLCalculatorType)).Cast<Enum>())/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.PlCalculatorType)" class="rz-message rz-messages-error" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Variant="Variant.Text" Text="Asset">
+                    <AssetsSelector TValue="int?" @bind-Value=@request.AssetId Required="false"/>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Variant="Variant.Text" Text="Min size">
+                    <ChildContent>
+                        <RadzenNumeric @bind-Value=@request.MinSize ShowUpDown="false"/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.MinSize)" class="rz-message rz-messages-error"/>
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Variant="Variant.Text" Text="Min size money">
+                    <ChildContent>
+                        <RadzenNumeric @bind-Value=@request.MinSizeMoney ShowUpDown="false"/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.MinSizeMoney)" class="rz-message rz-messages-error"/>
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Variant="Variant.Text" Text="Max size">
+                    <ChildContent>
+                        <RadzenNumeric @bind-Value=@request.MaxSize ShowUpDown="false"/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.MaxSize)" class="rz-message rz-messages-error"/>
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Variant="Variant.Text" Text="Max size money">
+                    <ChildContent>
+                        <RadzenNumeric @bind-Value=@request.MaxSizeMoney ShowUpDown="false"/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.MaxSizeMoney)" class="rz-message rz-messages-error"/>
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Variant="Variant.Text" Text="Size Increment">
+                    <ChildContent>
+                        <RadzenNumeric @bind-Value=@request.SizeIncrement ShowUpDown="false"/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.SizeIncrement)" class="rz-message rz-messages-error"/>
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Variant="Variant.Text" Text="Tick size">
+                    <ChildContent>
+                        <RadzenNumeric @bind-Value=@request.TickSize ShowUpDown="false"/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.TickSize)" class="rz-message rz-messages-error"/>
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        
+        @if (request.PlCalculatorType == PLCalculatorType.DefaultFutures)
+        {
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenFormField Variant="Variant.Text" Text="Tick value">
+                        <ChildContent>
+                            <RadzenNumeric @bind-Value=@request.TickValue ShowUpDown="false"/>
+                        </ChildContent>
+                        <Helper>
+                            <ValidationMessage For="@(() => request.TickValue)" class="rz-message rz-messages-error"/>
+                        </Helper>
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenFormField Variant="Variant.Text" Text="Price quotation">
+                        <ChildContent>
+                            <RadzenNumeric @bind-Value=@request.PriceQuotation ShowUpDown="false"/>
+                        </ChildContent>
+                        <Helper>
+                            <ValidationMessage For="@(() => request.PriceQuotation)" class="rz-message rz-messages-error"/>
+                        </Helper>
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+        }
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Settlement currency" Variant="Variant.Text">
+                    <ChildContent>
+                        <CurrenciesSelector TValue="int" @bind-Value=@request.SettlementCurrencyId />
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.SettlementCurrencyId)" class="rz-message rz-messages-error"/>
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        @* <RadzenRow> *@
+        @*     <RadzenColumn Size="12"> *@
+        @*         <DatafeedsSelector TValue="int?" @bind-Value=@request.DefaultDatafeedId Required="false"/> *@
+        @*     </RadzenColumn> *@
+        @* </RadzenRow> *@
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Variant="Variant.Text" Text="Commissions">
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Variant="Variant.Text" Text="Exchange">
+                    <ChildContent>
+                        <ExchangesSelector TValue="int" @bind-Value=@request.ExchangeId Required="true"/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.PriceQuotation)" class="rz-message rz-messages-error"/>
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        @if (request.ExchangeId != 0)
+        {
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenFormField Variant="Variant.Text" Text="Trading sessions">
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+        }
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Variant="Variant.Text" Text="Broker">
+                    <ChildContent>
+                        <BrokersSelector TValue="int" @bind-Value=@request.BrokerId Required="true"/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.BrokerId)" class="rz-message rz-messages-error"/>
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Variant="Variant.Text" Text="Days in year">
+                    <RadzenNumeric @bind-Value=@request.DaysInYear ShowUpDown="false" Min="1" Max="365" Step="1"/>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+    </Fields>
+</CreateItemForm>
+
+@code {
+    [Parameter] public EventCallback OnCompleted { get; set; }
+}
+

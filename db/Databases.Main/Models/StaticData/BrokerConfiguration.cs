@@ -22,9 +22,27 @@ namespace QuantInfra.Databases.Main.Models.StaticData
 		public static void CreateRelations(ModelBuilder modelBuilder)
 		{
 			modelBuilder.HasSequence<int>("brokers_seq", "static_data")
-				.StartsAt(100);
+				.StartsAt(102);
 			
 			modelBuilder.Entity<Broker>().HasIndex(b => b.Name).IsUnique(true);
+
+			modelBuilder.Entity<Broker>().HasData(
+				new Broker
+				{
+					BrokerId = 100,
+					Name = "Interactive Brokers",
+					BrokerType = BrokerType.Ibkr,
+				}
+			);
+			
+			modelBuilder.Entity<Broker>().HasData(
+				new Broker
+				{
+					BrokerId = 101,
+					Name = "Binance USD-m Futures",
+					BrokerType = BrokerType.BinanceUsdmFutures,
+				}
+			);
 		}
 	}
 }

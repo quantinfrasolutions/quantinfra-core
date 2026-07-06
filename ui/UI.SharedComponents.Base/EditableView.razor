@@ -33,15 +33,11 @@
                                 @SearchForm
                             }
 
-                            <RadzenButton Text="@SearchButtonText" Variant="Variant.Text" ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Disabled="@IsLoading"/>
+                            <RadzenButton Text="@SearchButtonText" Variant="Variant.Text" ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" IsBusy="@IsLoading"/>
                         }
                         @if (CreateButton != null && !HideAddUpdateDeleteButtons)
                         {
                             @CreateButton
-                        }
-                        else if (CreateAction != null && !HideAddUpdateDeleteButtons)
-                        {
-                            <RadzenButton ButtonStyle="ButtonStyle.Success" Text="Create" Variant="Variant.Text" Click=@Create />
                         }
                         @if (CustomButtons != null)
                         {
@@ -102,9 +98,7 @@
                                 <Template Context="item">
                                     @if (LookIntoHref != null && LookIntoHref(item) != null)
                                     {
-                                        <RadzenLink Path="@LookIntoHref(item)">
-                                            <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Info" Icon="search" />
-                                        </RadzenLink>
+                                        <RadzenLink Path="@LookIntoHref(item)" Icon="search" />
                                     }
                                     @if (CustomItemButtons != null)
                                     {
@@ -140,7 +134,6 @@
     [Parameter] public bool RunSearchImmediately { get; set; }
     [Parameter] public bool AllowSelectRow { get; set; }
     [Parameter] public Variant Variant { get; set; } = Variant.Filled;
-    [Parameter] public Func<TItem, Task>? CreateAction { get; set; }
     [Parameter] public RenderFragment<DialogService>? CreateDialogForm { get; set; }
     [Parameter] public RenderFragment<DialogService>? CreateDialogHeader { get; set; }
     [Parameter] public EventCallback<TItem> SelectAction { get; set; }
@@ -255,14 +248,5 @@
     {
         args.Expandable = RowExpandable?.Invoke(args.Data) == true;
     }
-
-    private async Task Create()
-    {
-        if (await DialogService.OpenAsync(CreateDialogHeader, CreateDialogForm))
-        {
-            
-        }
-    }
-
 }
 

@@ -1,0 +1,9 @@
+<CreateItemButton TForm="CreateExchangeForm"
+                  ShowButton="@ShowButton"
+                  DialogTitle="Create exchange"
+                  OnCompleted="@OnCompleted"/>
+
+@code {
+    [Parameter] public bool ShowButton { get; set; }
+    [Parameter] public EventCallback OnCompleted { get; set; }
+}

@@ -1,10 +1,15 @@
 ﻿using Common.StaticData.Abstractions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
+using NodaTime.Text;
 using QuantInfra.Common.Interfaces.Api.StaticData;
 using QuantInfra.Databases.Main;
 using QuantInfra.Sdk.StaticData;
+using Stream = QuantInfra.Sdk.StaticData.Stream;
 
 namespace QuantInfra.Core.Services.Api.StaticData;
 
@@ -23,19 +28,21 @@ public class StaticDataController(MainContext context, IStaticDataRepositoryRead
     [HttpPost]
     [Route("exchanges")]
     [EndpointName("CreateExchange")]
-    public async Task<IActionResult> CreateExchange([FromBody] Exchange exchange)
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CreateExchange([FromBody] CreateExchangeRequest request)
     {
-        throw new NotImplementedException();
-        // if (!NodaTime.DateTimeZoneProviders.Tzdb.Ids.Contains(exchange.TimezoneName))
-        // {
-        //     return BadRequest($"{exchange.TimezoneName} is not supported, use Tzdb list");
-        // }
-        //
-        // var e = new Databases.Main.Models.StaticData.Exchange(exchange);
-        // e.Id = 0;
-        // context.Exchanges.Add(e);
-        // await context.SaveChangesAsync();
-        // return Ok();
+        if (!NodaTime.DateTimeZoneProviders.Tzdb.Ids.Contains(request.TimezoneName))
+            ModelState.AddModelError(nameof(request.TimezoneName), "Invalid timezone name. Use tzdb list.");
+        
+        var existingExchange = await context.Exchanges.SingleOrDefaultAsync(e => e.Name.ToLower() == request.Name.ToLower());
+        if (existingExchange != null) ModelState.AddModelError(nameof(request.Name), $"Duplicate exchange name ({existingExchange.ExchangeId})");
+        
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
+
+        var exchange = request.ToExchange();
+        context.Exchanges.Add(exchange);
+        await context.SaveChangesAsync();
+        return Ok();
     }
 
     [HttpPut]
@@ -94,9 +101,9 @@ public class StaticDataController(MainContext context, IStaticDataRepositoryRead
         // return await context.GetTradingSessionsAsync(exchangeId);
     }
 
-    [HttpPost]
-    [Route("exchanges/{exchangeId}/trading-sessions")]
+    [HttpPost, Route("exchanges/{exchangeId}/trading-sessions")]
     [EndpointName("CreateTradingSession")]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateTradingSession([FromRoute] long exchangeId,
         [FromBody] TradingSession ts)
     {
@@ -179,21 +186,50 @@ public class StaticDataController(MainContext context, IStaticDataRepositoryRead
             .ToListAsync();
     }
 
-    // [HttpPost]
-    // [Route("streams")]
-    // [EndpointName("CreateStream")]
-    // public async Task<IActionResult> CreateStream([FromBody] StreamDefinition stream)
-    // {
-    //     throw new NotImplementedException();
-    //     // stream.StreamId = await context.AddStreamAsync(stream);
-    //     //
-    //     // if (stream.Enabled)
-    //     // {
-    //     //     _mdsNotificationQueue.PublishUnwrappedObject(new StreamEnabledChangedEvt(stream.StreamId, true));
-    //     // }
-    //     //
-    //     // return Ok();
-    // }
+    [HttpPost, Route("streams")]
+    [EndpointName(nameof(CreateStream))]
+    [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CreateStream([FromBody] CreateStreamRequest request)
+    {
+        if (string.IsNullOrEmpty(request.Ticker)) ModelState.AddModelError(nameof(request.Ticker), "Ticker is required");
+        var existingStream = await context.Streams.FirstOrDefaultAsync(s => s.Ticker == request.Ticker);
+        if (existingStream != null) ModelState.AddModelError(nameof(request.Ticker), $"Duplicate ticker ({existingStream.StreamId})");
+
+        if (request.DatafeedId == 0) ModelState.AddModelError(nameof(request.DatafeedId), $"Datafeed is required");
+        else
+        {
+            var df = await context.Datafeeds.SingleOrDefaultAsync(d => d.DatafeedId == request.DatafeedId);
+            if (df is null) ModelState.AddModelError(nameof(request.DatafeedId), "Datafeed doesn't exist");
+        }
+        
+        Contract? contract = null;
+        if (request.ContractId.HasValue)
+        {
+            contract = await context.Contracts.SingleOrDefaultAsync(c => c.ContractId == request.ContractId.Value);
+            if (contract is null) ModelState.AddModelError(nameof(request.ContractId), $"Contract doesn't exist");
+        }
+        
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
+
+        var stream = new Stream
+        {
+            Ticker = request.Ticker,
+            DatafeedId = request.DatafeedId,
+            Contract = contract,
+            ConstantStreamValue = request.ConstantValue.HasValue
+                ? new ConstantStreamValue { Value = request.ConstantValue.Value }
+                : null
+        };
+        context.Streams.Add(stream);
+        
+        await context.SaveChangesAsync();
+        return CreatedAtAction(
+            nameof(GetStreams),
+            null,
+            stream.StreamId
+        );
+    }
 
     /// <summary>
     /// Only the following fields can be updated: ContractId, Description, Enabled, VolumeBAU (change to 0 to disable volume aggregation), TradingSessionsId
@@ -229,17 +265,30 @@ public class StaticDataController(MainContext context, IStaticDataRepositoryRead
         return await context.Datafeeds.AsNoTracking().ToListAsync();
     }
 
-    [HttpPost]
-    [Route("datafeeds")]
-    [EndpointName("CreateDatafeed")]
-    public async Task<IActionResult> CreateDatafeed([FromBody] Datafeed datafeed)
+    [HttpPost, Route("datafeeds")]
+    [EndpointName(nameof(CreateDatafeed))]
+    [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CreateDatafeed([FromBody] CreateDatafeedRequest request)
     {
-        throw new NotImplementedException();
-        // var d = datafeed.FromDatafeed();
-        // d.DatafeedId = 0;
-        // context.Datafeeds.Add(d);
-        // await context.SaveChangesAsync();
-        // return Ok();
+        if (string.IsNullOrEmpty(request.Name)) ModelState.AddModelError(nameof(request.Name), "Name is required");
+        else
+        {
+            var existingDf = await context.Datafeeds.SingleOrDefaultAsync(df => df.Name == request.Name);
+            if (existingDf is not null) ModelState.AddModelError(nameof(request.Name), $"Duplicate name ({existingDf.DatafeedId})");
+        }
+        
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
+        
+        var df = new Datafeed { DatafeedId = 0, Name = request.Name };
+        context.Datafeeds.Add(df);
+        await context.SaveChangesAsync();
+        
+        return CreatedAtAction(
+            nameof(GetDatafeeds),
+            null,
+            df.DatafeedId
+        );
     }
 
     [HttpPut]
@@ -279,8 +328,7 @@ public class StaticDataController(MainContext context, IStaticDataRepositoryRead
 
     #region Currencies
         
-    [HttpGet]
-    [Route("currencies")]
+    [HttpGet, Route("currencies")]
     [EndpointName("GetCurrencies")]
     [Produces("application/json")]
     public async Task<IEnumerable<Currency>> GetCurrencies([FromQuery] CurrencyFilter? filter = null)
@@ -307,35 +355,66 @@ public class StaticDataController(MainContext context, IStaticDataRepositoryRead
     [Route("assets")]
     [EndpointName("GetAssets")]
     [Produces("application/json")]
-    public async Task<IEnumerable<Asset>> GetAssets([FromQuery] AssetFilter? filter = null)
+    public async Task<IEnumerable<AssetView>> GetAssets([FromQuery] AssetFilter? filter = null)
     {
         filter ??= new();
         filter.Name = filter.Name?.ToLower();
 
-        return await context.Assets
-            .Where(a =>
-                (filter.Id == null || filter.Id == a.AssetId)
-                && (string.IsNullOrEmpty(filter.Name) || a.Name.ToLower().Contains(filter.Name))
-                && (filter.AssetType == null || filter.AssetType == a.AssetType)
+        return (
+            await context.Assets
+                .Where(a =>
+                    (filter.Id == null || filter.Id == a.AssetId)
+                    && (string.IsNullOrEmpty(filter.Name) || a.Name.ToLower().Contains(filter.Name))
+                    && (filter.AssetType == null || filter.AssetType == a.AssetType)
+                )
+                .GroupJoin(
+                    context.Currencies.Include(c => c.BrokerOverrides),
+                    asset => asset.AssetId,
+                    currency => currency.CurrencyId,
+                    (asset, currencies) => new
+                    {
+                        Asset = asset,
+                        Currency = currencies.SingleOrDefault()
+                    }
+                )
+                .OrderBy(a => a.Asset.Name)
+                .Skip(filter.Offset)
+                .Take(filter.Limit)
+                .AsNoTracking()
+                .ToListAsync()
             )
-            .OrderBy(a => a.Name)
-            .Skip(filter.Offset)
-            .Take(filter.Limit)
-            .AsNoTracking()
-            .ToListAsync();
+            .Select(x => new AssetView(
+                x.Asset,
+                x.Currency?.Decimals,
+                x.Currency?.BrokerOverrides.Any() ?? false,
+                Array.Empty<string>()
+            ));
     }
 
-    [HttpPost]
-    [Route("assets")]
+    [HttpPost, Route("assets")]
     [EndpointName("CreateAsset")]
-    public async Task<IActionResult> CreateAsset([FromBody] Asset asset)
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CreateAsset([FromBody] CreateAssetRequest request)
     {
-        throw new NotImplementedException();
-        // var a = asset.FromAsset();
-        // a.Id = 0;
-        // context.Assets.Add(a);
-        // await context.SaveChangesAsync();
-        // return Ok();
+        if (string.IsNullOrEmpty(request.Name)) ModelState.AddModelError(nameof(request.Name), "Name is required");
+        var existingAsset = await context.Assets.SingleOrDefaultAsync(a => a.Name.ToLower() == request.Name.ToLower());
+        if (existingAsset != null) ModelState.AddModelError(nameof(request.Name), $"Duplicate asset name {existingAsset.Name} ({existingAsset.AssetId})");
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
+        
+        var asset = request.ToAsset();
+        context.Assets.Add(asset);
+
+        if (asset.AssetType == AssetType.Currency)
+        {
+            var currency = new Currency
+            {
+                Asset = asset,
+                Decimals = request.Decimals,
+            };
+            context.Currencies.Add(currency);
+        }
+        await context.SaveChangesAsync();
+        return Ok();
     }
 
     [HttpPut]
@@ -418,17 +497,92 @@ public class StaticDataController(MainContext context, IStaticDataRepositoryRead
             .ToListAsync();
     }
 
-    // [HttpPost]
-    // [Route("contract-templates")]
-    // [EndpointName("CreateContractTemplate")]
-    // public async Task<IActionResult> CreateContractTemplate([FromBody] CreateContractTemplateRequest request)
-    // {
-    //     throw new NotImplementedException();
-    //     // var ct = new Databases.Main.Models.Contracts.ContractTemplate(request);
-    //     // context.ContractTemplates.Add(ct);
-    //     // await context.SaveChangesAsync();
-    //     // return Ok();
-    // }
+    [HttpPost]
+    [Route("contract-templates")]
+    [EndpointName(nameof(CreateContractTemplate))]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CreateContractTemplate([FromBody] CreateContractTemplateRequest request)
+    {
+        if (string.IsNullOrEmpty(request.Name)) ModelState.AddModelError(nameof(request.Name), $"Name is required");
+        var existingTemplate = await context.ContractTemplates.AsNoTracking().SingleOrDefaultAsync(c => c.Name == request.Name);
+        if (existingTemplate is not null) ModelState.AddModelError(nameof(request.Name), $"Duplicate name ({existingTemplate.TemplateId})");
+
+        if (request is { PlCalculatorType: PLCalculatorType.DefaultFutures, TickValue: null }) 
+            ModelState.AddModelError(nameof(request.TickValue), $"TickValue is required for futures");
+
+        Asset? asset = null;
+        if (request.AssetId.HasValue)
+        {
+            asset = await context.Assets.SingleOrDefaultAsync(a => a.AssetId == request.AssetId.Value);
+            if (asset == null) ModelState.AddModelError(nameof(request.AssetId), $"Asset {request.AssetId} not found");
+        }
+
+        Currency? settlCcy = null;
+        if (request.SettlementCurrencyId == 0) ModelState.AddModelError(nameof(request.SettlementCurrencyId), "Settlement currency is required");
+        else
+        {
+            settlCcy = await context.Currencies.SingleOrDefaultAsync(c => c.CurrencyId == request.SettlementCurrencyId);
+            if (settlCcy == null) ModelState.AddModelError(nameof(request.SettlementCurrencyId), $"Currency {request.SettlementCurrencyId} not found");
+        }
+        
+        Currency? baseCcy = null, quoteCcy = null;
+        if (request.BaseCurrencyId == 0) ModelState.AddModelError(nameof(request.BaseCurrencyId), "Settlement currency is required");
+        else
+        {
+            settlCcy = await context.Currencies.SingleOrDefaultAsync(c => c.CurrencyId == request.SettlementCurrencyId);
+            if (settlCcy == null) ModelState.AddModelError(nameof(request.SettlementCurrencyId), $"Currency {request.SettlementCurrencyId} not found");
+        }
+
+        Datafeed? df = null;
+        if (request.DefaultDatafeedId.HasValue)
+        {
+            df = await context.Datafeeds.SingleOrDefaultAsync(d => d.DatafeedId == request.DefaultDatafeedId);
+            if (df == null) ModelState.AddModelError(nameof(request.DefaultDatafeedId), $"Datafeed {request.DefaultDatafeedId} not found");
+        }
+
+        List<CommissionStructure> commissions = new();
+        if (request.CommissionIds.Count > 0)
+        {
+            commissions = await context.Commissions.Where(c => request.CommissionIds.Contains(c.CommissionId)).ToListAsync();
+            var missingCommissions = request.CommissionIds.Except(commissions.Select(c => c.CommissionId)).ToList();
+            if (missingCommissions.Any()) ModelState.AddModelError(nameof(request.CommissionIds), $"Commissions {string.Join(", ", missingCommissions)} not found");
+        }
+
+        List<TradingSession> tradingSessions = new();
+        if (request.TradingSessionsIds.Count > 0)
+        {
+            tradingSessions = await context.TradingSessions.Where(c => request.TradingSessionsIds.Contains(c.TradingSessionId)).ToListAsync();
+            var missingTradingSessions = request.TradingSessionsIds.Except(tradingSessions.Select(c => c.TradingSessionId)).ToList();
+            if (missingTradingSessions.Any()) ModelState.AddModelError(nameof(request.TradingSessionsIds), $"TradingSessions {string.Join(", ", missingTradingSessions)} not found");
+        }
+
+        Exchange? exchange = null;
+        if (request.ExchangeId == 0) ModelState.AddModelError(nameof(request.ExchangeId), $"Exchange is required");
+        else
+        {
+            exchange = await context.Exchanges.SingleOrDefaultAsync(e => e.ExchangeId == request.ExchangeId);
+            if (exchange == null) ModelState.AddModelError(nameof(request.ExchangeId), $"Exchange {request.ExchangeId} not found");
+        }
+
+        Broker? broker = null;
+        if (request.BrokerId == 0) ModelState.AddModelError(nameof(request.BrokerId), $"Broker is required");
+        else
+        {
+            broker = await context.Brokers.SingleOrDefaultAsync(b => b.BrokerId == request.BrokerId);
+            if (broker == null)
+                ModelState.AddModelError(nameof(request.BrokerId), $"Broker {request.BrokerId} not found");
+        }
+
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
+        
+        var ct = new ContractTemplate(0, request.Name, request.SecurityType, asset, request.MinSize, request.MinSizeMoney,
+            request.MaxSize, request.MaxSizeMoney, request.SizeIncrement, request.TickSize, request.TickValue ?? request.TickSize, request.PriceQuotation,
+            settlCcy!, request.PlCalculatorType, baseCcy, quoteCcy, 
+            df, commissions, tradingSessions, exchange!, broker!, request.DaysInYear, request.Description);
+        context.ContractTemplates.Add(ct);
+        await context.SaveChangesAsync();
+        return Ok();
+    }
 
     #endregion
         
@@ -457,21 +611,67 @@ public class StaticDataController(MainContext context, IStaticDataRepositoryRead
     // public async Task<Dictionary<long, BaseTradeSize>> GetBaseTradeSizes() =>
     //     (await _sdRepository.GetCurrentBaseTradeSizesAsync()).ToDictionary(bts => bts.ContractId, bts => bts);
     //
-    // [HttpPost]
-    // [Route("contracts")]
-    // [EndpointName("CreateContract")]
-    // public async Task<IActionResult> CreateContract([FromBody] CreateContractRequest request)
-    // {
-    //     if (request.Template != null)
-    //     {
-    //         await _sdRepository.CreateContractAsync(request.ContractDefinition.ToContractDefinition(), request.Template.ToContractTemplate());
-    //     }
-    //     else
-    //     {
-    //         await _sdRepository.CreateContractAsync(request.ContractDefinition.ToContractDefinition());
-    //     }
-    //     return Ok();
-    // }
+    [HttpPost, Route("contracts")]
+    [EndpointName(nameof(CreateContract))]
+    [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CreateContract([FromBody] CreateContractRequest request)
+    {
+        if (string.IsNullOrEmpty(request.Ticker)) ModelState.AddModelError(nameof(request.Ticker), "Ticker is required");
+        var existingContract = await context.Contracts.SingleOrDefaultAsync(c => c.Ticker == request.Ticker);
+        if (existingContract != null) ModelState.AddModelError(nameof(request.Ticker), $"Duplicate ticker ({existingContract.ContractId})");
+
+        var template = await context.ContractTemplates.Include(t => t.Asset)
+            .SingleOrDefaultAsync(t => t.TemplateId == request.TemplateId);
+        if (template == null) ModelState.AddModelError(nameof(request.TemplateId), $"Template {request.TemplateId} not found");
+        
+        if (template is not null && template.Asset is null && request.AssetId is null)
+            ModelState.AddModelError(nameof(request.AssetId), $"Template doesn't contain as asset, so it must be specified in the contract");
+
+        Asset? asset = null;
+        if (request.AssetId.HasValue)
+        {
+            asset = await context.Assets.SingleOrDefaultAsync(a => a.AssetId == request.AssetId.Value);
+            if (asset == null) ModelState.AddModelError(nameof(request.AssetId), $"Asset {request.AssetId} not found");
+        }
+
+        LocalDate? firstTradingDate = null, expirationDate = null;
+        if (!string.IsNullOrEmpty(request.FirstTradingDate))
+            firstTradingDate = LocalDatePattern.Iso.Parse(request.FirstTradingDate).Value;
+        if (!string.IsNullOrEmpty(request.ExpirationDate))
+            expirationDate = LocalDatePattern.Iso.Parse(request.ExpirationDate).Value;
+        
+        var datafeed = await context.Datafeeds.SingleOrDefaultAsync(c => c.DatafeedId == request.DefaultDatafeedId);
+        if (datafeed is null) ModelState.AddModelError(nameof(request.DefaultDatafeedId), $"Datafeed {request.DefaultDatafeedId} not found");
+        
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
+
+        var contract = new Contract(0, request.Ticker, template!, firstTradingDate, expirationDate, request.SyntheticContractType,
+            request.SynthRequiresBarRecalculationAtRollover, null, request.ExternalContractId, asset, request.Description, null,
+            request.DefaultDatafeedId
+        );
+        context.Contracts.Add(contract);
+        
+        await context.SaveChangesAsync();
+
+        var streamCollision = await context.Streams.SingleOrDefaultAsync(s => s.StreamId == contract.ContractId);
+        
+        var stream = new Stream
+        {
+            StreamId = streamCollision is null ? contract.ContractId : 0,
+            Contract = contract,
+            DatafeedId = contract.DefaultDatafeedId,
+            Ticker = contract.Ticker,
+        };
+        context.Streams.Add(stream);
+        
+        await context.SaveChangesAsync();
+        return CreatedAtAction(
+            nameof(GetContracts),
+            null,
+            contract.ContractId
+        );
+    }
     //
     // [HttpPut]
     // [Route("contracts/{contractId}")]
@@ -613,19 +813,68 @@ public class StaticDataController(MainContext context, IStaticDataRepositoryRead
     //     )
     //     .Select(cs => new CommissionStructureView(cs, cs.Exchange?.Name, cs.Broker?.Name))
     //     .Single();
-    //
-    // [HttpPost]
-    // [Route("commission-structures")]
-    // [EndpointName("CreateCommissionStructure")]
-    // public async Task<IActionResult> CreateCommissionStructure([FromBody] CommissionStructure commissionStructure)
-    // {
-    //     var cs = new Databases.Main.Models.Contracts.CommissionStructure(commissionStructure);
-    //     cs.Id = 0;
-    //     context.CommissionStructures.Add(cs);
-    //     await context.SaveChangesAsync();
-    //     return Ok();
-    // }
-    //
+    
+    [HttpPost, Route("commission-structures")]
+    [EndpointName(nameof(CreateCommissionStructure))]
+    [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CreateCommissionStructure([FromBody] CreateCommissionRequest request)
+    {
+        if (string.IsNullOrEmpty(request.Name)) ModelState.AddModelError(nameof(request.Name), "Name is required");
+        else
+        {
+            var existingComm = await context.Commissions.SingleOrDefaultAsync(c => c.Name == request.Name);
+            if (existingComm != null) ModelState.AddModelError(nameof(request.Name), $"Duplicate name ({existingComm.CommissionId})");
+        }
+
+        Currency? currency = null;
+        if (request.FixedPerShare != 0)
+        {
+            if (request.CurrencyId == 0) ModelState.AddModelError(nameof(request.CurrencyId), "Currency is required for fixed commissions");
+            else
+            {
+                currency = await context.Currencies.SingleOrDefaultAsync(c => c.CurrencyId == request.CurrencyId);
+                if (currency is null) ModelState.AddModelError(nameof(request.CurrencyId), $"Currency {request.CurrencyId} not found");
+            }
+        }
+
+        Broker? broker = null;
+        if (request.BrokerId.HasValue)
+        {
+            broker = await context.Brokers.SingleOrDefaultAsync(b => b.BrokerId == request.BrokerId.Value);
+            if (broker is null) ModelState.AddModelError(nameof(request.BrokerId),  $"Broker {request.BrokerId.Value} not found");
+        }
+        
+        Exchange? exchange = null;
+        if (request.ExchangeId.HasValue)
+        {
+            exchange = await context.Exchanges.SingleOrDefaultAsync(b => b.ExchangeId == request.ExchangeId.Value);
+            if (broker is null) ModelState.AddModelError(nameof(request.ExchangeId),  $"Exchange {request.ExchangeId.Value} not found");
+        }
+        
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
+
+        var comm = new CommissionStructure()
+        {
+            CommissionId = 0,
+            CommissionStructureType = request.CommissionStructureType,
+            BrokerId = request.BrokerId,
+            Currency = currency,
+            Description = request.Description,
+            ExchangeId = request.ExchangeId,
+            FixedPerShare = request.FixedPerShare,
+            Floating = request.Floating,
+            Name = request.Name,
+        };
+        context.Commissions.Add(comm);
+        await context.SaveChangesAsync();
+        return CreatedAtAction(
+            nameof(GetCommissionStructures),
+            null,
+            comm.CommissionId
+        );
+    }
+    
     // [HttpPut]
     // [Route("commission-structures/{id:long}")]
     // [EndpointName("UpdateCommissionStructure")]

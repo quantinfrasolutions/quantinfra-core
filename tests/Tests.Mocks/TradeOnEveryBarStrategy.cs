@@ -13,7 +13,7 @@ public class TradeOnEveryBarStrategyConfig
 
 public class TradeOnEveryBarStrategy : AbstractSingleBarHostedStrategy<TradeOnEveryBarStrategyConfig>
 {
-    public TradeOnEveryBarStrategy(StrategyConfig sc) : base(sc)
+    public TradeOnEveryBarStrategy(Strategy sc) : base(sc)
     {
     }
 

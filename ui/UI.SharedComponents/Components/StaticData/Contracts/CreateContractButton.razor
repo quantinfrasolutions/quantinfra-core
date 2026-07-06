@@ -1,0 +1,9 @@
+<CreateItemButton TForm="CreateContractForm"
+                  ShowButton="@ShowButton"
+                  DialogTitle="Create contract"
+                  OnCompleted="@OnCompleted"/>
+
+@code {
+    [Parameter] public bool ShowButton { get; set; }
+    [Parameter] public EventCallback OnCompleted { get; set; }
+}

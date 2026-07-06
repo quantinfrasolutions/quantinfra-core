@@ -106,7 +106,7 @@ public class LocalTestServer : ITestServer, ITypeResolver
         if (action is null) throw new ArgumentException($"Action {unit.Action} not found");
         
         var requiredMarketData = action.GetMarketDataRequirements(unit);
-        var reqs = await ValidateRequiredMarketDataInternal(unit.Options, requiredMarketData);
+        var reqs = await ValidateRequiredMarketDataInternal(unit.Options, unit.ContractOverride, requiredMarketData);
         return reqs.mdUnits;
     }
 
@@ -120,18 +120,10 @@ public class LocalTestServer : ITestServer, ITypeResolver
     }
 
     private async Task<(IReadOnlyCollection<RequiredMarketDataUnit> mdUnits, IReadOnlyCollection<int> fxConversionContracts, IReadOnlyCollection<ConstantStreamValue> constantStreams)> 
-        ValidateRequiredMarketDataInternal(TestExecutorOptions options, IReadOnlyCollection<MarketDataRequirement> md)
+        ValidateRequiredMarketDataInternal(TestExecutorOptions options, ContractOverride? contractOverride, IReadOnlyCollection<MarketDataRequirement> md)
     {
-        // TODO: this logic dosn't belong here as it's shared between different test servers
         List<RequiredMarketDataUnit> reqs = new();
         
-        // var contractIds = candles
-        //     .SelectMany(s => s.Symbols.Values)
-        //     .Union(candles.SelectMany(s =>
-        //         s.RequiredBarStorages.Values.Where(bs => bs.IdType == IdType.Contract).Select(bs => bs.Id))
-        //     )
-        //     .Distinct()
-        //     .ToList();
         var contractIds = md.SelectMany(x => x.ContractIds).Distinct().ToList();
         
         var fxConversions = md.SelectMany(
@@ -144,11 +136,11 @@ public class LocalTestServer : ITestServer, ITypeResolver
             );
         
         var streamIds = md.SelectMany(s => s.StreamIds).Distinct().ToList();
-
+    
         HashSet<int> fxConversionContracts = new();
         List<ConstantStreamValue> constantStreams = new();
         
-        await ProcessContracts(options, contractIds, reqs, fxConversions, fxConversionContracts, constantStreams);
+        await ProcessContracts(options, contractIds, reqs, fxConversions, fxConversionContracts, constantStreams, contractOverride);
         
         
         streamIds = streamIds.Distinct().ToList();
@@ -160,23 +152,38 @@ public class LocalTestServer : ITestServer, ITypeResolver
             
             return new RequiredMarketDataUnit() { StreamId = s, StreamTicker = stream.Ticker, IsOk = true };
         }));
-
+    
         var storage = GetMarketDataStorage();
         var res = await storage.ValidateRequiredMarketData(reqs, options.CandlesTimeframe);
         return (res, fxConversionContracts,  constantStreams);
     }
     
     private async Task ProcessContracts(TestExecutorOptions options, IReadOnlyCollection<int> contractIds,
-        List<RequiredMarketDataUnit> results, Dictionary<int, HashSet<int>> contractToAccountsCcy, 
-        HashSet<int> fxConversionContracts, List<ConstantStreamValue> constantStreams
-    )
+        List<RequiredMarketDataUnit> results, Dictionary<int, HashSet<int>> contractToAccountsCcy,
+        HashSet<int> fxConversionContracts, List<ConstantStreamValue> constantStreams, ContractOverride? contractOverride)
     {
         var contracts = (await Task.Run(() => _sdProvider.GetContracts(contractIds))).ToDictionary(c => c.ContractId);
         
         var notExistingContracts = contractIds.Except(contracts.Keys).ToList();
-        foreach (var cid in notExistingContracts)
+        if (notExistingContracts.Any())
         {
-            results.Add(new RequiredMarketDataUnit { ContractId = cid, IsOk = false, Message = "Contract does not exist" });
+            if (contractOverride is not null)
+            {
+                var currency = await Task.Run(() => _sdProvider.GetCurrency(840));
+                var template = GetTemplateForContractOverride(currency!, contractOverride);
+                foreach (var cid in notExistingContracts)
+                {
+                    contracts.Add(cid, new(cid, $"{cid}", template, null, null, null, null, null, null, null, null,
+                        [new() { DatafeedId = -1, StreamId = cid, Ticker = $"{cid}"}], -1));
+                }
+            }
+            else
+            {
+                foreach (var cid in notExistingContracts)
+                {
+                    results.Add(new RequiredMarketDataUnit { ContractId = cid, IsOk = false, Message = "Contract does not exist" });
+                }
+            }
         }
 
         HashSet<int> missingContracts = new();
@@ -252,7 +259,7 @@ public class LocalTestServer : ITestServer, ITypeResolver
         }
         
         if (missingContracts.Any()) await ProcessContracts(options, missingContracts, results,  contractToAccountsCcy, 
-            fxConversionContracts, constantStreams);
+            fxConversionContracts, constantStreams, contractOverride);
     }
 
     private readonly SemaphoreSlim _executionSemaphore = new(1); // TODO: add concurrency to config
@@ -283,9 +290,9 @@ public class LocalTestServer : ITestServer, ITypeResolver
             await _testUnitsRepository.SetUnitStatus(unitId, TestUnitStatus.Running);
 
             var requiredMarketData = action.GetMarketDataRequirements(unit);
-            var reqs = await ValidateRequiredMarketDataInternal(unit.Options, requiredMarketData);
+            var reqs = await ValidateRequiredMarketDataInternal(unit.Options, unit.ContractOverride, requiredMarketData);
 
-            var testSdProvider = await GetTestStaticDataProvider(requiredMarketData, reqs.mdUnits, reqs.fxConversionContracts, reqs.constantStreams);
+            var testSdProvider = await GetTestStaticDataProvider(unit.ContractOverride, requiredMarketData, reqs.mdUnits, reqs.fxConversionContracts, reqs.constantStreams);
             var contractTradingSessions = reqs.mdUnits
                 .Where(c => c.ContractId.HasValue)
                 .ToDictionary(
@@ -384,22 +391,66 @@ public class LocalTestServer : ITestServer, ITypeResolver
             .ToDictionary(x => x.Name, x => x.instance);
     }
     
-    private async Task<TestStaticDataRepository> GetTestStaticDataProvider(
+    private async Task<TestStaticDataRepository> GetTestStaticDataProvider(ContractOverride? contractOverride,
         IReadOnlyCollection<MarketDataRequirement> requiredMarketData, IReadOnlyCollection<RequiredMarketDataUnit> reqs,
         IReadOnlyCollection<int> fxConversionContracts,
-        IReadOnlyCollection<ConstantStreamValue> constantStreams)
+        IReadOnlyCollection<ConstantStreamValue> constantStreams
+    )
     {
-        // var sdProvider = GetStaticDataProvider();
-        
         var testSdProvider = new TestStaticDataRepository();
         var contractIds = reqs
             .Where(r => r.ContractId.HasValue)
             .Select(r => r.ContractId!.Value)
             .ToList();
-        
-        var contracts = await Task.Run(() => _sdProvider.GetContracts(contractIds));
-        foreach (var contract in contracts)
+
+        ContractTemplate? overrideTemplate = null;
+        var usd = await Task.Run(() => _sdProvider.GetCurrency(840));
+        if (contractOverride is not null) overrideTemplate = GetTemplateForContractOverride(usd!, contractOverride);
+
+        var contracts = (await Task.Run(() => _sdProvider.GetContracts(contractIds))).ToDictionary(c => c.ContractId);
+        foreach (var cid in contractIds)
         {
+            Contract? contract = null;
+
+            if (contracts.TryGetValue(cid, out var c))
+            {
+                if (contractOverride?.OverrideAllContracts == true)
+                {
+                    var template = new ContractTemplate(c.Template.TemplateId, c.Template.Name,
+                        c.Template.SecurityType, c.Template.Asset, c.Template.MinSize, c.Template.MinSizeMoney,
+                        c.Template.MaxSize, c.Template.MaxSizeMoney, c.Template.SizeIncrement, c.Template.TickSize,
+                        c.Template.TickValue, c.Template.PriceQuotation, c.Template.SettlementCurrency,
+                        c.Template.PlCalculatorType, c.Template.BaseCurrency, c.Template.QuoteCurrency,
+                        c.Template.DefaultDatafeed, 
+                        [new CommissionStructure
+                        {
+                            CommissionId = -1, 
+                            CommissionStructureType = CommissionStructureType.Other,
+                            Currency = usd,
+                            FixedPerShare = contractOverride.CostPerShare,
+                            Floating = contractOverride.FloatingCost,
+                        }], 
+                        c.Template.TradingSessions, c.Template.Exchange, c.Template.Broker, 
+                        c.Template.DaysInYear, c.Template.Description);
+
+                    contract = new(c.ContractId, c.Ticker, template, c.FirstTradingDate, c.ExpirationDate,
+                        c.SyntheticContractType,
+                        c.SynthRequiresBarRecalculationAtRollover, c.SyntheticContractCompositionHistory,
+                        c.ExternalContractId,
+                        c.Asset, c.Description, c.Streams, c.DefaultDatafeedId);
+                }
+                else contract = c;
+            }
+            else if (overrideTemplate is not null)
+            {
+                contract = new(cid, $"{cid}", overrideTemplate, null, null,
+                    null, null, null, null,
+                    new() { AssetId = cid },
+                    null,
+                    [new() { DatafeedId = -1, StreamId = cid, Ticker = $"{cid}" }], -1);
+            }
+            
+            if (contract is null) throw new Exception($"Unable to find contract with id {cid}, and no override was provided");
             testSdProvider.TryAddContract(contract);
             if (fxConversionContracts.Contains(contract.ContractId)) testSdProvider.TryAddFxConversionContract(contract);
         }
@@ -425,9 +476,9 @@ public class LocalTestServer : ITestServer, ITypeResolver
             testSdProvider.TryAddConstantStreamValue(csv);
         }
         
-        var currencies = contracts.Select(c => c.Template.SettlementCurrency)
-            .Union(contracts.Where(c => c.Template.BaseCurrency is not null).Select(c => c.Template.BaseCurrency))
-            .Union(contracts.Where(c => c.Template.QuoteCurrency is not null).Select(c => c.Template.QuoteCurrency))
+        var currencies = contracts.Values.Select(c => c.Template.SettlementCurrency)
+            .Union(contracts.Values.Where(c => c.Template.BaseCurrency is not null).Select(c => c.Template.BaseCurrency))
+            .Union(contracts.Values.Where(c => c.Template.QuoteCurrency is not null).Select(c => c.Template.QuoteCurrency))
             .ToList();
         foreach (var currency in currencies)
         {
@@ -442,6 +493,30 @@ public class LocalTestServer : ITestServer, ITypeResolver
 
         return testSdProvider;
     }
+    
+    private ContractTemplate GetTemplateForContractOverride(Currency usd, ContractOverride contractOverride) =>
+        new(-1, "Override", contractOverride.SecurityType, null, 
+            contractOverride.MinSize, contractOverride.MinSizeMoney,
+            contractOverride.MaxSize, contractOverride.MaxSizeMoney,
+            contractOverride.SizeIncrement, contractOverride.TickSize, contractOverride.TickValue, 1, usd!,
+            contractOverride.PlCalculatorType, null, null,
+            new Datafeed() { DatafeedId = -1 },
+            [
+                new CommissionStructure()
+                {
+                    CommissionId = -1,
+                    CommissionStructureType = CommissionStructureType.Other,
+                    FixedPerShare = contractOverride.CostPerShare,
+                    Floating = contractOverride.FloatingCost,
+                    Currency = usd,
+                }
+            ],
+            Array.Empty<TradingSession>(),
+            new Exchange() { ExchangeId = -1 },
+            new Broker() { BrokerId = -1 },
+            252,
+            null
+        );
     
     private static readonly Lazy<JsonSerializerOptions> Options = new(() =>
     {

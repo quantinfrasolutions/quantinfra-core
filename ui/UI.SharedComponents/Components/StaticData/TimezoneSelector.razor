@@ -1,14 +1,28 @@
+@using QuantInfra.Common.Interfaces.Api
 <RadzenFormField Variant="Variant.Text" Text="Time zone">
-    <RadzenDropDown Value="@Value"
-                    ValueChanged="@ValueChanged"
-                    Data="@NodaTime.DateTimeZoneProviders.Tzdb.Ids" 
-                    TValue="string" 
-                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
-                    FilterOperator="StringFilterOperator.Contains" 
-                    AllowFiltering="true" />
+    <ChildContent>
+        <RadzenDropDown Value="@Value"
+                        ValueChanged="@ValueChanged"
+                        Data="@NodaTime.DateTimeZoneProviders.Tzdb.Ids"
+                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                        FilterOperator="StringFilterOperator.Contains"
+                        AllowFiltering="true"
+                        Name="Timezone"
+                        Disabled="@Disabled"/>
+    </ChildContent>
+    <Helper>
+        <RadzenRequiredValidator Component="Timezone" Text="Required"/>
+        @if (!string.IsNullOrEmpty(FieldName))
+        {
+            <ServerValidationErrors Details=@ServerError FieldName=@FieldName ComponentName="Timezone"/>
+        }
+    </Helper>
 </RadzenFormField>
 
 @code {
     [Parameter] public string Value { get; set; } = "UTC";
     [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public ValidationProblemDetails? ServerError { get; set; }
+    [Parameter] public string? FieldName { get; set; }
+    [Parameter] public bool Disabled { get; set; }
 }

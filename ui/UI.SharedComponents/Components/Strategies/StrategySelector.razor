@@ -4,26 +4,26 @@
 
 @typeparam TValue
 
-<SearchSelector TKey="int?"
-                TItem="StrategyViewBrief"
-                Text="Strategy"
-                Required=@Required
-                @ref=_selector
-                KeySelector="@(c => c.StrategyId)"
-                LabelSelector="@(c => c.Name)"
-                Value=@(Value as int?)
-                ValueChanged=@OnValueChanged
-                LabelChanged=@LabelChanged
-                SomethingSelected="@(Value is int? && Value as int? != 0)"
-                Disabled=@Disabled
-                >
-    <Selector>
-        <StrategiesView AllowSelect="true" ValueChanged=@_selector.OnSomethingSelected Variant="Variant.Flat" EnableActions="false" Columns=@(new List<string> { "StrategyId", "IsActive", "Name", "StrategyClassName" })/>
-    </Selector>
-</SearchSelector>
+@* <SearchSelector TKey="int?" *@
+@*                 TItem="StrategyViewBrief" *@
+@*                 Text="Strategy" *@
+@*                 Required=@Required *@
+@*                 @ref=_selector *@
+@*                 KeySelector="@(c => c.StrategyId)" *@
+@*                 LabelSelector="@(c => c.Name)" *@
+@*                 Value=@(Value as int?) *@
+@*                 ValueChanged=@OnValueChanged *@
+@*                 LabelChanged=@LabelChanged *@
+@*                 SomethingSelected="@(Value is int? && Value as int? != 0)" *@
+@*                 Disabled=@Disabled *@
+@*                 > *@
+@*     <Selector> *@
+@*         <StrategiesView AllowSelect="true" ValueChanged=@_selector.OnSomethingSelected Variant="Variant.Flat" EnableActions="false" Columns=@(new List<string> { "StrategyId", "IsActive", "Name", "StrategyClassName" })/> *@
+@*     </Selector> *@
+@* </SearchSelector> *@
 
 @code {
-    private SearchSelector<int?, StrategyViewBrief> _selector;
+    // private SearchSelector<int?, StrategyViewBrief> _selector;
     
     [Parameter] public TValue Value { get; set; }
     [Parameter] public EventCallback<TValue> ValueChanged { get; set; }
