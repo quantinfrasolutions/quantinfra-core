@@ -1,0 +1,25 @@
+@using QuantInfra.Common.Backtesting.Abstractions
+
+<RadzenCard>
+    <RadzenDataGrid TItem="MetricsRecord" Data=@Data?.Rows IsLoading="@IsLoading" Density="Density.Compact">
+        <Columns>
+            <RadzenDataGridColumn Property="@nameof(MetricsRecord.StrategyId)" Title="StrategyId" Width="120px" />
+            <RadzenDataGridColumn Property="@nameof(MetricsRecord.Label)" Title="Label" Width="120px" />
+            @if (Data is not null)
+            {
+                foreach (var c in Data.Columns)
+                {
+                    <RadzenDataGridColumn TItem="MetricsRecord" Title="@c" Width="150px">
+                        <Template Context="row">@row.Columns[c]</Template>
+                    </RadzenDataGridColumn>
+                }
+            }
+            <RadzenDataGridColumn MinWidth="0" />
+        </Columns>
+    </RadzenDataGrid>
+</RadzenCard>
+
+@code {
+    [Parameter, EditorRequired] public MetricsTable? Data { get; set; }
+    [Parameter] public bool IsLoading { get; set; }
+}

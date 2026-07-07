@@ -14,4 +14,5 @@ public interface ITestResultsRepositoryReadonly
     Task<IReadOnlyList<BalanceValue>> GetEndOfDayBalances(Guid unitId, AccountEndOfDayBalancesFilter filter);
     Task<IReadOnlyList<Trade>> GetTrades(Guid unitId, TradeFilter filter);
     Task<IReadOnlyList<(Position, PositionValue)>> GetEndOfDayPositions(Guid unitId, AccountEndOfDayPositionsFilter filter);
+    Task<MetricsTable?> GetMetrics(Guid unitId);
 }

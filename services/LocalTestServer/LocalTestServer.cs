@@ -32,6 +32,7 @@ public class LocalTestServer : ITestServer, ITypeResolver
     private readonly ILogger<LocalTestServer> _logger;
     
     private Dictionary<string, IStrategyTestAction?> _actions = new();
+    private Dictionary<string, IMetricsCalculator> _metricsCalculators = new();
 
     public LocalTestServer(
         LocalTestServerConfig config,
@@ -63,7 +64,7 @@ public class LocalTestServer : ITestServer, ITypeResolver
             .ToList();
         _factory = new HostedStrategiesFactory(this, loggerFactory);
 
-        LoadActionsAssemblies(config);
+        LoadPluginAssemblies(config);
     }
 
     
@@ -84,20 +85,30 @@ public class LocalTestServer : ITestServer, ITypeResolver
         return new Storage(new() { MarketDataPaths = _config.MarketDataPaths });
     }
 
-    public async Task<IReadOnlyCollection<string>> GetSupportedActionsAsync() =>
-        await Task.Run(() => _actions.Keys.ToList());
+    public Task<IReadOnlyCollection<string>> GetSupportedActionsAsync() =>
+        Task.FromResult((IReadOnlyCollection<string>)_actions.Keys.ToList());
+
+    public Task<IReadOnlyCollection<string>> GetSupportedMetricsCalculatorsAsync() =>
+        Task.FromResult((IReadOnlyCollection<string>)_metricsCalculators.Keys.ToList());
 
     public Task<IReadOnlyCollection<StrategyTypeDescription>> GetStrategiesAsync() =>
-        Task.Run(() => Task.FromResult<IReadOnlyCollection<StrategyTypeDescription>>(_factory.SupportedStrategyClasses.ToList()));
+        Task.FromResult<IReadOnlyCollection<StrategyTypeDescription>>(_factory.SupportedStrategyClasses.ToList());
 
-    public Task<string> GetSampleParams(string actionName)
+    public Task<string> GetSampleActionParamsAsync(string actionName)
     {
         var action = _actions.GetValueOrDefault(actionName);
         if (action is null) throw new ArgumentException($"Action {actionName} not found");
         return Task.FromResult(action.GetSampleParams());
     }
 
-    public async Task<IReadOnlyCollection<RequiredMarketDataUnit>> ValidateRequiredMarketData(Guid unitId)
+    public Task<string> GetSampleMetricsCalculatorOptionsAsync(string calculator)
+    {
+        var calc = _metricsCalculators.GetValueOrDefault(calculator);
+        if (calc is null) throw new ArgumentException($"Calculator {calculator} not found");
+        return Task.FromResult(calc.GetSampleOptions());
+    }
+
+    public async Task<IReadOnlyCollection<RequiredMarketDataUnit>> ValidateRequiredMarketDataAsync(Guid unitId)
     {
         var unit = await _testUnitsRepository.GetTestUnitAsync(unitId);
         if (unit is null) throw new ArgumentException($"Test unit {unitId} not found");
@@ -110,7 +121,7 @@ public class LocalTestServer : ITestServer, ITypeResolver
         return reqs.mdUnits;
     }
 
-    public async Task<ActionParamsValidationResult> ValidateParams(string actionName, string? options)
+    public async Task<ActionParamsValidationResult> ValidateParamsAsync(string actionName, string? options)
     {
         if (!_actions.TryGetValue(actionName, out var action) || action is null)
         {
@@ -286,6 +297,18 @@ public class LocalTestServer : ITestServer, ITypeResolver
                 _executionSemaphore.Release();
                 return;
             }
+            
+            IMetricsCalculator? calculator = null;
+            if (!string.IsNullOrEmpty(unit.MetricsCalculatorName))
+            {
+                calculator = _metricsCalculators.GetValueOrDefault(unit.MetricsCalculatorName);
+                if (calculator is null)
+                {
+                    await _testUnitsRepository.SetUnitStatus(unitId, TestUnitStatus.Failed, "Invalid metrics calculator");
+                    _executionSemaphore.Release();
+                    return;
+                }
+            }
 
             await _testUnitsRepository.SetUnitStatus(unitId, TestUnitStatus.Running);
 
@@ -335,10 +358,10 @@ public class LocalTestServer : ITestServer, ITypeResolver
             }
 
 
-            var teFactory = new TestExecutorFactory(unit.Options, candlesStorage, testSdProvider, loggingConfiguration, _factory);
+            var teFactory = new TestExecutorFactory(unit.Options, unit.PersistOptions, candlesStorage, testSdProvider, loggingConfiguration, _factory);
 
             var tracker = new ProgressTracker(unitId, _testUnitsRepository);
-            action.Run(unit, teFactory, tracker, null, _resultsPersister); // TODO
+            action.Run(unit, teFactory, tracker, calculator, _resultsPersister);
             await _testUnitsRepository.SetUnitStatus(unitId, TestUnitStatus.Completed, $"Test time: {tracker.ExecutionTimeUs} ms");
         }
         catch (Exception ex)
@@ -355,10 +378,10 @@ public class LocalTestServer : ITestServer, ITypeResolver
     }
     
 
-    private void LoadActionsAssemblies(LocalTestServerConfig config)
+    private void LoadPluginAssemblies(LocalTestServerConfig config)
     {
         var actionAssemblies = config.PluginAssembliesPaths
-            .Union(["QuantInfra.Services.BacktestingCore.dll"]) // add default actions
+            .Union(["QuantInfra.Services.BacktestingCore.dll"]) // add default actions and calculators
             .Select(path =>
             {
                 var loadContext = new PluginLoadContext(path);
@@ -382,6 +405,28 @@ public class LocalTestServer : ITestServer, ITypeResolver
                     if (instance == null)
                     {
                         _logger.LogError($"Unable to create action {t.FullName}");
+                        return (null, null);
+                    }
+                    return (instance.Name, instance);
+                })
+                .Where(x => x.instance != null)
+            )
+            .ToDictionary(x => x.Name, x => x.instance);
+        
+        _metricsCalculators = actionAssemblies
+            .SelectMany(a => a
+                .GetTypes()
+                .Where(t => 
+                    t.IsClass
+                    && typeof(IMetricsCalculator).IsAssignableFrom(t)
+                    && !t.IsAbstract
+                )
+                .Select(t =>
+                {
+                    var instance = (IMetricsCalculator?)Activator.CreateInstance(t);
+                    if (instance == null)
+                    {
+                        _logger.LogError($"Unable to create calculator {t.FullName}");
                         return (null, null);
                     }
                     return (instance.Name, instance);

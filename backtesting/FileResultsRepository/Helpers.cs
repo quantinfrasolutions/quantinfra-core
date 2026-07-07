@@ -12,6 +12,7 @@ internal static class Helpers
     public const string TradesFile = "trades.csv";
     public const string EndOfDayPositionsFile = "eod-positions.csv";
     public const string EndOfDayPositionValuesFile = "eod-position-values.csv";
+    public const string MetricsFile = "metrics.csv";
     
     public static string GetPath(string root, Guid unitId, string fileName)
     {

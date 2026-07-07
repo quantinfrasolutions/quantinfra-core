@@ -8,10 +8,24 @@ namespace QuantInfra.Core.Apps.StrategyTesterCli;
 
 internal class Commands(LocalTestServer server, IServiceProvider serviceProvider)
 {
+    /// <summary>
+    /// Lists available testing actions
+    /// </summary>
     [Command("get-actions")]
     public async Task GetActionsAsync()
     {
         var actions = await server.GetSupportedActionsAsync();
+        await Console.Out.WriteLineAsync(JsonSerializer.Serialize(actions, JsonSerializerOptions));
+        await Console.Out.FlushAsync();
+    }
+    
+    /// <summary>
+    /// Lists available metrics calculators
+    /// </summary>
+    [Command("get-metrics")]
+    public async Task GetMetricsAsync()
+    {
+        var actions = await server.GetSupportedMetricsCalculatorsAsync();
         await Console.Out.WriteLineAsync(JsonSerializer.Serialize(actions, JsonSerializerOptions));
         await Console.Out.FlushAsync();
     }
@@ -33,7 +47,18 @@ internal class Commands(LocalTestServer server, IServiceProvider serviceProvider
     [Command("get-sample-params")]
     public async Task GetSampleParamsAsync(string actionName)
     {
-        var sample = await server.GetSampleParams(actionName);
+        var sample = await server.GetSampleActionParamsAsync(actionName);
+        await Console.Out.WriteLineAsync(sample);
+        await Console.Out.FlushAsync();
+    }
+    
+    /// <summary>
+    /// Returns a sample configuration JSON for the chosen command
+    /// </summary>
+    [Command("get-sample-metrics-options")]
+    public async Task GetSampleMetricsOptions(string calculatorName)
+    {
+        var sample = await server.GetSampleMetricsCalculatorOptionsAsync(calculatorName);
         await Console.Out.WriteLineAsync(sample);
         await Console.Out.FlushAsync();
     }
@@ -41,7 +66,7 @@ internal class Commands(LocalTestServer server, IServiceProvider serviceProvider
     [Command("validate-params")]
     public async Task ValidateParamsAsync(string actionName, string @params)
     {
-        var res = await server.ValidateParams(actionName, @params);
+        var res = await server.ValidateParamsAsync(actionName, @params);
         await Console.Out.WriteLineAsync(JsonSerializer.Serialize(res, JsonSerializerOptions));
         await Console.Out.FlushAsync();
     }
@@ -50,7 +75,7 @@ internal class Commands(LocalTestServer server, IServiceProvider serviceProvider
     public async Task ValidateRequiredMarketData(Guid unitId)
     {
         await Helpers.MigrateSqliteAsync(serviceProvider);
-        var res = await server.ValidateRequiredMarketData(unitId);
+        var res = await server.ValidateRequiredMarketDataAsync(unitId);
         await Console.Out.WriteLineAsync(JsonSerializer.Serialize(res, JsonSerializerOptions));
         await Console.Out.FlushAsync();
     }

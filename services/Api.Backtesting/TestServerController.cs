@@ -31,7 +31,23 @@ public class TestServerController(ITestServer testServer)
     [Produces("application/json")]
     public async Task<string> GetSampleParams(string actionName)
     {
-        return await testServer.GetSampleParams(actionName);
+        return await testServer.GetSampleActionParamsAsync(actionName);
+    }
+    
+    [HttpGet, Route("calculators")]
+    [EndpointName(nameof(GetCalculators))]
+    [Produces("application/json")]
+    public async Task<IEnumerable<string>> GetCalculators()
+    {
+        return await testServer.GetSupportedMetricsCalculatorsAsync();
+    }
+    
+    [HttpGet, Route("calculators/sample-params/{calculator}")]
+    [EndpointName(nameof(GetSampleCalculatorOptions))]
+    [Produces("application/json")]
+    public async Task<string> GetSampleCalculatorOptions(string calculator)
+    {
+        return await testServer.GetSampleMetricsCalculatorOptionsAsync(calculator);
     }
 
     [HttpPost, Route("validate-market-data/{unitId:guid}")]
@@ -39,7 +55,7 @@ public class TestServerController(ITestServer testServer)
     [Produces("application/json")]
     public async Task<IEnumerable<RequiredMarketDataUnit>> ValidateMarketData(Guid unitId)
     {
-        return await testServer.ValidateRequiredMarketData(unitId);
+        return await testServer.ValidateRequiredMarketDataAsync(unitId);
     }
 
     [HttpPost, Route("validate-params")]
@@ -47,7 +63,7 @@ public class TestServerController(ITestServer testServer)
     [Produces("application/json")]
     public async Task<ActionParamsValidationResult> ValidateParams(string action, [FromBody] string? @params)
     {
-        return await testServer.ValidateParams(action, @params);
+        return await testServer.ValidateParamsAsync(action, @params);
     }
 
     [HttpPost, Route("run/{unitId:guid}")]

@@ -1,8 +1,7 @@
+using QuantInfra.Common.Backtesting.Abstractions;
 using QuantInfra.Common.Interfaces.Api.Accounts;
 using QuantInfra.Sdk.Accounting;
 using QuantInfra.Sdk.Strategies;
-using QuantInfra.Sdk.Trading;
-using QuantInfra.Sdk.Trading.Positions;
 
 namespace QuantInfra.UI.Interfaces.Backtesting;
 
@@ -14,4 +13,5 @@ public interface IUiBacktestResultsRepository
     Task<IEnumerable<BalanceValueView>> GetEndOfDayBalances(Guid testUnitId, AccountEndOfDayBalancesFilter? filter = null);
     Task<IEnumerable<PositionValueView>> GetEndOfDayPositions(Guid testUnitId, AccountEndOfDayBalancesFilter? filter = null);
     Task<IEnumerable<TradeView>> GetTrades(Guid testUnitId, TradeFilter? filter = null);
+    Task<MetricsTable> GetMetrics(Guid testUnitId);
 }

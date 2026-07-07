@@ -32,7 +32,6 @@ using QuantInfra.Sdk.Backtesting;
 using QuantInfra.Sdk.StaticData;
 using QuantInfra.Sdk.Strategies;
 using QuantInfra.Sdk.Trading;
-using QuantInfra.Services.BacktestingCore.Analysis;
 using QuantInfra.Services.BacktestingCore.Providers;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
@@ -50,6 +49,7 @@ public class TestExecutor:
     public TestExecutor(
         TestExecutorFactory factory,
         TestExecutorOptions options,
+        PersistOptions persistOptions,
         ITestMarketDataProvider candlesStorage,
         TestStaticDataRepository sdProvider,
         IReadOnlyCollection<BacktestedStrategyConfig> strategies,
@@ -100,7 +100,7 @@ public class TestExecutor:
             .AddSingleton<Config>(_ => new() { LogLevel = options.LogLevel })
             .AddInMemoryState()
             .UseSingletonInMemoryBus()
-            .AddBacktestResultsAggregator(options, strategies.Count);
+            .AddBacktestResultsAggregator(options, persistOptions, strategies.Count);
 
         _serviceProvider = serviceCollection.BuildServiceProvider();
         _results = _serviceProvider.GetRequiredService<BacktestResultsAgregator>();
@@ -135,10 +135,10 @@ public class TestExecutor:
                 Amount = Options.Investment,
                 AssetId = account.CurrencyId,
             }));
-                
-            _strategyConfigs.Add(config);
+            
             var strategy = new Strategy(strategyId, config.Name, config.ClassName, config.Params, config.RequiredBarStorages,
                 config.Symbols, config.LiquidationParameters, config.UseSignalGroups, StrategyStatus.Running, strategyId, string.Empty);
+            _strategyConfigs.Add(strategy);
             eventBus.Emit(new StrategyCreatedEvt(0, strategyId, strategy, account, now));
         }
 
@@ -343,7 +343,7 @@ public class TestExecutor:
         Array.Empty<Commission>()
     );
     
-    private readonly List<BacktestedStrategyConfig> _strategyConfigs = new();
+    private readonly List<Strategy> _strategyConfigs = new();
     // public IReadOnlyCollection<BacktestedStrategyConfig> GetStrategyConfigs() => _strategyConfigs;
     //
     private readonly List<AccountRecordV6> _accounts = new();

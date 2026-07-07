@@ -85,16 +85,6 @@
                                 </Helper>
                             </RadzenFormField>
                         </RadzenColumn>
-                        <RadzenColumn Size="4" Style="min-width: 200px; max-width: 250px;">
-                            <RadzenFormField Text="Days in year" Variant="Variant.Text">
-                                <ChildContent>
-                                    <RadzenNumeric TValue="int" @bind-Value=@Value.DaysInYear Min="1" Max="365" Step="1" ShowUpDown="false" Disabled=@Disabled/>
-                                </ChildContent>
-                                <Helper>
-                                    <RadzenText TextStyle="TextStyle.Caption">Used for metrics calculation (Sharpe, etc.)</RadzenText>
-                                </Helper>
-                            </RadzenFormField>
-                        </RadzenColumn>
                     </RadzenRow>
                 </RadzenStack>
             </RadzenColumn>

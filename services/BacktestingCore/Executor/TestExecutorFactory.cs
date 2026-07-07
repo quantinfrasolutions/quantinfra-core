@@ -11,6 +11,7 @@ namespace QuantInfra.Services.BacktestingCore.Executor
 {
     public class TestExecutorFactory(
         TestExecutorOptions options,
+        PersistOptions persistOptions,
         ITestMarketDataProvider candlesStorage,
         TestStaticDataRepository sdProvider,
         LoggingConfiguration loggingConfiguration,
@@ -23,6 +24,7 @@ namespace QuantInfra.Services.BacktestingCore.Executor
             new TestExecutor(
                 this,
                 optionsOverride ?? options,
+                persistOptions,
                 candlesStorage, 
                 sdProvider,
                 configs,

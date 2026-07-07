@@ -11,24 +11,25 @@ public class TestUnitStatusRecord : QuantInfra.Sdk.Backtesting.TestUnit
     [JsonConstructor]
     public TestUnitStatusRecord() { }
     
-    public TestUnitStatusRecord(
-        Guid testId,
+    public TestUnitStatusRecord(Guid testId,
         string action,
         TestExecutorOptions options,
         PersistOptions persistOptions,
-        ContractOverride?  contractOverride,
+        ContractOverride? contractOverride,
         Instant createdAt,
+        string? metricsCalculatorName,
         string data,
         TestUnitStatus status,
-        string? statusMessage
-    ) : base(testId, action, options, persistOptions, contractOverride, createdAt, data)
+        string? statusMessage, 
+        string metricsCalculatorData
+    ) : base(testId, action, options, persistOptions, contractOverride, createdAt, metricsCalculatorName, data, metricsCalculatorData)
     {
         Status = status;
         StatusMessage = statusMessage;
     }
     
     public TestUnitStatusRecord(TestUnit unit) : this(unit.TestId, unit.Action, unit.Options,
-        unit.PersistOptions, unit.ContractOverride, unit.CreatedAt, unit.Data, TestUnitStatus.Queued, null)
+        unit.PersistOptions, unit.ContractOverride, unit.CreatedAt, unit.MetricsCalculatorName, unit.Data, TestUnitStatus.Queued, null, unit.MetricsCalculorData)
     { }
 
     public TestUnitStatus Status { get; set; }

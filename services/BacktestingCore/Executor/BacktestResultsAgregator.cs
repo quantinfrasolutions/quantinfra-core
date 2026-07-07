@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using QuantInfra.Common.EventSourcing;
@@ -11,7 +10,7 @@ using QuantInfra.Sdk.Backtesting;
 using QuantInfra.Sdk.Trading;
 using QuantInfra.Sdk.Trading.Positions;
 
-namespace QuantInfra.Services.BacktestingCore.Analysis;
+namespace QuantInfra.Services.BacktestingCore.Executor;
 
 internal class BacktestResultsAgregator :
     IProjectionWriter<SharePriceHistoryProjectionEvt>,
@@ -46,23 +45,23 @@ internal class BacktestResultsAgregator :
     
     Instant _lastProcessedDt;
         
-    public BacktestResultsAgregator(TestExecutorOptions options, int numberOfStrategies)
+    public BacktestResultsAgregator(TestExecutorOptions options, PersistOptions persistOptions, int numberOfStrategies)
     {
         _numberOfDays = (int)(options.EndDt - options.StartDt).TotalDays + 1; // initial sp event + one extra day
-        if (options.RecordSharePrices) _returns = new (numberOfStrategies * _numberOfDays);
-        if (options.RecordPositionCloses)
+        if (persistOptions.SaveDailyReturns) _returns = new (numberOfStrategies * _numberOfDays);
+        if (persistOptions.SavePositions)
         {
             _recordPositionCloses = true;
-            _positionCloses = new(numberOfStrategies * _numberOfDays * options.ExpectedNumberOfTradesPerDay * 2);
+            _positionCloses = new(numberOfStrategies * _numberOfDays * persistOptions.ExpectedNumberOfTradesPerDay * 2);
         }
-        if (options.RecordEndOfDayPositions)
+        if (persistOptions.SaveEndOfDayValues)
         {
             _recordEndOfDayPositions = true;
-            _endOfDayPositions = new(numberOfStrategies * _numberOfDays * options.ExpectedNumberOfPositionsPerDay);
-            _endOfDayBalances = new(numberOfStrategies * _numberOfDays * options.ExpectedNumberOfPositionsPerDay);
-            _positionValues = new(numberOfStrategies * _numberOfDays * options.ExpectedNumberOfPositionsPerDay);
+            _endOfDayPositions = new(numberOfStrategies * _numberOfDays * persistOptions.ExpectedNumberOfOpenPositionsAtEndOfDay);
+            _endOfDayBalances = new(numberOfStrategies * _numberOfDays * persistOptions.ExpectedNumberOfOpenPositionsAtEndOfDay);
+            _positionValues = new(numberOfStrategies * _numberOfDays * persistOptions.ExpectedNumberOfOpenPositionsAtEndOfDay);
         }
-        if (options.RecordTrades) _trades = new(numberOfStrategies * _numberOfDays * options.ExpectedNumberOfTradesPerDay);
+        if (persistOptions.SaveTrades) _trades = new(numberOfStrategies * _numberOfDays * persistOptions.ExpectedNumberOfTradesPerDay);
         // _commissions = new List<Commission>(numberOfStrategies * numberOfDays);
     }
     
@@ -130,24 +129,24 @@ internal class BacktestResultsAgregator :
 internal static class BacktestResultsAggregatorConfigurationExtensions
 {
     public static IServiceCollection AddBacktestResultsAggregator(this IServiceCollection sc,
-        TestExecutorOptions options, int numberOfStrategies)
+        TestExecutorOptions options, PersistOptions persistOptions, int numberOfStrategies)
     {
-        sc.AddSingleton<BacktestResultsAgregator>(sp => new(options, numberOfStrategies));
+        sc.AddSingleton<BacktestResultsAgregator>(sp => new(options, persistOptions, numberOfStrategies));
 
-        if (options.RecordTrades)
+        if (persistOptions.SaveTrades)
             sc.AddSingleton<IEventHandler<TradeEvt>>(sp => sp.GetRequiredService<BacktestResultsAgregator>());
         
-        if (options.RecordPositionCloses || options.RecordEndOfDayPositions)
+        if (persistOptions.SavePositions || persistOptions.SaveEndOfDayValues)
             sc.AddSingleton<IProjectionWriter<PositionChangedEvt>>(sp => sp.GetRequiredService<BacktestResultsAgregator>());
 
-        if (options.RecordEndOfDayPositions)
+        if (persistOptions.SaveEndOfDayValues)
         {
             sc
                 .AddSingleton<IProjectionWriter<BalanceMarkedToMarketProjectionEvt>>(sp => sp.GetRequiredService<BacktestResultsAgregator>())
                 .AddSingleton<IEventHandler<AccountEndOfDayEvt>>(sp => sp.GetRequiredService<BacktestResultsAgregator>());
         }
         
-        if (options.RecordSharePrices)
+        if (persistOptions.SaveDailyReturns)
             sc.AddSingleton<IProjectionWriter<SharePriceHistoryProjectionEvt>>(sp => sp.GetRequiredService<BacktestResultsAgregator>());
 
         return sc;

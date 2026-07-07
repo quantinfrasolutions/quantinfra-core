@@ -1,16 +1,16 @@
 <RadzenTemplateForm TItem="PersistOptionsModel" Data="@Value">
-    <RadzenStack JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Gap="1rem">
+    <RadzenStack>
         <RadzenRow>
             <RadzenColumn Size="12">
-                <div class="rz-p-12 rz-text-align-center">
+                <div>
                     <RadzenCheckBox @bind-Value=@Value.SaveStrategies Name="RecordStrategies"/>
-                    <RadzenLabel Text="Strategies returns" Component="RecordStrategies" class="rz-ms-2"/>
+                    <RadzenLabel Text="Strategy configs" Component="RecordStrategies" class="rz-ms-2"/>
                 </div>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow>
             <RadzenColumn Size="12">
-                <div class="rz-p-12 rz-text-align-center">
+                <div>
                     <RadzenCheckBox @bind-Value=@Value.SaveDailyReturns Name="RecordSharePrices"/>
                     <RadzenLabel Text="Daily returns" Component="RecordSharePrices" class="rz-ms-2"/>
                 </div>
@@ -20,7 +20,7 @@
         {
             <RadzenRow>
                 <RadzenColumn Size="12">
-                    <div class="rz-p-12 rz-text-align-center">
+                    <div>
                         <RadzenCheckBox @bind-Value=@Value.DoNotSaveZeroDailyReturns Name="SkipZeroReturns"/>
                         <RadzenLabel Text="Skip zero returns" Component="SkipZeroReturns" class="rz-ms-2"/>
                     </div>
@@ -29,55 +29,66 @@
         }
         <RadzenRow>
             <RadzenColumn Size="12">
-                <div class="rz-p-12 rz-text-align-center">
+                <div>
                     <RadzenCheckBox @bind-Value=@Value.SaveMetrics Name="RecordMetrics"/>
                     <RadzenLabel Text="Metrics" Component="RecordMetrics" class="rz-ms-2"/>
                 </div>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow>
-            <RadzenColumn Size="6">
-                <div class="rz-p-12 rz-text-align-center">
+            <RadzenColumn Size="4" Style="min-width: 200px; max-width: 250px;">
+                <div>
                     <RadzenCheckBox @bind-Value=@Value.SaveTrades Name="RecordTrades"/>
                     <RadzenLabel Text="Trades" Component="RecordTrades" class="rz-ms-2"/>
                 </div>
             </RadzenColumn>
-            @* @if (Value.RecordTrades) *@
-            @* { *@
-            @*     <RadzenColumn Size="6"> *@
-            @*         <RadzenFormField Variant="Variant.Text" Text="Average number of trades per day"> *@
-            @*             <RadzenNumeric @bind-Value=@Value.ExpectedNumberOfTradesPerDay ShowUpDown="false" Min="1" Step="1"/> *@
-            @*         </RadzenFormField> *@
-            @*     </RadzenColumn> *@
-            @* } *@
+            @if (Value.SaveTrades)
+            {
+                <RadzenColumn Size="4" Style="min-width: 200px; max-width: 250px;">
+                    <RadzenFormField Variant="Variant.Text" Text="Average number of trades per day">
+                        <ChildContent>
+                            <RadzenNumeric @bind-Value=@Value.ExpectedTradesPerDay ShowUpDown="false" Min="0" Step="1"/>
+                        </ChildContent>
+                        <Helper>
+                            <RadzenText TextStyle="TextStyle.Caption">Increaing trades buffer improves the test speed</RadzenText>
+                        </Helper>
+                    </RadzenFormField>
+                </RadzenColumn>
+            }
         </RadzenRow>
         <RadzenRow>
             <RadzenColumn Size="12">
-                <div class="rz-p-12 rz-text-align-center">
+                <div>
                     <RadzenCheckBox @bind-Value=@Value.SavePositions Name="RecordPositionCloses"/>
                     <RadzenLabel Text="Deals" Component="RecordPositionCloses" class="rz-ms-2"/>
                 </div>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow>
-            <RadzenColumn Size="6">
-                <div class="rz-p-12 rz-text-align-center">
+            <RadzenColumn Size="4" Style="min-width: 200px; max-width: 250px;">
+                <div>
                     <RadzenCheckBox @bind-Value=@Value.SaveEndOfDayValues Name="RecordEndOfDayPositions"/>
                     <RadzenLabel Text="End of day reports" Component="RecordEndOfDayPositions" class="rz-ms-2"/>
                 </div>
             </RadzenColumn>
-            @* @if (Value.RecordTrades) *@
-            @* { *@
-            @*     <RadzenColumn Size="6"> *@
-            @*         <RadzenFormField Variant="Variant.Text" Text="Average number of positions at EOD"> *@
-            @*             <RadzenNumeric @bind-Value=@Value.ExpectedNumberOfPositionsPerDay ShowUpDown="false" Min="1" Step="1"/> *@
-            @*         </RadzenFormField> *@
-            @*     </RadzenColumn> *@
-            @* } *@
+            @if (Value.SaveEndOfDayValues)
+            {
+                <RadzenColumn Size="4" Style="min-width: 200px; max-width: 250px;">
+                    <RadzenFormField Variant="Variant.Text" Text="Average number of positions at EOD">
+                        <ChildContent>
+                            <RadzenNumeric @bind-Value=@Value.ExpectedPositionsAtEOD ShowUpDown="false" Min="1" Step="1"/>
+                        </ChildContent>
+                        <Helper>
+                            <RadzenText TextStyle="TextStyle.Caption">Increasing the positions buffer improves the test speed</RadzenText>
+                        </Helper>
+                    </RadzenFormField>
+                </RadzenColumn>
+            }
         </RadzenRow>
     </RadzenStack>
 </RadzenTemplateForm>
 
 @code {
     [Parameter, EditorRequired] public PersistOptionsModel Value { get; set; }
+    [Parameter] public bool Disabled { get; set; }
 }

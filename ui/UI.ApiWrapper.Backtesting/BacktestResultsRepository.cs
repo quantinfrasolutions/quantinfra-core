@@ -1,3 +1,4 @@
+using QuantInfra.Common.Backtesting.Abstractions;
 using QuantInfra.Common.Interfaces.Api.Accounts;
 using QuantInfra.Sdk.Accounting;
 using QuantInfra.Sdk.Strategies;
@@ -29,4 +30,7 @@ public partial class ApiRepository : IUiBacktestResultsRepository
     public Task<IEnumerable<TradeView>>? GetTrades(Guid testUnitId, TradeFilter? filter = null) =>
         RetrieveCollection("trades", () => _wrapper.Client.GetTradesAsync(testUnitId, filter?.FromDt, filter?.ToDt,
             filter?.AccountId, filter?.TradeId, filter?.ContractId, filter?.ExternalId, filter?.Limit, filter?.Offset));
+
+    public Task<MetricsTable> GetMetrics(Guid testUnitId) =>
+        Retrieve("metrics", () => _wrapper.Client.GetMetricsAsync(testUnitId));
 }

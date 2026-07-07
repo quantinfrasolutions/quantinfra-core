@@ -10,6 +10,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\common\Common.Backtesting.Abstractions\Common.Backtesting.Abstractions.csproj" />
       <ProjectReference Include="..\..\common\Common.Interfaces.Api.Backtesting\Common.Interfaces.Api.Backtesting.csproj" />
     </ItemGroup>
 

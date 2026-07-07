@@ -11,10 +11,13 @@ internal class NewTestModel
     [Required] public string Action { get; set; }
     public string? Data { get; set; }
     
+    public string? Calculator { get; set; }
+    public string? CalculatorData { get; set; }
+    
     public ContractOverrideModel? ContractOverride { get; set; } = null;
     public TestExecutorOptionsModel TestExecutorOptions { get; set; } = new();
     public PersistOptionsModel PersistOptions { get; set; } = new();
     
-    public TestUnit ToTestUnit() => new(Action, TestExecutorOptions.ToSdk(), PersistOptions.ToSdk(), Data, 
-        SystemClock.Instance.GetCurrentInstant(), ContractOverride?.ToSdk()); 
+    public TestUnit ToTestUnit() => new(Action, TestExecutorOptions.ToSdk(), PersistOptions.ToSdk(), 
+        Calculator, Data, CalculatorData, SystemClock.Instance.GetCurrentInstant(), ContractOverride?.ToSdk()); 
 }

@@ -43,6 +43,15 @@ namespace QuantInfra.Databases.Backtesting.Sqlite.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("data");
 
+                    b.Property<string>("MetricsCalculatorName")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("metrics_calculator_name");
+
+                    b.Property<string>("MetricsCalculorData")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("metrics_calculator_data");
+
                     b.Property<int>("Status")
                         .HasColumnType("text")
                         .HasColumnName("status");
@@ -66,6 +75,14 @@ namespace QuantInfra.Databases.Backtesting.Sqlite.Migrations
                             b1.Property<bool>("DoNotSaveZeroDailyReturns")
                                 .HasColumnType("INTEGER")
                                 .HasColumnName("skip_zero_daily_returns");
+
+                            b1.Property<int>("ExpectedNumberOfOpenPositionsAtEndOfDay")
+                                .HasColumnType("INTEGER")
+                                .HasColumnName("expected_positions_per_day");
+
+                            b1.Property<int>("ExpectedNumberOfTradesPerDay")
+                                .HasColumnType("INTEGER")
+                                .HasColumnName("expected_trades_per_day");
 
                             b1.Property<bool>("SaveDailyReturns")
                                 .HasColumnType("INTEGER")
@@ -121,22 +138,10 @@ namespace QuantInfra.Databases.Backtesting.Sqlite.Migrations
                                 .HasColumnType("INTEGER")
                                 .HasColumnName("check_pending_orders_execution_using_high_low");
 
-                            b1.Property<int>("DaysInYear")
-                                .HasColumnType("INTEGER")
-                                .HasColumnName("days_in_year");
-
                             b1.Property<string>("EndDt")
                                 .IsRequired()
                                 .HasColumnType("TEXT")
                                 .HasColumnName("end_dt");
-
-                            b1.Property<int>("ExpectedNumberOfPositionsPerDay")
-                                .HasColumnType("INTEGER")
-                                .HasColumnName("expected_positions_per_day");
-
-                            b1.Property<int>("ExpectedNumberOfTradesPerDay")
-                                .HasColumnType("INTEGER")
-                                .HasColumnName("expected_trades_per_day");
 
                             b1.Property<string>("HighLowExecutionOffset")
                                 .IsRequired()
@@ -164,22 +169,6 @@ namespace QuantInfra.Databases.Backtesting.Sqlite.Migrations
                                 .IsRequired()
                                 .HasColumnType("TEXT")
                                 .HasColumnName("open_execution_offset");
-
-                            b1.Property<bool>("RecordEndOfDayPositions")
-                                .HasColumnType("INTEGER")
-                                .HasColumnName("record_end_of_day_positions");
-
-                            b1.Property<bool>("RecordPositionCloses")
-                                .HasColumnType("INTEGER")
-                                .HasColumnName("record_position_closes");
-
-                            b1.Property<bool>("RecordSharePrices")
-                                .HasColumnType("INTEGER")
-                                .HasColumnName("record_share_prices");
-
-                            b1.Property<bool>("RecordTrades")
-                                .HasColumnType("INTEGER")
-                                .HasColumnName("record_trades");
 
                             b1.Property<int>("RequestBarAttempts")
                                 .HasColumnType("INTEGER")

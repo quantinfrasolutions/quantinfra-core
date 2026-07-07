@@ -18,7 +18,6 @@ public class TestExecutorOptionsModel
     [Required] public int RequestBarAttempts { get; set; } = 1;
     public bool ThrowOnZeroVolumeOrders { get; set; }
     public int VirtualAccountSizeStepFraction { get; set; } = 100;
-    public int DaysInYear { get; set; } = 252;
     public bool CheckPendingOrdersExecutionUsingHighLow { get; set; } = false;
     public bool CheckOrdersAtBarOpen { get; set; } = true;
     public bool CheckOrdersAtBarClose { get; set; } = false;
@@ -38,7 +37,6 @@ public class TestExecutorOptionsModel
         RequestBarAttempts = RequestBarAttempts,
         ThrowOnZeroVolumeOrders = ThrowOnZeroVolumeOrders,
         VirtualAccountSizeStepFraction = VirtualAccountSizeStepFraction,
-        DaysInYear = DaysInYear,
         CheckPendingOrdersExecutionUsingHighLow = CheckPendingOrdersExecutionUsingHighLow,
         CheckOrdersAtBarOpen = CheckOrdersAtBarOpen,
         CheckOrdersAtBarClose = CheckOrdersAtBarClose,
@@ -59,7 +57,6 @@ public class TestExecutorOptionsModel
         RequestBarAttempts = testUnit.Options.RequestBarAttempts,
         ThrowOnZeroVolumeOrders = testUnit.Options.ThrowOnZeroVolumeOrders,
         VirtualAccountSizeStepFraction = testUnit.Options.VirtualAccountSizeStepFraction,
-        DaysInYear = testUnit.Options.DaysInYear,
         CheckPendingOrdersExecutionUsingHighLow = testUnit.Options.CheckPendingOrdersExecutionUsingHighLow,
         CheckOrdersAtBarOpen = testUnit.Options.CheckOrdersAtBarOpen,
         CheckOrdersAtBarClose = testUnit.Options.CheckOrdersAtBarClose,

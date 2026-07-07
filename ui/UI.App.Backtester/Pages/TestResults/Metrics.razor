@@ -1,0 +1,37 @@
+@page "/tests/history/{id:guid}/metrics"
+@using QuantInfra.Common.Backtesting.Abstractions
+@using QuantInfra.UI.Interfaces.Backtesting
+@using UI.SharedComponents.Backtesting
+@layout TestResultBase
+
+@inject IUiBacktestResultsRepository Repository 
+
+<MetricsView Data="@_data" IsLoading="@_isLoading" />
+
+@code {
+    private MetricsTable? _data;
+    private bool _dataLoaded = false;
+    private bool _isLoading;
+    
+    [Parameter] public Guid Id { get; set; }
+    [CascadingParameter] public TestResultBase? TestResultBase { get; set; }
+    
+    protected override void OnInitialized()
+    {
+        TestResultBase!.Id = Id;
+        TestResultBase.Path = "metrics";
+        Task.Run(LoadData);
+    }
+
+    private async Task LoadData()
+    {
+        if (Id != Guid.Empty && !_dataLoaded)
+        {
+            _isLoading = true;
+            _data = await Repository.GetMetrics(Id);
+            _dataLoaded = true;
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+}

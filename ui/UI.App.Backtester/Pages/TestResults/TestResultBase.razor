@@ -63,6 +63,11 @@
             _tabs.Add(new() { Text = "Returns", Path = "returns" });
         }
 
+        if (unit.PersistOptions.SaveMetrics)
+        {
+            _tabs.Add(new() { Text = "Metrics", Path = "metrics" });
+        }
+
         if (unit.PersistOptions.SaveTrades)
         {
             _tabs.Add(new() { Text = "Trades", Path = "trades" });

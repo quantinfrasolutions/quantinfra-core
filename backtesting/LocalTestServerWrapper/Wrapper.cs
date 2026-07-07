@@ -37,6 +37,22 @@ public sealed class Wrapper : ITestServer
         return (await JsonSerializer.DeserializeAsync<IReadOnlyCollection<string>>(process.StandardOutput.BaseStream, JsonSerializerOptions))!;
     }
 
+    public async Task<IReadOnlyCollection<string>> GetSupportedMetricsCalculatorsAsync()
+    {
+        var process = GetProcess("get-metrics");
+        var task = process.WaitForExitAsync();
+        if (await Task.WhenAny(task, Task.Delay(10000)) != task)
+            throw new TimeoutException();
+
+        if (process.ExitCode != 0)
+        {
+            var error = await process.StandardOutput.ReadToEndAsync();
+            _logger.LogError($"Error retrieving actions: {error}");
+            throw new Exception(error);
+        }
+        return (await JsonSerializer.DeserializeAsync<IReadOnlyCollection<string>>(process.StandardOutput.BaseStream, JsonSerializerOptions))!;
+    }
+
     public async Task<IReadOnlyCollection<StrategyTypeDescription>> GetStrategiesAsync()
     {
         var process = GetProcess("get-strategies");
@@ -53,7 +69,7 @@ public sealed class Wrapper : ITestServer
         return (await JsonSerializer.DeserializeAsync<List<StrategyTypeDescription>>(process.StandardOutput.BaseStream, JsonSerializerOptions))!;
     }
 
-    public async Task<string> GetSampleParams(string action)
+    public async Task<string> GetSampleActionParamsAsync(string action)
     {
         var process = GetProcess("get-sample-params", "--action-name", action);
         var task = process.WaitForExitAsync();
@@ -69,7 +85,23 @@ public sealed class Wrapper : ITestServer
         return await process.StandardOutput.ReadToEndAsync();
     }
 
-    public async Task<IReadOnlyCollection<RequiredMarketDataUnit>> ValidateRequiredMarketData(Guid unitId)
+    public async Task<string> GetSampleMetricsCalculatorOptionsAsync(string calculator)
+    {
+        var process = GetProcess("get-sample-metrics-options", "--calculator-name", calculator);
+        var task = process.WaitForExitAsync();
+        if (await Task.WhenAny(task, Task.Delay(1000)) != task)
+            throw new TimeoutException();
+        
+        if (process.ExitCode != 0)
+        {
+            var error = await process.StandardOutput.ReadToEndAsync();
+            _logger.LogError($"Error getting sample action: {error}");
+            throw new Exception(error);
+        }
+        return await process.StandardOutput.ReadToEndAsync();
+    }
+
+    public async Task<IReadOnlyCollection<RequiredMarketDataUnit>> ValidateRequiredMarketDataAsync(Guid unitId)
     {
         var process = GetProcess("validate-market-data", "--unit-id", unitId.ToString());
         
@@ -84,7 +116,7 @@ public sealed class Wrapper : ITestServer
         return (await JsonSerializer.DeserializeAsync<IReadOnlyCollection<RequiredMarketDataUnit>>(process.StandardOutput.BaseStream, JsonSerializerOptions))!;
     }
 
-    public async Task<ActionParamsValidationResult> ValidateParams(string action, string? options)
+    public async Task<ActionParamsValidationResult> ValidateParamsAsync(string action, string? options)
     {
         options ??= "null";
         options = options.Replace('\n', ' ');

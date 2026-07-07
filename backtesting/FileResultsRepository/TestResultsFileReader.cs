@@ -115,6 +115,64 @@ public sealed class TestResultsFileReader : ITestResultsRepositoryReadonly
             ).ToList());
         });
 
+    public Task<MetricsTable> GetMetrics(Guid unitId) => Task.Run(() =>
+    {
+        var path = GetPath(unitId, Helpers.MetricsFile);
+
+        if (!File.Exists(path))
+            return new MetricsTable([], []);
+
+        using var reader = new StreamReader(path);
+        using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            HasHeaderRecord = true,
+            TrimOptions = TrimOptions.Trim,
+            MissingFieldFound = null,
+            HeaderValidated = null,
+            IgnoreBlankLines = true,
+        });
+
+        csv.Read();
+        csv.ReadHeader();
+
+        var headers = csv.HeaderRecord?.ToArray() ?? [];
+        var rows = new List<MetricsRecord>();
+
+        while (csv.Read())
+        {
+            var row = new Dictionary<string, double?>();
+            Guid testId = Guid.Empty;
+            int? strategyId = null;
+            string? label = null;
+            foreach (var header in headers)
+            {
+                var data = csv.GetField(header);
+                
+                if (header == "TestId")
+                {
+                    testId = string.IsNullOrEmpty(data) ? Guid.Empty : Guid.Parse(data);
+                    continue;
+                }
+                if (header == "StrategyId")
+                {
+                    strategyId = string.IsNullOrEmpty(data) ? null : int.Parse(data);
+                    continue;
+                }
+                if (header == "Label")
+                {
+                    label = csv.GetField(header);
+                    continue;
+                }
+
+                row[header] = string.IsNullOrEmpty(data) ? null : double.Parse(data);
+            }
+
+            rows.Add(new(testId, strategyId, label, row));
+        }
+
+        return new MetricsTable(headers.Where(h => h != "TestId" && h != "StrategyId" && h != "Label").ToArray(), rows);
+    });
+
     private string GetPath(Guid unitId, string fileName) => Helpers.GetPath(_root, unitId, fileName);
 
     private static IReadOnlyList<T> ReadMany<T>(string path)

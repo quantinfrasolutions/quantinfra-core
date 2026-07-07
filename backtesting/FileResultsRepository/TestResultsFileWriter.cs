@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Reflection;
 using System.Text.Json;
 using CsvHelper;
 using NodaTime;
@@ -51,6 +53,40 @@ public class TestResultsFileWriter(Config config) : ITestResultsPersister
             
             path = Path.Combine(directory, Helpers.EndOfDayPositionValuesFile);
             using (var writer = new StreamWriter(path)) Write(writer, result.PositionValues);
+        }
+    }
+
+    public void PersistMetrics(TestUnit unit, ITestMetrics metrics)
+    {
+        if (unit.PersistOptions.SaveMetrics)
+        {
+            var directory = Path.Combine(config.WorkingDirectory, unit.TestId.ToString());
+            if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
+            var path = Path.Combine(directory, Helpers.MetricsFile);
+            
+            var runtimeType = metrics.GetType();
+
+            var props = runtimeType
+                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .Where(p => p.CanRead)
+                .ToArray();
+
+            var fileExists = File.Exists(path);
+            using var writer = new StreamWriter(path, append: true);
+            using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+
+            if (!fileExists)
+            {
+                foreach (var prop in props)
+                    csv.WriteField(prop.Name);
+
+                csv.NextRecord();
+            }
+
+            foreach (var prop in props)
+                csv.WriteField(prop.GetValue(metrics));
+
+            csv.NextRecord();
         }
     }
 

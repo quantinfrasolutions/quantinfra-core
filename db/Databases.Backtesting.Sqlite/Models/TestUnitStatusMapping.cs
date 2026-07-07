@@ -31,6 +31,7 @@ public class TestUnitStatusMapping
         builder.Property(s => s.TestId).HasColumnName("test_id").IsRequired();
         builder.Property(s => s.CreatedAt).HasColumnName("created_at").IsRequired();
         builder.Property(s => s.Action).HasColumnName("action").IsRequired();
+        builder.Property(s => s.MetricsCalculatorName).HasColumnName("metrics_calculator_name");
         builder.OwnsOne(s => s.Options, o =>
         {
             o.Property(x => x.StartDt).HasColumnName("start_dt").IsRequired();
@@ -44,7 +45,6 @@ public class TestUnitStatusMapping
             o.Property(x => x.RequestBarAttempts).HasColumnName("request_bar_attempts").IsRequired();
             o.Property(x => x.ThrowOnZeroVolumeOrders).HasColumnName("throw_on_zero_volume_orders").IsRequired();
             o.Property(x => x.VirtualAccountSizeStepFraction).HasColumnName("virtual_account_size_step_fraction").IsRequired();
-            o.Property(x => x.DaysInYear).HasColumnName("days_in_year").IsRequired();
             o.Property(x => x.CheckPendingOrdersExecutionUsingHighLow).HasColumnName("check_pending_orders_execution_using_high_low").IsRequired();
             o.Property(x => x.CheckOrdersAtBarOpen).HasColumnName("check_orders_at_bar_open").IsRequired();
             o.Property(x => x.CheckOrdersAtBarClose).HasColumnName("check_orders_at_bar_close").IsRequired();
@@ -54,27 +54,24 @@ public class TestUnitStatusMapping
                 .HasConversion(new DurationConverter());
             o.Property(x => x.HighLowExecutionOffset).HasColumnName("high_low_execution_offset").IsRequired()
                 .HasConversion(new DurationConverter());
-            o.Property(x => x.RecordSharePrices).HasColumnName("record_share_prices").IsRequired();
-            o.Property(x => x.RecordTrades).HasColumnName("record_trades").IsRequired();
-            o.Property(x => x.ExpectedNumberOfTradesPerDay).HasColumnName("expected_trades_per_day").IsRequired();
-            o.Property(x => x.RecordPositionCloses).HasColumnName("record_position_closes").IsRequired();
-            o.Property(x => x.RecordEndOfDayPositions).HasColumnName("record_end_of_day_positions").IsRequired();
-            o.Property(x => x.ExpectedNumberOfPositionsPerDay).HasColumnName("expected_positions_per_day").IsRequired();
         });
         builder.OwnsOne(s => s.PersistOptions, o =>
         {
             o.Property(x => x.SaveStrategies).HasColumnName("save_strategies").IsRequired();
             o.Property(x => x.SaveTrades).HasColumnName("save_trades").IsRequired();
+            o.Property(x => x.ExpectedNumberOfTradesPerDay).HasColumnName("expected_trades_per_day").IsRequired();
             o.Property(x => x.SavePositions).HasColumnName("save_positions").IsRequired();
             o.Property(x => x.SaveDailyReturns).HasColumnName("save_daily_returns").IsRequired();
             o.Property(x => x.DoNotSaveZeroDailyReturns).HasColumnName("skip_zero_daily_returns").IsRequired();
             o.Property(x => x.SaveEndOfDayValues).HasColumnName("save_end_of_day_values").IsRequired();
+            o.Property(x => x.ExpectedNumberOfOpenPositionsAtEndOfDay).HasColumnName("expected_positions_per_day").IsRequired();
             o.Property(x => x.SaveStrategies).HasColumnName("save_strategies").IsRequired();
             o.Property(x => x.SaveMetrics).HasColumnName("save_metrics").IsRequired();
         });
         builder.Property(s => s.ContractOverride).HasColumnName("contract_override").HasColumnType("string")
             .HasConversion(new JsonValueConverter<ContractOverride?>());
         builder.Property(s => s.Data).HasColumnName("data");
+        builder.Property(s => s.MetricsCalculorData).HasColumnName("metrics_calculator_data");
         builder.Property(s => s.Status).HasColumnName("status").HasColumnType("text").IsRequired();
         builder.Property(s => s.StatusMessage).HasColumnName("status_message");
     }

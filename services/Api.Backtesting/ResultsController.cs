@@ -73,6 +73,14 @@ public class ResultsController(ITestUnitsRepository unitsRepository, ITestResult
         return values.Select(v => new BalanceValueView(v, currencies.GetValueOrDefault(v.CurrencyId, v.CurrencyId.ToString())));
     }
 
+    [HttpGet("{unitId:guid}/metrics")]
+    [EndpointName(nameof(GetMetrics))]
+    [Produces("application/json")]
+    public Task<MetricsTable?> GetMetrics(Guid unitId)
+    {
+        return repository.GetMetrics(unitId);
+    }
+
     // [HttpGet("{unitId:guid}/end-of-day")]
     // [EndpointName(nameof(GetEndOfDayPositions))]
     // [Produces("application/json")]
