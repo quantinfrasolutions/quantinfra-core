@@ -14,7 +14,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(UseLocalSdkReference)' == 'true'">
-        <ProjectReference Include="..\..\..\quantinfra-sdk\QuantInfra.Sdk.Backtesting\QuantInfra.Sdk.Backtesting.csproj" />
+        <ProjectReference Include="..\..\..\quantinfra-sdk\src\QuantInfra.Sdk.Backtesting\QuantInfra.Sdk.Backtesting.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(UseLocalSdkReference)' != 'true'">

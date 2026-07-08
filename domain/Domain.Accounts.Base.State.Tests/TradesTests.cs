@@ -62,7 +62,8 @@ public class TradesTests
             5000,
             2,
             securityType,
-            2
+            2,
+            PnLCalculatorType.Default, 0.01m, 0.01m, 1m
         ), true);
         
         var balances = _state.Balances;
@@ -92,7 +93,8 @@ public class TradesTests
             978,
             2,
             SecurityType.FX,
-            2
+            2,
+            PnLCalculatorType.Default, 0.01m, 0.01m, 1m
         ), true);
         
         var positions = _state.Positions.ToList();
@@ -126,7 +128,8 @@ public class TradesTests
             5000,
             2,
             securityType,
-            2
+            2,
+            PnLCalculatorType.Default, 0.01m, 0.01m, 1m
         ), true);
         
         var positions = _state.Positions.ToList();
@@ -161,7 +164,8 @@ public class TradesTests
             5000,
             8,
             securityType,
-            8
+            8,
+            PnLCalculatorType.InverseFutures, 0.1m, 0.1m, 1m
         ), true);
         
         var positions = _state.Positions.ToList();
@@ -174,7 +178,7 @@ public class TradesTests
         var balances = _state.Balances;
         Assert.That(balances.Count, Is.EqualTo(1));
         
-        Assert.That(balances, Contains.Key(840));
-        Assert.That(balances[840], Is.EqualTo(-20));
+        Assert.That(balances, Contains.Key(1000));
+        Assert.That(balances[1000], Is.EqualTo(-20));
     }
 }

@@ -4,10 +4,10 @@ WORKDIR /src
 COPY . .
 
 RUN dotnet restore \
-    apps/QuantInfra.Core.Apps.MonolithTradingService/QuantInfra.Core.Apps.MonolithTradingService.csproj
+    apps/TesterUI/TesterUI.csproj
 
 RUN dotnet publish --no-restore \
-    apps/QuantInfra.Core.Apps.MonolithTradingService/QuantInfra.Core.Apps.MonolithTradingService.csproj \
+    apps/TesterUI/TesterUI.csproj \
     -c Release \
     -o /app
 
@@ -18,6 +18,6 @@ WORKDIR /app
 COPY --from=publish /app .
 
 EXPOSE 8080
-ENTRYPOINT ["dotnet", "QuantInfra.Core.Apps.MonolithTradingService.dll"]
+ENTRYPOINT ["dotnet", "TesterUI.dll"]
 
 #MUST BE RUN FROM THE SOLUTION ROOT!

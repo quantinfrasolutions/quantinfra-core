@@ -34,10 +34,10 @@ public class KlineData : StreamDataBase
 {
     [JsonPropertyName("k")] public Kline Kline { get; set; }
 
-    public ExchangeBar ToExchangeBar(int streamId, int datasourceId, int? tradingSessionId) => 
+    public ExchangeBar ToExchangeBar(int streamId, int? tradingSessionId) => 
         new(streamId, null,
             Instant.FromUnixTimeMilliseconds(Kline.OpenTs), Instant.FromUnixTimeMilliseconds(Kline.CloseTs + 1),
-            Kline.Open, Kline.High, Kline.Low, Kline.Close, Kline.Volume, Kline.QuoteAssetVolume, datasourceId,
+            Kline.Open, Kline.High, Kline.Low, Kline.Close, Kline.Volume, Kline.QuoteAssetVolume,
             tradingSessionId
         );
 }

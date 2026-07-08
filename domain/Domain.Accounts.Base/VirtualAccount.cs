@@ -111,7 +111,7 @@ public sealed class VirtualAccount : AccountBase
             // }
             
             var contract = Query<GetContract, Contract?>(new(er.ContractId));
-            var calculator = contract.PLCalculator;
+            var calculator = contract.GetCalculator();
             // TODO: different cost for market and limit orders
         
             var tradeValue = calculator.GetValueInSettlementCcy(er.LastPx!.Value, er.LastQty!.Value);

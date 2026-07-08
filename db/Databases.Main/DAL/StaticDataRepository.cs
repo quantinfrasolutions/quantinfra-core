@@ -44,7 +44,7 @@ public class StaticDataRepository(IServiceProvider serviceProvider) : IStaticDat
             .Select(c => new ContractListView(
                 c.ContractId, c.Ticker,
                 new ContractTemplateListView(c.Template.TemplateId, c.Template.Name, c.Template.SecurityType,
-                    c.Template.PlCalculatorType,
+                    c.Template.PnLCalculatorType,
                     c.Template.Asset.AssetId, c.Template.Asset.Name, c.Template.MinSize, c.Template.MinSizeMoney,
                     c.Template.MaxSize, c.Template.MaxSizeMoney,
                     c.Template.SizeIncrement, c.Template.TickSize, c.Template.TickValue, c.Template.PriceQuotation,

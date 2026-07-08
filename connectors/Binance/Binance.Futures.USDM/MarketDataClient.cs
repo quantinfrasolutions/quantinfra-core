@@ -391,7 +391,7 @@ public class MarketDataClient : GenericWebSocketClient.Client,
         
         var subscription = _subscriptions[message.SubscriptionId];
         var streamId = subscription.StreamId;
-        bar = message.ToExchangeBar(subscription.StreamId ?? 0, _config.DatasourceId, _config.TradingSessionId);
+        bar = message.ToExchangeBar(subscription.StreamId ?? 0, _config.TradingSessionId);
         
         subscription.LastBar = bar;
         

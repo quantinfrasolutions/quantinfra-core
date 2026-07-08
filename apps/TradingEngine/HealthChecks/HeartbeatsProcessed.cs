@@ -2,7 +2,7 @@
 // using Microsoft.Extensions.Diagnostics.HealthChecks;
 // using NodaTime;
 //
-// namespace QuantInfra.Core.Apps.MonolithTradingService.HealthChecks
+// namespace TradingEngine.HealthChecks
 // {
 // #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 //     internal class HeartbeatsProcessedConfig

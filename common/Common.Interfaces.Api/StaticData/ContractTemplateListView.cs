@@ -1,11 +1,12 @@
 using QuantInfra.Sdk.StaticData;
+using QuantInfra.Sdk.Trading;
 
 namespace QuantInfra.Common.Interfaces.Api.StaticData;
 
 public class ContractTemplateListView
 {
     public ContractTemplateListView(int templateId, string name, SecurityType securityType,
-        PLCalculatorType plCalculatorType, int? assetId, string? assetName, decimal minSize, decimal? minSizeMoney,
+        PnLCalculatorType plCalculatorType, int? assetId, string? assetName, decimal minSize, decimal? minSizeMoney,
         decimal maxSize, decimal? maxSizeMoney, decimal sizeIncrement, decimal tickSize, decimal? tickValue,
         decimal priceQuotation, int settlementCurrencyId, string settlementCurrencyName, int? baseCurrencyId,
         string? baseCurrencyName, int? quoteCurrencyId, string? quoteCurrencyName, int? defaultDatafeedId,
@@ -45,7 +46,7 @@ public class ContractTemplateListView
     public int TemplateId { get; init; }
     public string Name { get; init; }
     public SecurityType SecurityType { get; init; }
-    public PLCalculatorType PlCalculatorType { get; init; }
+    public PnLCalculatorType PlCalculatorType { get; init; }
     public int? AssetId { get; init; }
     public string? AssetName { get; init; }
     public decimal MinSize { get; init; }

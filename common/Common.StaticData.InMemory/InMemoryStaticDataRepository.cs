@@ -244,8 +244,6 @@ public class InMemoryStaticDataRepository :
 
     public Contract GetContract(int contractId) => Contracts[contractId];
 
-    public IPnLCalculator GetCalculator(int contractId) => GetContract(contractId).PLCalculator;
-
     // public IEnumerable<StreamDefinition> GetStreamDefinitions() => Streams.Values;
 
     public IEnumerable<Stream> GetStreams() => Streams.Values;
@@ -362,6 +360,11 @@ public class InMemoryStaticDataRepository :
 
     public Broker GetBroker(int brokerId) => Brokers[brokerId];
     public string? GetContractOrderBookSubscriptionServiceName(int contractId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IReadOnlyCollection<Stream> GetStreams(IEnumerable<int> streamIds)
     {
         throw new NotImplementedException();
     }

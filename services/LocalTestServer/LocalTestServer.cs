@@ -465,7 +465,7 @@ public class LocalTestServer : ITestServer, ITypeResolver
                         c.Template.SecurityType, c.Template.Asset, c.Template.MinSize, c.Template.MinSizeMoney,
                         c.Template.MaxSize, c.Template.MaxSizeMoney, c.Template.SizeIncrement, c.Template.TickSize,
                         c.Template.TickValue, c.Template.PriceQuotation, c.Template.SettlementCurrency,
-                        c.Template.PlCalculatorType, c.Template.BaseCurrency, c.Template.QuoteCurrency,
+                        c.Template.PnLCalculatorType, c.Template.BaseCurrency, c.Template.QuoteCurrency,
                         c.Template.DefaultDatafeed, 
                         [new CommissionStructure
                         {
@@ -544,7 +544,7 @@ public class LocalTestServer : ITestServer, ITypeResolver
             contractOverride.MinSize, contractOverride.MinSizeMoney,
             contractOverride.MaxSize, contractOverride.MaxSizeMoney,
             contractOverride.SizeIncrement, contractOverride.TickSize, contractOverride.TickValue, 1, usd!,
-            contractOverride.PlCalculatorType, null, null,
+            contractOverride.PnLCalculatorType, null, null,
             new Datafeed() { DatafeedId = -1 },
             [
                 new CommissionStructure()

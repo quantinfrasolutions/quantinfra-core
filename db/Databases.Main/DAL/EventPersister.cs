@@ -115,7 +115,7 @@ public class EventPersister(MainContext context) : IEventPersister
         {
             AccountId = evt.AccountId,
             TradeId = evt.Trade.TradeId,
-            Data = JsonSerializer.SerializeToDocument<TradeEvtData>(new(evt.AssetId)), 
+            Data = JsonSerializer.SerializeToDocument<TradeEvtData>(new(evt.AssetId, evt.PnLCalculatorOptions)), 
         };
         context.Events.Add(evtRecord);
 
@@ -271,7 +271,12 @@ public class EventPersister(MainContext context) : IEventPersister
 
     public void RecordEvent(string accountServiceName, AccountEndOfDayEvt evt)
     {
-        var evtRecord = new Event(accountServiceName, evt.EventId, evt.GetType().FullName!, evt.Timestamp, evt.Version) { AccountId = evt.AccountId };
+        var evtRecord = new Event(accountServiceName, evt.EventId, evt.GetType().FullName!, evt.Timestamp, evt.Version)
+        {
+            AccountId = evt.AccountId,
+            Data = JsonSerializer.SerializeToDocument(new AccountEndOfDayEvtData(evt.PnLCalculatorOptions), 
+                PersistentEventStorage.JsonSerializerOptions)
+        };
         context.Events.Add(evtRecord);
 
         foreach (var pv in evt.PositionValues)

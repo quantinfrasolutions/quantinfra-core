@@ -60,7 +60,7 @@ public class ExecutionTests
     
     private static Contract _contractWithNoExternalId = new Contract(10000, "Test",
         new(10000, "Test", SecurityType.Stock, new() { AssetId = 10000, }, 1, null, 10000, null, 1, 0.01m, null, 1, _usd,
-        PLCalculatorType.Default, null,
+        PnLCalculatorType.Default, null,
         null, null, new List<CommissionStructure>(), new List<TradingSession>(), new Exchange(),
         new Broker() { BrokerId = 100 },
         252, null),
@@ -68,7 +68,7 @@ public class ExecutionTests
     
     private static Contract _contractWithExternalId = new Contract(10000, "Test",
         new(10000, "Test", SecurityType.Stock, new() { AssetId = 10000, }, 1, null, 10000, null, 1, 0.01m, null, 1, _usd,
-            PLCalculatorType.Default, null,
+            PnLCalculatorType.Default, null,
             null, null, new List<CommissionStructure>(), new List<TradingSession>(), new Exchange(),
             new Broker() { BrokerId = 100 },
             252, null),
@@ -659,7 +659,8 @@ public class ExecutionTests
             10000,
             2,
             SecurityType.Stock,
-            2
+            2,
+            PnLCalculatorType.Default, 0.01m, 0.01m, 1m
         ), true);
         _internalTradesHistory.Events.Clear();
         
@@ -706,7 +707,8 @@ public class ExecutionTests
             10000,
             2,
             SecurityType.Stock,
-            2
+            2,
+            PnLCalculatorType.Default, 0.01m, 0.01m, 1m
         ), true);
         _internalTradesHistory.Events.Clear();
         
@@ -724,7 +726,9 @@ public class ExecutionTests
         var positions = _baState.Positions.ToList();
         Assert.That(positions.Count, Is.EqualTo(1));
         var pos = positions.Single();
-        Assert.That(pos is { SignedVolume: -8, OpenPrice: 11, ContractId: 10000 });
+        Assert.That(pos.SignedVolume, Is.EqualTo(-8));
+        Assert.That(pos.OpenPrice, Is.EqualTo(11));
+        Assert.That(pos.ContractId, Is.EqualTo(10000));
         
         Assert.That(_internalTradesHistory.Events.Count, Is.EqualTo(2 + (numberOfSsas == 1 ? 2 : 0))); // 2 corrections, 2 possible allocations
     }
@@ -923,7 +927,7 @@ public class ExecutionTests
         
         var c10001 = new Contract(10001, "Test",
             new(10000, "Test", SecurityType.Stock, new() { AssetId = 10000 }, 1, null, 10000, null, 1, 0.01m, null, 1, _usd,
-                PLCalculatorType.Default, null,
+                PnLCalculatorType.Default, null,
                 null, null, new List<CommissionStructure>(), new List<TradingSession>(), new Exchange(),
                 new Broker() { BrokerId = 100 },
                 252, null),
@@ -931,7 +935,7 @@ public class ExecutionTests
         
         var c10002 = new Contract(10002, "Test",
             new(10000, "Test", SecurityType.Stock, new() { AssetId = 10002 }, 1, null, 10000, null, 1, 0.01m, null, 1, _usd,
-                PLCalculatorType.Default, null,
+                PnLCalculatorType.Default, null,
                 null, null, new List<CommissionStructure>(), new List<TradingSession>(), new Exchange(),
                 new Broker() { BrokerId = 100 },
                 252, null),
@@ -939,7 +943,7 @@ public class ExecutionTests
         
         var c10003 = new Contract(10003, "Test",
             new(10000, "Test", SecurityType.Stock, new() { AssetId = 10003 }, 1, null, 10000, null, 1, 0.01m, null, 1, _usd,
-                PLCalculatorType.Default, null,
+                PnLCalculatorType.Default, null,
                 null, null, new List<CommissionStructure>(), new List<TradingSession>(), new Exchange(),
                 new Broker() { BrokerId = 100 },
                 252, null),
@@ -969,9 +973,12 @@ public class ExecutionTests
         var t3 = new Trade("AS-test", _idsProvider.GetNextTradeId(), null, _brokerAccountId, 10002, null, null, null,
             null, null, Side.Buy, 3, 50000, 0, _clock.GetCurrentInstant(), null, null, null, 840, 1, 150000, null, null, false);
         
-        _baState.Apply(new TradeEvt(_idsProvider.GetNextEventId(), _brokerAccountId, t1, _baState.GetNextVersion(), _clock.GetCurrentInstant(), 10000, 2, SecurityType.Stock, 2), true);
-        _baState.Apply(new TradeEvt(_idsProvider.GetNextEventId(), _brokerAccountId, t2, _baState.GetNextVersion(), _clock.GetCurrentInstant(), 10000, 2, SecurityType.Stock, 2), true);
-        _baState.Apply(new TradeEvt(_idsProvider.GetNextEventId(), _brokerAccountId, t3, _baState.GetNextVersion(), _clock.GetCurrentInstant(), 10000, 2, SecurityType.Stock, 2), true);
+        _baState.Apply(new TradeEvt(_idsProvider.GetNextEventId(), _brokerAccountId, t1, _baState.GetNextVersion(), _clock.GetCurrentInstant(), 10000, 2, SecurityType.Stock, 2,
+            PnLCalculatorType.Default, 0.01m, 0.01m, 1m), true);
+        _baState.Apply(new TradeEvt(_idsProvider.GetNextEventId(), _brokerAccountId, t2, _baState.GetNextVersion(), _clock.GetCurrentInstant(), 10000, 2, SecurityType.Stock, 2,
+            PnLCalculatorType.Default, 0.01m, 0.01m, 1m), true);
+        _baState.Apply(new TradeEvt(_idsProvider.GetNextEventId(), _brokerAccountId, t3, _baState.GetNextVersion(), _clock.GetCurrentInstant(), 10000, 2, SecurityType.Stock, 2,
+            PnLCalculatorType.Default, 0.01m, 0.01m, 1m), true);
         _internalTradesHistory.Events.Clear();
     
         var snapshot = new AccountPositionsSnapshot

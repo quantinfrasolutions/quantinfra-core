@@ -1,5 +1,6 @@
 using NodaTime;
 using QuantInfra.Sdk.StaticData;
+using QuantInfra.Sdk.Trading;
 using QuantInfra.Sdk.Trading.Orders;
 
 namespace QuantInfra.Databases.Main.Models.Events;
@@ -32,7 +33,13 @@ internal readonly struct OrderCancelReplaceRejectEvtData(CxlRejReason reason, st
     public string? RejectText { get; } = rejectText;
 }
 
-internal readonly struct TradeEvtData(int assetId)
+internal readonly struct TradeEvtData(int assetId, PnLCalculatorOptions options)
 {
     public int AssetId { get; } = assetId;
+    public PnLCalculatorOptions Options { get; } = options;
+}
+
+internal readonly struct AccountEndOfDayEvtData(IReadOnlyDictionary<int, PnLCalculatorOptions> options)
+{
+    public IReadOnlyDictionary<int, PnLCalculatorOptions> Options { get; } = options;
 }

@@ -14,12 +14,12 @@ namespace QuantInfra.Services.MarketData.TradeAggregators
         protected void StartNewAggregation(int streamId, int? contractId, Instant dt, double price, double volume,
             int datasourceId, int? tradingSessionId)
         {
-            Aggregation = new(streamId, contractId, dt, Instant.MinValue, price, price, price, price, volume, 0, datasourceId, tradingSessionId);
+            Aggregation = new(streamId, contractId, dt, Instant.MinValue, price, price, price, price, volume, 0, tradingSessionId);
         }
 
         protected void StartNewAggregation(Instant dt, ExchangeBar bar)
         {
-            Aggregation = new(bar.StreamId, bar.ContractId, dt, Instant.MinValue, bar.Open, bar.High, bar.Low, bar.Close, bar.Volume, bar.DollarValue, bar.DatasourceId, bar.TradingSessionId);
+            Aggregation = new(bar.StreamId, bar.ContractId, dt, Instant.MinValue, bar.Open, bar.High, bar.Low, bar.Close, bar.Volume, bar.DollarValue, bar.TradingSessionId);
         }
 
         protected ExchangeBar CloseAggregation(Instant closeDt)

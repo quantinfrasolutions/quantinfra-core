@@ -148,7 +148,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Utils.ExecutableAppB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Interfaces.Api", "common\Common.Interfaces.Api\Common.Interfaces.Api.csproj", "{2F37F6A1-F15D-4372-960E-1862EAA4E92E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantInfra.Core.Apps.MonolithTradingService", "apps\QuantInfra.Core.Apps.MonolithTradingService\QuantInfra.Core.Apps.MonolithTradingService.csproj", "{6E2FE049-3ED3-4FFC-97DE-D7F01F8986B8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradingEngine", "apps\TradingEngine\TradingEngine.csproj", "{6E2FE049-3ED3-4FFC-97DE-D7F01F8986B8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Messaging.InProcess", "common\Common.Messaging.InProcess\Common.Messaging.InProcess.csproj", "{101342F6-D960-455E-BDF5-9B344D610DC2}"
 EndProject

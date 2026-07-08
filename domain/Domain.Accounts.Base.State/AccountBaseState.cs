@@ -215,9 +215,10 @@ public class AccountBaseState : Aggregate, IAccountStateReadonly
 
                 (actualPosition, historyRecord) = position
                     .ChangePosition(trade.TradeId, trade.SignedVolume, trade.Price, trade.CalculatedCcyLastQty,
-                        trade.FxRate,
-                        tradeEvt.AccountCcyPrecision, trade.Dt, trade.Commission, tradeEvt.SettlCcyPrecision,
-                        trade.ParentPositionId);
+                        trade.FxRate, tradeEvt.AccountCcyPrecision, trade.Dt, trade.Commission, 
+                        tradeEvt.SettlCcyPrecision, trade.ParentPositionId, 
+                        tradeEvt.PnLCalculatorOptions.GetCalculator()
+                    );
             }
             else
             {
@@ -227,6 +228,7 @@ public class AccountBaseState : Aggregate, IAccountStateReadonly
                     AccountId,
                     trade.Volume,
                     trade.Side,
+                    trade.Price,
                     trade.CalculatedCcyLastQty,
                     trade.FxRate,
                     tradeEvt.AccountCcyPrecision,
@@ -319,14 +321,14 @@ public class AccountBaseState : Aggregate, IAccountStateReadonly
         foreach (var position in positions)
         {
             Position actualPosition, positionHistory;
-            if (evt.PositionValues.TryGetValue(position.OpenTradeId, out var value))
+            if (evt.PositionValues.TryGetValue(position.OpenTradeId, out var value) && value.Price.HasValue)
             {
-                (actualPosition, positionHistory) = position.MarkToMarket(evt.ReferenceDt, value.Price, value.SignedValue, value.SignedValueInAccountCcy);
+                (actualPosition, positionHistory) = position.MarkToMarket(evt.ReferenceDt, value.Price.Value, value.SignedValue, value.SignedValueInAccountCcy, evt.PnLCalculatorOptions[position.ContractId].GetCalculator());
             }
             else
             {
                 Logger.LogWarning("Position {openTradeid} not found in EOD", position.OpenTradeId);
-                (actualPosition, positionHistory) = position.MarkToMarket(evt.ReferenceDt, position.SettlPrice, position.TotalSettlPayments, position.TotalSettlPaymentsInAccountCcy);
+                (actualPosition, positionHistory) = position.MarkToMarket(evt.ReferenceDt, position.SettlPrice, position.TotalSettlPayments, position.TotalSettlPaymentsInAccountCcy, evt.PnLCalculatorOptions[position.ContractId].GetCalculator());
             }
             var posEvt = new PositionChangedEvt(evt.EventId, AccountId, actualPosition, positionHistory, PositionChangeType.MTM, evt.Timestamp, value);
             Apply(posEvt);

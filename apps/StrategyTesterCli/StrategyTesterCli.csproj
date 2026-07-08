@@ -6,7 +6,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>preview</LangVersion>
-        <AssemblyName>QuantInfra.Core.Apps.StrategyTesterCli</AssemblyName>
         <RootNamespace>QuantInfra.Core.Apps.StrategyTesterCli</RootNamespace>
     </PropertyGroup>
 

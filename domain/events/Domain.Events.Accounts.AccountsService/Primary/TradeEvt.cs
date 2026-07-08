@@ -13,5 +13,6 @@ public record TradeEvt(
     int AssetId,
     int SettlCcyPrecision,
     SecurityType SecurityType,
-    int AccountCcyPrecision
+    int AccountCcyPrecision,
+    PnLCalculatorOptions PnLCalculatorOptions
 ) : IAccountEventBase;

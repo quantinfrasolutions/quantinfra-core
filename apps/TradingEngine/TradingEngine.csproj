@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <LangVersion>default</LangVersion>
+        <RootNamespace>QuantInfra.Core.Apps.TradingEngine</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

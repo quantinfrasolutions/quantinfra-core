@@ -7,6 +7,7 @@ using QuantInfra.Sdk.Accounts;
 using QuantInfra.Sdk.MarketData;
 using QuantInfra.Sdk.StaticData;
 using QuantInfra.Sdk.Strategies;
+using QuantInfra.Sdk.Trading;
 using QuantInfra.Tests.Mocks;
 using Stream = QuantInfra.Sdk.StaticData.Stream;
 
@@ -48,7 +49,7 @@ public class TestLoadStrategies
         var exchange = new Exchange();
         sdRepository.CreateExchange(exchange);
         var template = new ContractTemplate(10000, "TEST", SecurityType.Stock, null, 1, null, 100, null, 1, 0.01m, 0.01m, 1,
-            currency, PLCalculatorType.Default, null, null, null, null, null,
+            currency, PnLCalculatorType.Default, null, null, null, null, null,
             exchange, null, 252, null);
         sdRepository.CreateContractTemplate(template);
         var streams = new List<Stream>();

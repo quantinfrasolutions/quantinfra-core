@@ -10,7 +10,7 @@
     </PropertyGroup>
 
     <ItemGroup Condition="'$(UseLocalSdkReference)' == 'true'">
-        <ProjectReference Include="..\..\..\..\quantinfra-sdk\QuantInfra.Sdk.Package\QuantInfra.Sdk.Package.csproj" />
+        <ProjectReference Include="..\..\..\..\quantinfra-sdk\src\QuantInfra.Sdk.Package\QuantInfra.Sdk.Package.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(UseLocalSdkReference)' != 'true'">

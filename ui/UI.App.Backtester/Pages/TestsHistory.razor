@@ -5,7 +5,11 @@
 @inject IUiTestUnitsRepository Repository
 
 @layout MainLayout
+
+@page "/"
 @page "/tests/history"
+
+<PageTitle>History</PageTitle>
 
 <EditableView TItem="TestUnitListView"
               TFilter="TestUnitsFilter"

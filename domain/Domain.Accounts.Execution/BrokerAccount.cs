@@ -623,7 +623,7 @@ public class BrokerAccount : AccountBase, IBrokerAccount
 
         if (BrokerType == BrokerType.Ibkr)
         {
-            calculatedLastCcyOverride = contract.PLCalculator
+            calculatedLastCcyOverride = contract.GetCalculator()
                 .GetValueInSettlementCcy(externalTradeRecord.Price, externalTradeRecord.Volume);
         }
 
@@ -878,7 +878,7 @@ public class BrokerAccount : AccountBase, IBrokerAccount
     {
         List<Trade> offsetTrades = new();
         
-        var openPayments = contract.PLCalculator.GetValueInSettlementCcy(p.OpenPrice, Math.Abs(p.SignedVolume));
+        var openPayments = contract.GetCalculator().GetValueInSettlementCcy(p.OpenPrice, Math.Abs(p.SignedVolume));
         if (p.SignedVolume != ep.SignedVolume || (p.SignedVolume != 0 && openPayments != ep.TotalOpenPayments))
         {
             if (LoggingEnabled && LogLevel <= LogLevel.Warning)
@@ -892,7 +892,7 @@ public class BrokerAccount : AccountBase, IBrokerAccount
             }
             
             offsetTrades = ep.GetOffsetTrades(ServiceName, TradeIdProvider, AccountId, contract.ContractId, 
-                p.SignedVolume, openPayments, referenceDt, contract.PLCalculator, 
+                p.SignedVolume, openPayments, referenceDt, contract.GetCalculator(), 
                 contract.Template.SettlementCurrency.CurrencyId, fxRate);
             foreach (var t in offsetTrades)
             {

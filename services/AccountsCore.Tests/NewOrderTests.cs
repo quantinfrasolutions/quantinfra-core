@@ -62,7 +62,7 @@ public class NewOrderTests
         var exchange = new Exchange();
         sdRepository.CreateExchange(exchange);
         var template = new ContractTemplate(10000, "TEST", SecurityType.Stock, null, 1, null, 100, null, 1, 0.01m, 0.01m, 1,
-            currency, PLCalculatorType.Default, null, null, null, null, null,
+            currency, PnLCalculatorType.Default, null, null, null, null, null,
             exchange, null, 252, null);
         sdRepository.CreateContractTemplate(template);
         var contract = new Contract(10000, "TEST", template, null, null, null, null, null, null, null, null,

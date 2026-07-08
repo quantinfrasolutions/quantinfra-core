@@ -134,7 +134,9 @@ public class StaticDataProvider(IServiceProvider serviceProvider) : IStaticDataP
             )
             .Select(c => new { c.ContractId, isDirect = c.Contract.Template.BaseCurrency!.CurrencyId == fromCcyId })
             .AsNoTracking()
-            .Single();
+            .SingleOrDefault();
+        
+        if (res == null) throw new InvalidOperationException($"Cannot find contract for FX conversion from {fromCcyId} to {toCcyId}");
 
         return (res.ContractId, res.isDirect);
     }

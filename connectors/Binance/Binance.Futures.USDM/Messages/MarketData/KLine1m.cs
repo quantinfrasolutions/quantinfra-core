@@ -17,7 +17,7 @@ public readonly record struct Kline1m(
     bool IsClosed
 )
 {
-    public ExchangeBar ToExchangeBar(int streamId, int datafeedId, int? tradingSessionId) => new(
+    public ExchangeBar ToExchangeBar(int streamId, int? tradingSessionId) => new(
         streamId,
         null,
         Instant.FromUnixTimeMilliseconds(OpenTimeMs),
@@ -28,7 +28,6 @@ public readonly record struct Kline1m(
         Close,
         Volume,
         0,
-        datafeedId,
         tradingSessionId
     );
 }

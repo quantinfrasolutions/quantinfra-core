@@ -93,7 +93,7 @@ public class AccountBase : Processor, IAccount
             fxRate = Query<GetConversionRate, decimal?>(new(AccountCurrency.CurrencyId, contract.Template.SettlementCurrency.CurrencyId));
             if (fxRate == null) return null;
         }
-        var tradeSize = AccountState.Investment * fxRate / contract.PLCalculator.GetValueInSettlementCcy(price.Value, 1);
+        var tradeSize = AccountState.Investment * fxRate / contract.GetCalculator().GetValueInSettlementCcy(price.Value, 1);
         if (AccountType == AccountType.VirtualAccount)
             return Math.Round(tradeSize.Value, 8); // TODO: move VirtualAccountSizeFraction to config
         
@@ -443,7 +443,8 @@ public class AccountBase : Processor, IAccount
             contract.Asset?.AssetId ?? contract.Template.Asset!.AssetId,
             contract.GetSettlementCurrencyPrecision(),
             contract.Template.SecurityType,
-            AccountCurrency.Decimals
+            AccountCurrency.Decimals,
+            contract.Template.GetPnLCalculatorOptions()
         );
         AccountState.Apply(tradeEvt, true);
             
@@ -555,7 +556,7 @@ public class AccountBase : Processor, IAccount
         if (LoggingEnabled && Logger.IsEnabled(LogLevel.Information))
             Logger.LogInformation($"MarkToMarketEOD, referenceDt={referenceDt}, processingDt={processingDt}");
         
-        var (positionValues, balanceValues, success) = MarkToMarket(eodPrices, referenceDt);
+        var (positionValues, balanceValues, options, success) = MarkToMarket(eodPrices, referenceDt);
 
         var evt = new AccountEndOfDayEvt(
             EventIdProvider.GetNextEventId(),
@@ -564,6 +565,7 @@ public class AccountBase : Processor, IAccount
             positionValues,
             balanceValues,
             success,
+            options,
             referenceDt,
             processingDt
         );
@@ -620,29 +622,47 @@ public class AccountBase : Processor, IAccount
         }
     }
 
-    public (IReadOnlyDictionary<long, PositionValue> positionValues, IReadOnlyDictionary<int, BalanceValue> balanceValues, bool success) MarkToMarket(Instant dt)
+    public (
+        IReadOnlyDictionary<long, PositionValue> positionValues, 
+        IReadOnlyDictionary<int, BalanceValue> balanceValues, 
+        IReadOnlyDictionary<int, PnLCalculatorOptions> pnLCalculatorOptions, 
+        bool success
+    ) MarkToMarket(Instant dt)
     {
         var prices = Query<GetLastKnownContractPrices, IReadOnlyDictionary<int, decimal>>(new());
         return MarkToMarket(prices, dt);
     }
     
-    public (IReadOnlyDictionary<long, PositionValue> positionValues, IReadOnlyDictionary<int, BalanceValue> balanceValues, bool success) MarkToMarket(IReadOnlyDictionary<int, decimal> prices, Instant dt)
+    public (
+        IReadOnlyDictionary<long, PositionValue> positionValues, 
+        IReadOnlyDictionary<int, BalanceValue> balanceValues, 
+        IReadOnlyDictionary<int, PnLCalculatorOptions> pnLCalculatorOptions, 
+        bool success
+    ) MarkToMarket(IReadOnlyDictionary<int, decimal> prices, Instant dt)
     {
         var success = true;
 
         Dictionary<int, PositionSum> values = new();
-        
+        Dictionary<int, PnLCalculatorOptions> options = new();
         var positionValues = AccountState.Positions.ToDictionary(
             p => p.OpenTradeId,
             p =>
             {
-                var contract = Query<GetContract, Contract>(new(p.ContractId));
+                var contract = Query<GetContract, Contract?>(new(p.ContractId));
+
+                if (!options.TryGetValue(p.ContractId, out var pnlCalcOptions))
+                {
+                    pnlCalcOptions = contract.Template.GetPnLCalculatorOptions();
+                    options.Add(p.ContractId, pnlCalcOptions);
+                }
+                
+                var calculator = pnlCalcOptions.GetCalculator();
                 decimal? price = null;
                 decimal value;
                 if (prices.ContainsKey(p.ContractId))
                 {
                     price = prices[p.ContractId];
-                    value = contract.PLCalculator.GetValueInSettlementCcy(prices[p.ContractId], p.Volume,
+                    value = calculator.GetValueInSettlementCcy(prices[p.ContractId], p.Volume,
                         contract.Template.SettlementCurrency.Decimals) * p.Side.GetSign();
                 }
                 else
@@ -673,7 +693,7 @@ public class AccountBase : Processor, IAccount
                     case SecurityType.CFD or SecurityType.Futures:
                         // For futures and CFDs there is no upfront payment, and the balance doesn't decrease.
                         // The value included into equity is hence the floating PnL
-                        equityValueInAccountCcy = value - p.TotalOpenPayments * p.Side.GetSign();
+                        equityValueInAccountCcy = calculator.GetPnL(p.TotalOpenPayments * p.Side.GetSign(), value);
                         if (settlCcyId != AccountCurrency.CurrencyId)
                         {
                             equityValueInAccountCcy = ConvertToAccountCurrency(equityValueInAccountCcy, settlCcyId, prices, out successfulConversion, out _);
@@ -727,7 +747,7 @@ public class AccountBase : Processor, IAccount
                     totalAmount, value, fxRate);
             });
 
-        return (positionValues, balanceValues, success);
+        return (positionValues, balanceValues, options, success);
     }
 
     class PositionSum

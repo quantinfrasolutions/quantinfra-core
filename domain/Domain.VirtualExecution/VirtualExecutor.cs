@@ -100,7 +100,7 @@ public class VirtualExecutor : IConfigurableLoggingModule
                     if (checkMarketOrdersOnly && o.OrdType != OrdType.Market) continue;
 
                     var er = o.CheckExecution(_execIdProvider, price, contract, referenceDt, processingDt,
-                        contract.PLCalculator,
+                        contract.GetCalculator(),
                         useStopPx: stopOrdersExecution == StopOrdersExecution.StopPx,
                         tradingSessionId: tradingSessionId,
                         immediateCancellation: true);
@@ -178,7 +178,7 @@ public class VirtualExecutor : IConfigurableLoggingModule
                     || o is { Side: Side.Buy, OrdType: OrdType.StopMarket } // SL for short position
                 ) ? high : low;
                 
-                var er = o.CheckExecution(_execIdProvider, triggerPrice, contract, referenceDt, processingDt, contract.PLCalculator, 
+                var er = o.CheckExecution(_execIdProvider, triggerPrice, contract, referenceDt, processingDt, contract.GetCalculator(), 
                     useStopPx: stopOrdersExecution == StopOrdersExecution.StopPx,
                     tradingSessionId: tradingSessionId, immediateCancellation: true, 
                     executionPrice: stopOrdersExecution == StopOrdersExecution.BarClose ? executionPrice : null

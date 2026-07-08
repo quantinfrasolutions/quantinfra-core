@@ -15,7 +15,7 @@ public class ContractTemplateConfiguration : IEntityTypeConfiguration<ContractTe
             .IsRequired();
         builder.Property(a => a.Name).HasColumnName("name").IsRequired();
         builder.Property(t => t.SecurityType).HasColumnName("security_type").HasColumnType("text").IsRequired();
-        builder.Property(t => t.PlCalculatorType).HasColumnName("pl_calculator_type").HasColumnType("text").IsRequired();
+        builder.Property(t => t.PnLCalculatorType).HasColumnName("pl_calculator_type").HasColumnType("text").IsRequired();
         builder.HasOne(t => t.Asset)
             .WithMany()
             .HasForeignKey("asset_id")

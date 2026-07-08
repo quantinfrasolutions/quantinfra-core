@@ -9,6 +9,7 @@ using NodaTime.Text;
 using QuantInfra.Common.Interfaces.Api.StaticData;
 using QuantInfra.Databases.Main;
 using QuantInfra.Sdk.StaticData;
+using QuantInfra.Sdk.Trading;
 using Stream = QuantInfra.Sdk.StaticData.Stream;
 
 namespace QuantInfra.Core.Services.Api.StaticData;
@@ -481,7 +482,7 @@ public class StaticDataController(MainContext context, IStaticDataRepositoryRead
             .Skip(filter.Offset)
             .Take(filter.Limit)
             .Select(c => new ContractTemplateListView(
-                c.TemplateId, c.Name, c.SecurityType, c.PlCalculatorType,
+                c.TemplateId, c.Name, c.SecurityType, c.PnLCalculatorType,
                 c.Asset != null ? c.Asset.AssetId : null, c.Asset != null ? c.Asset.Name : null, 
                 c.MinSize, c.MinSizeMoney, c.MaxSize, c.MaxSizeMoney,
                 c.SizeIncrement, c.TickSize, c.TickValue, c.PriceQuotation, 
@@ -507,7 +508,7 @@ public class StaticDataController(MainContext context, IStaticDataRepositoryRead
         var existingTemplate = await context.ContractTemplates.AsNoTracking().SingleOrDefaultAsync(c => c.Name == request.Name);
         if (existingTemplate is not null) ModelState.AddModelError(nameof(request.Name), $"Duplicate name ({existingTemplate.TemplateId})");
 
-        if (request is { PlCalculatorType: PLCalculatorType.DefaultFutures, TickValue: null }) 
+        if (request is { PlCalculatorType: PnLCalculatorType.Futures or PnLCalculatorType.InverseFutures, TickValue: null }) 
             ModelState.AddModelError(nameof(request.TickValue), $"TickValue is required for futures");
 
         Asset? asset = null;

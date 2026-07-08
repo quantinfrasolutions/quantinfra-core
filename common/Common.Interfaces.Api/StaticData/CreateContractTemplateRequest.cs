@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using QuantInfra.Sdk.StaticData;
+using QuantInfra.Sdk.Trading;
 
 namespace QuantInfra.Common.Interfaces.Api.StaticData;
 
@@ -7,7 +8,7 @@ public class CreateContractTemplateRequest
 {
     [Required(ErrorMessage = "Template name is required")] public string Name { get; set; }
     [Required(ErrorMessage = "Security type iis required")] public SecurityType SecurityType { get; set; } = SecurityType.Stock;
-    public PLCalculatorType PlCalculatorType { get; set; } = PLCalculatorType.Default;
+    public PnLCalculatorType PlCalculatorType { get; set; } = PnLCalculatorType.Default;
     public int? AssetId { get; set; }
     
     [Required(ErrorMessage = "MinSize is required")]

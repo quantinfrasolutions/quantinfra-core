@@ -74,13 +74,11 @@
         var s = StrategyBase.Strategy;
 
         return JsonSerializer.Serialize(
-            new StrategyConfig(s.StrategyId, s.Name, s.StrategyClassName, s.Params,
+            new StrategyConfig(s.Name, s.StrategyClassName, s.Params,
                 s.RequiredBarStorages.ToDictionary(kv => kv.Key, kv => kv.Value.ToBarStorageConfig()),
                 s.Symbols.ToDictionary(kv => kv.Key, kv => kv.Value.Id),
                 s.LiquidationParameters, s.UseSignalGroups),
             options
         ).Replace('\u0022', '\"');
-        
-        // .Replace('\u0022', '\"')
     }
 }

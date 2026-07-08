@@ -84,10 +84,12 @@ public class PersistentEventStorage(IServiceProvider serviceProvider) : IPersist
         switch (e.EventType)
         {
             case "QuantInfra.Domain.Events.Accounts.AccountsService.Primary.AccountEndOfDayEvt":
+                var eodData = e.Data!.Deserialize<AccountEndOfDayEvtData>();
                 return new AccountEndOfDayEvt(e.EventId, e.AccountId!.Value, e.Version,
                         e.EndOfDayPositions.ToDictionary(p => p.PositionId),
                         e.EndOfDayBalances.ToDictionary(b => b.Currency.CurrencyId, b => (BalanceValue)b),
                         true,
+                        eodData.Options,
                         e.EndOfDayPositions.Select(p => p.Dt).DefaultIfEmpty(e.Timestamp).First(),
                         e.Timestamp);
 
@@ -101,9 +103,9 @@ public class PersistentEventStorage(IServiceProvider serviceProvider) : IPersist
                     e.ExecutionReport!, e.Timestamp);
 
             case "QuantInfra.Domain.Events.Accounts.AccountsService.Primary.ExternalExecutionReportEvt":
-                var data = e.Data!.Deserialize<ExternalExecutionReportEvtData>();
+                var eerData = e.Data!.Deserialize<ExternalExecutionReportEvtData>();
                 return new ExternalExecutionReportEvt(e.EventId, e.AccountId!.Value, e.Version,
-                    data.BrokerType, data.ExternalContractId, e.ExecutionReport!, e.Timestamp);
+                    eerData.BrokerType, eerData.ExternalContractId, e.ExecutionReport!, e.Timestamp);
 
             case "QuantInfra.Domain.Events.Accounts.AccountsService.Primary.NewOrderSingleExternalCreatedEvt":
                 return new NewOrderSingleExternalCreatedEvt(e.EventId, e.AccountId!.Value,
@@ -161,7 +163,8 @@ public class PersistentEventStorage(IServiceProvider serviceProvider) : IPersist
                 var tradeData = e.Data!.Deserialize<TradeEvtData>()!;                
                 return new TradeEvt(e.EventId, e.AccountId!.Value, e.Trade!, e.Version, e.Timestamp,
                     tradeData.AssetId, e.Trade!.PaymentCurrency.Decimals,
-                    e.Trade.Contract.Template.SecurityType, e.Account!.Currency.Decimals);
+                    e.Trade.Contract.Template.SecurityType, e.Account!.Currency.Decimals,
+                    tradeData.Options);
             
             case "QuantInfra.Domain.Events.Accounts.AccountsService.Primary.AccountReconciliationStatusChangedEvt":
                 var reconData = JsonSerializer.Deserialize<AccountReconciliationStatusChangedEvtData>(e.Data!);

@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using QuantInfra.Sdk.Backtesting;
 using QuantInfra.Sdk.StaticData;
+using QuantInfra.Sdk.Trading;
 
 namespace QuantInfra.Common.Interfaces.Api.Backtesting;
 
@@ -8,7 +9,7 @@ public class ContractOverrideModel
 {
     public bool OverrideAllContracts { get; set; } = false; 
     public SecurityType SecurityType { get; set; } = SecurityType.Stock;
-    public PLCalculatorType PlCalculatorType { get; set; } = PLCalculatorType.Default;
+    public PnLCalculatorType PnLCalculatorType { get; set; } = PnLCalculatorType.Default;
     public int SettlementCurrencyDecimals { get; set; } = 2;
     public decimal CostPerShare { get; set; } = 0m;
     public decimal FloatingCost { get; set; } = 0m;
@@ -39,7 +40,7 @@ public class ContractOverrideModel
     {
         OverrideAllContracts = OverrideAllContracts,
         SecurityType = SecurityType,
-        PlCalculatorType = PlCalculatorType,
+        PnLCalculatorType = PnLCalculatorType,
         SettlementCurrencyDecimals = SettlementCurrencyDecimals,
         CostPerShare = CostPerShare,
         FloatingCost = FloatingCost,
@@ -56,7 +57,7 @@ public class ContractOverrideModel
     {
         OverrideAllContracts = co.OverrideAllContracts,
         SecurityType = co.SecurityType,
-        PlCalculatorType = co.PlCalculatorType,
+        PnLCalculatorType = co.PnLCalculatorType,
         SettlementCurrencyDecimals = co.SettlementCurrencyDecimals,
         CostPerShare = co.CostPerShare,
         FloatingCost = co.FloatingCost,

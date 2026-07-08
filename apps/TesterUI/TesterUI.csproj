@@ -5,7 +5,7 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <AssemblyName>QuantInfra.Core.Apps.TesterUI</AssemblyName>
+        <AssemblyName>StrategyTester</AssemblyName>
         <RootNamespace>QuantInfra.Core.Apps.TesterUI</RootNamespace>
     </PropertyGroup>
 
