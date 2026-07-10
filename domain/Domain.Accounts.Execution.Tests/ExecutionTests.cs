@@ -130,8 +130,8 @@ public class ExecutionTests
             new List<OrderStatus>(), new List<Position>(), 1, 0, 1, 0, 0, 0,
             Instant.MinValue, Instant.MinValue, new List<string>(), new List<ExecutionReport>(),
             Instant.MinValue, new List<string>(), new List<ExternalTradeRecord>(),
-            new List<string>(), new Dictionary<string, Instant>(),
-            true, false, false, _serviceProvider.GetRequiredService<IEventBus>(), _serviceProvider.GetRequiredService<ILoggerFactory>()
+            Array.Empty<string>(), Array.Empty<string>(),new Dictionary<string, Instant>(),
+            true, Array.Empty<string>(), false, false, _serviceProvider.GetRequiredService<IEventBus>(), _serviceProvider.GetRequiredService<ILoggerFactory>()
         );
         
         _ba = new BrokerAccount(

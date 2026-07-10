@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using QuantInfra.Common.EventSourcing;
+using QuantInfra.Common.Interfaces.Api.Accounts;
 using QuantInfra.Common.Messaging;
 using QuantInfra.Common.Messaging.Patterns;
 using QuantInfra.Common.Messaging.Patterns.DealerRouterWithReplay;
@@ -162,6 +163,7 @@ public static class ConfigurationExtensions
         .AddSingleton<ICommandHandler<QuantInfra.Domain.Commands.Accounts.AccountsService.NewOrderCmd>>(sp => sp.GetRequiredService<TradingCommandsHandler>())
         .AddSingleton<ICommandHandler<QuantInfra.Domain.Commands.Accounts.AccountsService.ReplaceOrderCmd>>(sp => sp.GetRequiredService<TradingCommandsHandler>())
         .AddSingleton<ICommandHandler<QuantInfra.Domain.Commands.Accounts.AccountsService.CancelOrderCmd>>(sp => sp.GetRequiredService<TradingCommandsHandler>())
+        .AddSingleton<ICommandHandler<QuantInfra.Domain.Commands.Accounts.AccountsService.ClearBrokerAccountReconciliationStatus>>(sp => sp.GetRequiredService<TradingCommandsHandler>())
         .AddSingleton<IConfigurableLoggingModule>(sp => sp.GetRequiredService<TradingCommandsHandler>())
         
         .AddSingleton<EndOfDay>()
@@ -195,6 +197,7 @@ public static class ConfigurationExtensions
         .AddSingleton<IQueryHandler<GetStrategyState, IStrategyStateReadonly?>>(sp => sp.GetRequiredService<QueryHandler>())
         .AddSingleton<IQueryHandler<global::QuantInfra.Domain.Queries.Strategies.AccountsService.GetStrategyState, StrategyStateReadonly?>>(sp => sp.GetRequiredService<QueryHandler>())
         .AddSingleton<IQueryHandler<GetPositions, IReadOnlyCollection<Position>>>(sp => sp.GetRequiredService<QueryHandler>())
+        .AddSingleton<IQueryHandler<GetBrokerAccountReconciliationStatus, BrokerAccountReconciliationStatus?>>(sp => sp.GetRequiredService<QueryHandler>())
         
         .AddSingleton<MarketDataEventsHandler>()
         .AddSingleton<IEventHandler<ContractLastPriceUpdatedEvt>>(sp => sp.GetRequiredService<MarketDataEventsHandler>())

@@ -14,14 +14,17 @@ public class ManagementServiceClient(ManagementService service) : IManagementSer
     public Task<int> CreateAccountAsync(CreateAccountRequest request) => service.CreateAccountAsync(request, 0);
 
     public Task CreateSubaccountAsync(CreateSubaccountRequest request) => service.CreateSubaccountAsync(request, 0);
+    
+    public Task<BrokerAccountReconciliationStatus?> GetBrokerAccountReconciliationStatusAsync(int accountId) =>
+        service.GetBrokerAccountReconciliationStatusAsync(accountId);
 
     public Task<IReadOnlyDictionary<int, decimal>> GetBalancesAsync(int accountId) =>
         service.GetBalancesAsync(accountId);
 
     public Task<int> CreateBalanceOperationAsync(NewBalanceOperation request) => service.CreateBalanceOperationAsync(request, 0);
 
-    public Task<IReadOnlyCollection<Position>> GetActivePositionsAsync(int accountId) =>
-        service.GetPositionsAsync(accountId);
+    public Task<IReadOnlyCollection<Position>> GetActivePositionsAsync(int accountId, bool markToMarket) =>
+        service.GetPositionsAsync(accountId, markToMarket);
 
     public Task<IReadOnlyCollection<OrderStatus>> GetActiveOrdersAsync(int accountId) =>
         service.GetOrdersAsync(accountId);
@@ -39,4 +42,7 @@ public class ManagementServiceClient(ManagementService service) : IManagementSer
 
     public Task DeleteTradingClientConfig(int accountId) =>
         service.DeleteTradingClientConfigAsync(accountId, 0);
+
+    public Task Reconcile(int accountId) =>
+        service.Reconcile(accountId);
 }

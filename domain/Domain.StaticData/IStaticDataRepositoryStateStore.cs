@@ -10,4 +10,5 @@ public interface IStaticDataRepositoryStateStore
     Dictionary<int, Dictionary<int, IReadOnlyCollection<FxConversionStep>>> ConversionPaths { get; }
     Dictionary<int, Broker?> Brokers { get; }
     Dictionary<int, Dictionary<string, Asset?>> AssetsByExternalId { get; }
+    Dictionary<int, Asset?> Assets { get; }
 }

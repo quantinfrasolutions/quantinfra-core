@@ -17,6 +17,7 @@ public class TradingCommandsHandler(
     ICommandHandler<NewOrderCmd>,
     ICommandHandler<ReplaceOrderCmd>,
     ICommandHandler<CancelOrderCmd>,
+    ICommandHandler<ClearBrokerAccountReconciliationStatus>,
     IConfigurableLoggingModule
 {
     private readonly ILogger _logger = logger;
@@ -57,5 +58,14 @@ public class TradingCommandsHandler(
         var now = clock.GetCurrentInstant();
         // TODO: account is null
         account.CancelOrder(cmd.Ocr, now);
+    }
+
+    public void Handle(ClearBrokerAccountReconciliationStatus cmd)
+    {
+        if (_loggingEnabled) _logger.LogDebug("Handle {cmd}", cmd);
+        
+        var account = queryBus.Query<GetAccount, IBrokerAccount?>(new (cmd.AccountId));
+        if (account is null) return;
+        account.Reconcile(clock.GetCurrentInstant(), cmd.RequestId);
     }
 }

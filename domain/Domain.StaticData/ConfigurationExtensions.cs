@@ -10,6 +10,7 @@ namespace QuantInfra.Domain.StaticData;
 public static class ConfigurationExtensions
 {
     public static IServiceCollection AddStaticDataQueryHandlers(this IServiceCollection sc) => sc
+        .AddSingleton<IQueryHandler<GetAsset, Asset?>, GetAssetQueryHandler>()
         .AddSingleton<IQueryHandler<GetAssetByExternalId, Asset?>, GetAssetByExternalIdQueryHandler>()
         .AddSingleton<IQueryHandler<GetContractByExternalId, Contract?>, GetContractByExternalIdQueryHandler>()
         .AddSingleton<IQueryHandler<GetContract, Contract?>, GetContractQueryHandler>()
@@ -22,6 +23,7 @@ public static class ConfigurationExtensions
         .AddSingleton<IQueryHandler<GetBroker, Broker?>>(sp => sp.GetRequiredService<CachingStaticDataRepository>())
         .AddSingleton<IQueryHandler<GetContract, Contract?>>(sp => sp.GetRequiredService<CachingStaticDataRepository>())
         .AddSingleton<IQueryHandler<GetContracts, IReadOnlyCollection<Contract>>>(sp => sp.GetRequiredService<CachingStaticDataRepository>())
+        .AddSingleton<IQueryHandler<GetAsset, Asset?>>(sp => sp.GetRequiredService<CachingStaticDataRepository>())
         .AddSingleton<IQueryHandler<GetAssetByExternalId, Asset?>>(sp => sp.GetRequiredService<CachingStaticDataRepository>())
         .AddSingleton<IQueryHandler<GetContractByExternalId, Contract?>>(sp => sp.GetRequiredService<CachingStaticDataRepository>())
         .AddSingleton<IQueryHandler<GetCurrency, Currency?>>(sp => sp.GetRequiredService<CachingStaticDataRepository>())

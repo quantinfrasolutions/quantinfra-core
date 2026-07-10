@@ -167,7 +167,21 @@ public class BrokerAccount : AccountBase, IBrokerAccount
 
     public void ReplaceExternalOrder(OrderReplaceRequest req, ExecutionReport er, Instant processingDt) =>
         ReplaceExternalOrder(req, er, processingDt, false);
-    
+
+    public void Reconcile(Instant processingDt, Guid? requestId)
+    {
+        var evt = new AccountReconciliationStatusChangedEvt(
+            EventIdProvider.GetNextEventId(), 
+            AccountId, 
+            _accountState.GetNextVersion(),
+            false,
+            null,
+            processingDt,
+            requestId
+        );
+        _accountState.Apply(evt, true);
+    }
+
     private void ReplaceExternalOrder(OrderReplaceRequest req, ExecutionReport er, Instant processingDt, bool notifySsa)
     {
         if (er is { OrdStatus: OrdStatus.PendingReplace, IsVirtual: false })
@@ -288,22 +302,16 @@ public class BrokerAccount : AccountBase, IBrokerAccount
         
         if (contract == null && order is null)
         {
-            // This scenario is covered above
-            // if (externalEr.OrdStatus.IsTerminal())
-            // {
-            //     if (LoggingEnabled && LogLevel <= LogLevel.Error) 
-            //         Logger.LogWarning($"Received an unknown order {externalEr.ExternalId} for an unknown contract {externalEr.ExternalContractId}, skipping");
-            //     return null;
-            // }
-
             if (LoggingEnabled && LogLevel <= LogLevel.Warning)
-                Logger.LogWarning("Unknown order for an unknown contract, placing order into the dead letter queue");
+                Logger.LogWarning("Unknown order for an unknown contract, skipping");
 
             var externalContractId = externalEr.ExternalContractId;
             if (!string.IsNullOrEmpty(externalContractId) && !_accountState.UnmappedExternalContractIds.Contains(externalContractId))
             {
-                var evt = new NewUnmappedContractRegisteredEvt(EventIdProvider.GetNextEventId(), AccountId, externalContractId, _accountState.GetNextVersion(), processingDt);
+                var evt = new NewUnmappedContractRegisteredEvt(EventIdProvider.GetNextEventId(), AccountId, externalContractId, null, _accountState.GetNextVersion(), processingDt);
                 _accountState.Apply(evt, true);
+                
+                SetAccountNeedsReconciliation($"New unknown contract {externalContractId}", processingDt);
             }
             return null;
         }
@@ -592,12 +600,12 @@ public class BrokerAccount : AccountBase, IBrokerAccount
             
             if (!string.IsNullOrEmpty(externalContractId) && !_accountState.UnmappedExternalContractIds.Contains(externalContractId))
             {
-                var evt = new NewUnmappedContractRegisteredEvt(EventIdProvider.GetNextEventId(), AccountId, externalContractId, _accountState.GetNextVersion(), processingDt);
+                var evt = new NewUnmappedContractRegisteredEvt(EventIdProvider.GetNextEventId(), AccountId, externalContractId, null, _accountState.GetNextVersion(), processingDt);
                 _accountState.Apply(evt, true);
             }
             
-            var extTradeEvt = new NewTradeInDeadLetterQueueEvt(EventIdProvider.GetNextEventId(), AccountId, externalTradeRecord, _accountState.GetNextVersion(), processingDt);
-            _accountState.Apply(extTradeEvt, true);
+            SetAccountNeedsReconciliation($"Trade {externalTradeRecord.ExternalTradeId} with unknown contract {externalContractId} was not booked", processingDt);
+            
             return;
         }
 
@@ -613,10 +621,13 @@ public class BrokerAccount : AccountBase, IBrokerAccount
         decimal fxRate = 1;
         if (contract.Template.SettlementCurrency.CurrencyId != AccountCurrency.CurrencyId)
         {
-            fxRate = Query<GetConversionRate, decimal?>(new(contract.Template.SettlementCurrency.CurrencyId, AccountCurrency.CurrencyId))
-                ?? 1m;
-            
-            // TODO: place the trade into a dead letter queue if the rate cannot be retrieved
+            var rate = Query<GetConversionRate, decimal?>(new(contract.Template.SettlementCurrency.CurrencyId, AccountCurrency.CurrencyId));
+
+            if (!rate.HasValue)
+            {
+                SetAccountNeedsReconciliation($"Trade {externalTradeRecord.ExternalTradeId} was booked with wrong value due to missing FX rate", processingDt);
+                fxRate = 0;
+            }
         }
         
         decimal? calculatedLastCcyOverride = null;
@@ -629,7 +640,11 @@ public class BrokerAccount : AccountBase, IBrokerAccount
 
         if (externalTradeRecord.CommissionCurrency != contract.Template.SettlementCurrency.Asset.Name)
         {
-            throw new NotSupportedException($"Settlement currency {contract.Template.SettlementCurrency.Asset.Name} doesn't match commission currency {externalTradeRecord.CommissionCurrency}");
+            SetAccountNeedsReconciliation(
+                $"Settlement currency {contract.Template.SettlementCurrency.Asset.Name} doesn't match commission currency {externalTradeRecord.CommissionCurrency}. Trade {externalTradeRecord.ExternalTradeId} was not booked",
+                processingDt
+            );
+            return;
         }
         
         var trade = externalTradeRecord.ToTrade(
@@ -677,10 +692,12 @@ public class BrokerAccount : AccountBase, IBrokerAccount
         {
             if (!string.IsNullOrEmpty(positionReport.ExternalContractId) && !_accountState.UnmappedExternalContractIds.Contains(positionReport.ExternalContractId))
             {
-                var evt = new NewUnmappedContractRegisteredEvt(EventIdProvider.GetNextEventId(), AccountId, positionReport.ExternalContractId, _accountState.GetNextVersion(), processingDt);
+                var evt = new NewUnmappedContractRegisteredEvt(EventIdProvider.GetNextEventId(), AccountId, positionReport.ExternalContractId, null, _accountState.GetNextVersion(), processingDt);
                 _accountState.Apply(evt, true);
-                return;
             }
+            
+            SetAccountNeedsReconciliation($"Position with unknown contract {positionReport.ExternalContractId} was not booked", processingDt);
+            return;
         }
 
         // EnsureContractIdAddedToUsed(contract.ContractId, referenceDt, processingDt);
@@ -710,9 +727,18 @@ public class BrokerAccount : AccountBase, IBrokerAccount
 
         if (asset == null)
         {
-            if (LoggingEnabled && LogLevel <= LogLevel.Error)
-                Logger.LogError($"No asset found by external id {balanceOperation.ExternalAssetId} and broker {_brokerId}, placing into dead letter queue");
-            // TODO: dead letter queue
+            if (LoggingEnabled && Logger.IsEnabled(LogLevel.Error))
+                Logger.LogError("No asset found by external id {externalAssetId} and broker {brokerId}. Balance operation was not booked", 
+                    balanceOperation.ExternalAssetId, _brokerId);
+            
+            if (!string.IsNullOrEmpty(balanceOperation.ExternalAssetId) && !_accountState.UnmappedExternalAssetIds.Contains(balanceOperation.ExternalId))
+            {
+                var evt = new NewUnmappedContractRegisteredEvt(EventIdProvider.GetNextEventId(), AccountId, 
+                    null, balanceOperation.ExternalAssetId, _accountState.GetNextVersion(), processingDt);
+                _accountState.Apply(evt, true);
+            }
+            
+            SetAccountNeedsReconciliation($"Balance operation {balanceOperation.ExternalId} with unknown asset {balanceOperation.ExternalAssetId} was not booked", processingDt);
             return;
         }
         
@@ -735,30 +761,29 @@ public class BrokerAccount : AccountBase, IBrokerAccount
             var bo = balanceOperation.ToNewBalanceOperation(asset.AssetId, true, false, false);
             try
             {
-                ProcessBalanceOperation(bo, processingDt);
+                ProcessBalanceOperationInternal(bo, processingDt, null, true);
             }
             catch (MissingFxRateException e)
             {
-                SetAccountNeedsReconciliation($"Could not process balance operation: {e.Message}", processingDt);
+                SetAccountNeedsReconciliation($"Balance operation booked with incorrect value due to missing FX rate: {e.Message}", processingDt);
             }
         }
         else
         {
-            if (!string.IsNullOrEmpty(balanceOperation.SwapPositionExternalContractId))
+            // TODO: attribute swaps to positions
+            // if (!string.IsNullOrEmpty(balanceOperation.SwapPositionExternalContractId))
+            // {
+            //     throw new NotImplementedException();
+            // }
+            
+            var bo = balanceOperation.ToNewBalanceOperation(asset.AssetId, true, true, false);
+            try
             {
-                throw new NotImplementedException();
+                ProcessBalanceOperationInternal(bo, processingDt, null, true);
             }
-            else
+            catch (MissingFxRateException e)
             {
-                var bo = balanceOperation.ToNewBalanceOperation(asset.AssetId, true, true, false);
-                try
-                {
-                    ProcessBalanceOperation(bo, processingDt);
-                }
-                catch (MissingFxRateException e)
-                {
-                    SetAccountNeedsReconciliation($"Could not process balance operation: {e.Message}", processingDt);
-                }
+                SetAccountNeedsReconciliation($"Balance operation booked with incorrect value due to the missing FX rate: {e.Message}", processingDt);
             }
         }
     }
@@ -856,7 +881,7 @@ public class BrokerAccount : AccountBase, IBrokerAccount
             {
                 if (!string.IsNullOrEmpty(p.ExternalContractId) && !_accountState.UnmappedExternalContractIds.Contains(p.ExternalContractId))
                 {
-                    var evt = new NewUnmappedContractRegisteredEvt(EventIdProvider.GetNextEventId(), AccountId, p.ExternalContractId, _accountState.GetNextVersion(), processingDt);
+                    var evt = new NewUnmappedContractRegisteredEvt(EventIdProvider.GetNextEventId(), AccountId, p.ExternalContractId, null, _accountState.GetNextVersion(), processingDt);
                     _accountState.Apply(evt, true);
                 }
                 
@@ -945,8 +970,18 @@ public class BrokerAccount : AccountBase, IBrokerAccount
             {
                 Logger.LogWarning($"Assets not found by externalId: {string.Join(',', missingAssets)}");
             }
-            
-            // TODO: add missing assets to the dead letter queue
+
+            foreach (var ma in missingAssets)
+            {
+                if (!string.IsNullOrEmpty(ma) && !_accountState.UnmappedExternalAssetIds.Contains(ma))
+                {
+                    var evt = new NewUnmappedContractRegisteredEvt(EventIdProvider.GetNextEventId(), AccountId,
+                        null, ma, _accountState.GetNextVersion(), processingDt);
+                    _accountState.Apply(evt, true);
+                }
+            }
+
+            SetAccountNeedsReconciliation($"Balances were not reconciled due to some assets not found by externalId: {string.Join(',', missingAssets)}", processingDt);
         }
         
         var actualBalances = assetsMap
@@ -984,11 +1019,11 @@ public class BrokerAccount : AccountBase, IBrokerAccount
 
                 try
                 {
-                    ProcessBalanceOperation(bo, processingDt);
+                    ProcessBalanceOperationInternal(bo, processingDt, null, true);
                 }
                 catch (MissingFxRateException e)
                 {
-                    SetAccountNeedsReconciliation($"Could not reconcile balance: {e.Message}", processingDt);
+                    SetAccountNeedsReconciliation($"Reconciliation balance operation was booked with invalid value due to missing FX rate: {e.Message}", processingDt);
                 }
             }
         }

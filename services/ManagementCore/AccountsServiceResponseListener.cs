@@ -1,5 +1,6 @@
 using ManagementCore;
 using QuantInfra.Common.EventSourcing;
+using QuantInfra.Common.Interfaces.Api.Accounts;
 using QuantInfra.Common.Messaging;
 using QuantInfra.Common.Messaging.Patterns.TopicMulticast;
 using QuantInfra.Connectors.Common;
@@ -57,6 +58,12 @@ public class AccountsServiceResponseListener : IMulticastListenerEventHandler
                 break;
             case BalanceOperationProcessedEvt bo:
                 if (bo.RequestId.HasValue) _requestsManager.CompleteRequest(bo.RequestId.Value, bo.BalanceOperation.BalanceOperationId);
+                break;
+            case AsyncQueryResponse<GetBrokerAccountReconciliationStatus, BrokerAccountReconciliationStatus?> br:
+                _requestsManager.CompleteRequest(br.RequestId, br.Result);
+                break;
+            case AccountReconciliationStatusChangedEvt recon:
+                if (recon.RequestId.HasValue) _requestsManager.CompleteRequest(recon.RequestId.Value, recon);
                 break;
         }
     }

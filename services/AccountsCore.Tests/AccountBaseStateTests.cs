@@ -29,6 +29,7 @@ public class AccountBaseStateTests
         _bpl = _sp.GetRequiredService<Bpl>();
         var sd = _sp.GetRequiredService<InMemoryStaticDataRepository>();
         sd.CreateCurrency(new Currency { CurrencyId = 840, Decimals = 2 });
+        sd.CreateAsset(new Asset { AssetId = 840, Name = "test" });
     }
     
     [Test]

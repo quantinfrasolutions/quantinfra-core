@@ -10,6 +10,7 @@ using QuantInfra.Common.Trading.Infrastructure;
 using QuantInfra.Connectors.Common;
 using QuantInfra.Domain.Commands.Accounts.AccountsService;
 using QuantInfra.Domain.Commands.StaticData;
+using QuantInfra.Domain.Events.Accounts.AccountsService.Primary;
 using QuantInfra.Domain.Events.Accounts.Management;
 using QuantInfra.Domain.Events.Strategies.Management;
 using QuantInfra.Domain.Queries.Accounts.AccountsService;
@@ -230,7 +231,7 @@ public class ManagementService(
         return Task.CompletedTask;
     }
 
-    public async Task<IReadOnlyCollection<Position>> GetPositionsAsync(int accountId)
+    public async Task<IReadOnlyCollection<Position>> GetPositionsAsync(int accountId, bool markToMarket)
     {
         logger.LogInformation($"Getting positions for account {accountId}");
         
@@ -238,7 +239,7 @@ public class ManagementService(
         if (account == null) throw new KeyNotFoundException($"Account {accountId} not found");
 
         return await requestsManager.SendRequest<IReadOnlyCollection<Position>>(
-            reqId => Task.Run(() => publisher.PublishUnwrappedObject(new GetPositions(reqId, accountId, account.AccountServiceName)))
+            reqId => Task.Run(() => publisher.PublishUnwrappedObject(new GetPositions(reqId, accountId, account.AccountServiceName, markToMarket)))
         );
     }
 
@@ -251,6 +252,34 @@ public class ManagementService(
         
         return await requestsManager.SendRequest<IReadOnlyDictionary<int, decimal>>(
             reqId => Task.Run(() => publisher.PublishUnwrappedObject(new GetBalances(reqId, accountId, account.AccountServiceName)))
+        );
+    }
+
+    public async Task<BrokerAccountReconciliationStatus?> GetBrokerAccountReconciliationStatusAsync(int accountId)
+    {
+        logger.LogInformation($"Getting account reconciliation status for account {accountId}");
+        
+        var account = await accountsRepository.GetAccountRecordAsync(accountId);
+        if (account == null) throw new KeyNotFoundException($"Account {accountId} not found");
+        if (account.AccountType != AccountType.BrokerAccount) throw new InvalidOperationException($"Account {accountId} is not BrokerAccount");
+
+        return await requestsManager.SendRequest<BrokerAccountReconciliationStatus?>(
+            reqId => Task.Run(() => publisher.PublishUnwrappedObject(new GetBrokerAccountReconciliationStatus(reqId, accountId, account.AccountServiceName)))
+        );
+    }
+
+    public async Task Reconcile(int accountId)
+    {
+        logger.LogInformation($"Getting account reconciliation status for account {accountId}");
+        
+        var account = await accountsRepository.GetAccountRecordAsync(accountId);
+        if (account == null) throw new KeyNotFoundException($"Account {accountId} not found");
+        if (account.AccountType != AccountType.BrokerAccount) throw new InvalidOperationException($"Account {accountId} is not BrokerAccount");
+
+        await requestsManager.SendRequest<AccountReconciliationStatusChangedEvt>(
+            reqId => Task.Run(() => 
+                publisher.PublishUnwrappedObject(new ClearBrokerAccountReconciliationStatus(account.AccountServiceName, accountId, clock.GetCurrentInstant(), reqId))
+            )
         );
     }
 

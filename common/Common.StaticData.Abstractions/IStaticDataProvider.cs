@@ -9,6 +9,7 @@ public interface IStaticDataProvider
     Contract? GetContract(int contractId);
     Contract? GetContractByExternalId(int brokerId, string externalContractId);
     IReadOnlyCollection<int> GetFxConversionContractIds();
+    Asset? GetAsset(int assetId);
     Asset? GetAssetByExternalId(int brokerId, string externalAssetId);
     IReadOnlyCollection<Contract> GetContracts(IEnumerable<int> contractIds);
     (int contractId, bool isDirect) GetFxConversionContract(int fromCcyId, int toCcyId);

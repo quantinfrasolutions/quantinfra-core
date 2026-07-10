@@ -35,8 +35,10 @@ public class BrokerAccountState : AccountBaseState, IBrokerAccountStateReadonly
         IEnumerable<string> lastReceivedBalanceOperationIds,
         IEnumerable<ExternalTradeRecord> tradesDeadLetterQueue,
         IEnumerable<string> unmappedExternalContractIds,
+        IEnumerable<string> unmappedExternalAssetIds,
         IReadOnlyDictionary<string, Instant> usedContractIds,
         bool isReconciled,
+        IReadOnlyCollection<string> reconciliationMessages,
         bool needsOrdersReconciliation,
         bool needsTradesReconciliation,
         IEventBus eventBus, ILoggerFactory loggerFactory
@@ -49,11 +51,13 @@ public class BrokerAccountState : AccountBaseState, IBrokerAccountStateReadonly
         _pendingFills = pendingFills.ToDictionary(x => x.ExecId);
         LastReceivedBalanceOperationTs = lastReceivedBalanceOperationTs;
         IsReconciled = isReconciled;
+        _reconciliationMessages = reconciliationMessages.ToList();
         NeedsOrdersReconciliation = needsOrdersReconciliation;
         NeedsTradesReconciliation = needsTradesReconciliation;
         _lastReceivedBalanceOperationIds = lastReceivedBalanceOperationIds.ToList();
         _tradesDeadLetterQueue = tradesDeadLetterQueue.ToList();
         _unmappedExternalContractIds = unmappedExternalContractIds.ToHashSet();
+        _unmappedExternalAssetIds = unmappedExternalAssetIds.ToHashSet();
         _usedContractIds = usedContractIds.CopyAsDictionary();
     }
     
@@ -78,11 +82,18 @@ public class BrokerAccountState : AccountBaseState, IBrokerAccountStateReadonly
     
     private readonly HashSet<string> _unmappedExternalContractIds;
     public IReadOnlyCollection<string> UnmappedExternalContractIds => _unmappedExternalContractIds;
+    
+    private readonly HashSet<string> _unmappedExternalAssetIds;
+    public IReadOnlyCollection<string> UnmappedExternalAssetIds => _unmappedExternalAssetIds;
 
     private readonly Dictionary<string, Instant> _usedContractIds = new();
     public IReadOnlyDictionary<string, Instant> UsedContractIds => _usedContractIds;
     
     public bool IsReconciled { get; private set; }
+    
+    private readonly List<string> _reconciliationMessages = new();
+    public IReadOnlyCollection<string> ReconciliationMessages => _reconciliationMessages;
+    
     public bool NeedsOrdersReconciliation { get; private set; }
     public bool NeedsTradesReconciliation { get; private set; }
     
@@ -192,7 +203,8 @@ public class BrokerAccountState : AccountBaseState, IBrokerAccountStateReadonly
     public void Apply(NewUnmappedContractRegisteredEvt evt, bool emit)
     {
         if (!base.Apply(evt)) return;
-        _unmappedExternalContractIds.Add(evt.ExternalContractId);
+        if (!string.IsNullOrEmpty(evt.ExternalContractId)) _unmappedExternalContractIds.Add(evt.ExternalContractId);
+        if (!string.IsNullOrEmpty(evt.ExternalAssetId)) _unmappedExternalAssetIds.Add(evt.ExternalAssetId);
         if (emit) Emit(evt);
     }
 
@@ -206,7 +218,18 @@ public class BrokerAccountState : AccountBaseState, IBrokerAccountStateReadonly
     public void Apply(AccountReconciliationStatusChangedEvt evt, bool emit)
     {
         if (!base.Apply(evt)) return;
-        IsReconciled = !evt.NeedsReconciliation;
+        if (evt.NeedsReconciliation)
+        {
+            if (!string.IsNullOrEmpty(evt.Message)) _reconciliationMessages.Add(evt.Message);
+            IsReconciled = false;
+        }
+        else
+        {
+            _reconciliationMessages.Clear();
+            _unmappedExternalAssetIds.Clear();
+            _unmappedExternalContractIds.Clear();
+            IsReconciled = true;
+        }
         if (emit) Emit(evt);
     }
     
@@ -250,8 +273,8 @@ public class BrokerAccountState : AccountBaseState, IBrokerAccountStateReadonly
             Instant.MinValue, createdAt, new List<string>(),
             Array.Empty<ExecutionReport>(), createdAt,
             Array.Empty<string>(), Array.Empty<ExternalTradeRecord>(), 
-            Array.Empty<string>(), new Dictionary<string, Instant>(), 
-            false, false, false,
+            Array.Empty<string>(), Array.Empty<string>(), new Dictionary<string, Instant>(), 
+            false, Array.Empty<string>(), false, false,
             eventBus, loggerFactory
         );
 
@@ -261,8 +284,8 @@ public class BrokerAccountState : AccountBaseState, IBrokerAccountStateReadonly
         LastReconciliationDt, LastReceivedTradeTs, LastReceivedTradeIds.ToList(), PendingFills.Copy(), 
         LastReceivedBalanceOperationTs,
         LastReceivedBalanceOperationIds.ToList(),
-        TradesDeadLetterQueue.ToList(), UnmappedExternalContractIds.ToList(), UsedContractIds.Copy(), 
-        IsReconciled, NeedsOrdersReconciliation, NeedsTradesReconciliation
+        TradesDeadLetterQueue.ToList(), UnmappedExternalContractIds.ToList(), UnmappedExternalAssetIds.ToList(), UsedContractIds.Copy(), 
+        IsReconciled, ReconciliationMessages, NeedsOrdersReconciliation, NeedsTradesReconciliation
     );
     
     public static new BrokerAccountState FromAccountStateReadonly(IBrokerAccountStateReadonly state, IEventBus eventBus, ILoggerFactory loggerFactory) =>
@@ -270,8 +293,8 @@ public class BrokerAccountState : AccountBaseState, IBrokerAccountStateReadonly
             state.Positions, state.SharePrice, state.ShareCount, state.HWM, state.Investment,
             state.RealizedPnLSinceLastMtm, state.Version, state.LastReconciliationDt, state.LastReceivedTradeTs,
             state.LastReceivedTradeIds, state.PendingFills.Values, state.LastReceivedBalanceOperationTs,
-            state.LastReceivedBalanceOperationIds, state.TradesDeadLetterQueue, state.UnmappedExternalContractIds,
-            state.UsedContractIds, state.IsReconciled, state.NeedsOrdersReconciliation, state.NeedsTradesReconciliation,
+            state.LastReceivedBalanceOperationIds, state.TradesDeadLetterQueue, state.UnmappedExternalContractIds, state.UnmappedExternalAssetIds,
+            state.UsedContractIds, state.IsReconciled, state.ReconciliationMessages, state.NeedsOrdersReconciliation, state.NeedsTradesReconciliation,
             eventBus, loggerFactory
         );
 }

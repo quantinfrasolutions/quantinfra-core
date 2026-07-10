@@ -1,4 +1,5 @@
-﻿using NodaTime;
+﻿using System;
+using NodaTime;
 
 namespace QuantInfra.Domain.Events.Accounts.AccountsService.Primary
 {
@@ -8,7 +9,8 @@ namespace QuantInfra.Domain.Events.Accounts.AccountsService.Primary
         long Version,
         bool NeedsReconciliation,
         string? Message,
-        Instant Timestamp
+        Instant Timestamp,
+        Guid? RequestId = null
     ) : IAccountEventBase;
 }
 

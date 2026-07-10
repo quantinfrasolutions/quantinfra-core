@@ -80,7 +80,7 @@ public class HostedComponent : IComponentExceptionHandler
     public Task StopAsync(CancellationToken cancellationToken)
     {
         if (Status != ComponentStatus.Running) return Task.CompletedTask;
-        return StopAsync(cancellationToken);
+        return StopAsyncInternal(cancellationToken);
     }
 
     private async Task StopAsyncInternal(CancellationToken cancellationToken)

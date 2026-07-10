@@ -10,4 +10,5 @@ public class InMemoryStaticDataRepositoryStateStore : IStaticDataRepositoryState
     public Dictionary<int, Dictionary<int, IReadOnlyCollection<FxConversionStep>>> ConversionPaths { get; } = new();
     public Dictionary<int, Broker?> Brokers { get; } = new();
     public Dictionary<int, Dictionary<string, Asset?>> AssetsByExternalId { get; } = new();
+    public Dictionary<int, Asset?> Assets { get; } = new();
 }

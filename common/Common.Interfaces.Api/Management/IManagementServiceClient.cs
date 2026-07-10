@@ -12,9 +12,10 @@ public interface IManagementServiceClient
 {
     Task<int> CreateAccountAsync(CreateAccountRequest request);
     Task CreateSubaccountAsync(CreateSubaccountRequest request);
+    Task<BrokerAccountReconciliationStatus?> GetBrokerAccountReconciliationStatusAsync(int accountId);
     Task<IReadOnlyDictionary<int, decimal>> GetBalancesAsync(int accountId);
     Task<int> CreateBalanceOperationAsync(NewBalanceOperation request);
-    Task<IReadOnlyCollection<Position>> GetActivePositionsAsync(int accountId);
+    Task<IReadOnlyCollection<Position>> GetActivePositionsAsync(int accountId, bool markToMarket);
     Task<IReadOnlyCollection<OrderStatus>> GetActiveOrdersAsync(int accountId);
     Task PlaceOrderAsync(NewOrderSingle nos);
     Task CancelOrderAsync(OrderCancelRequest ocr);
@@ -22,4 +23,5 @@ public interface IManagementServiceClient
     Task StartStrategyAsync(int strategyId);
     Task CreateTradingClientConfig(TradingClientConfig config);
     Task DeleteTradingClientConfig(int accountId);
+    Task Reconcile(int accountId);
 }

@@ -118,6 +118,28 @@ public class AccountsController(
         var account = (await GetAccountsInternal(new() { AccountIds = [accountId] }, true)).SingleOrDefault();
         return account == null ? NotFound() : Ok(account);
     }
+    
+    [HttpGet, Route("{accountId:int}/broker-reconciliation-status")]
+    [EndpointName(nameof(GetBrokerAccountReconciliationStatus))]
+    [Produces("application/json")]
+    public async Task<ActionResult<BrokerAccountReconciliationStatus?>> GetBrokerAccountReconciliationStatus([FromRoute] int accountId)
+    {
+        var account = (await GetAccountsInternal(new() { AccountIds = [accountId] }, true)).SingleOrDefault();
+        if (account is null) return NotFound();
+        if (account.AccountType != AccountType.BrokerAccount) return BadRequest($"Account {accountId} is not broker account");
+        return await managementClient.GetBrokerAccountReconciliationStatusAsync(accountId);
+    }
+    
+    [HttpPost, Route("{accountId:int}/broker-reconciliation-status")]
+    [EndpointName(nameof(Reconcile))]
+    public async Task<IActionResult> Reconcile([FromRoute] int accountId)
+    {
+        var account = (await GetAccountsInternal(new() { AccountIds = [accountId] }, true)).SingleOrDefault();
+        if (account is null) return NotFound();
+        if (account.AccountType != AccountType.BrokerAccount) return BadRequest($"Account {accountId} is not broker account");
+        await managementClient.Reconcile(accountId);
+        return Ok();
+    }
 
     [HttpGet, Route("{accountId:int}/subaccounts")]
     [EndpointName(nameof(GetSubaccounts))]
@@ -357,7 +379,7 @@ public class AccountsController(
     [Produces("application/json")]
     public async Task<IReadOnlyCollection<PositionView>> GetActivePositions([FromRoute] int accountId)
     {
-        var positions = await managementClient.GetActivePositionsAsync(accountId);
+        var positions = await managementClient.GetActivePositionsAsync(accountId, true);
         
         if (positions.Count == 0) return Array.Empty<PositionView>();
         

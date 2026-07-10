@@ -13,6 +13,7 @@ public class CachingStaticDataRepository(IStaticDataProvider backendRepository, 
     IQueryHandler<GetCurrency, Currency?>,
     IQueryHandler<GetConversionPath, IReadOnlyCollection<FxConversionStep>>,
     IQueryHandler<GetContractByExternalId, Contract?>,
+    IQueryHandler<GetAsset, Asset?>,
     IQueryHandler<GetAssetByExternalId, Asset?>,
     IQueryHandler<GetContractOrderBookSubscriptionServiceName, string?>,
     IQueryHandler<GetBroker, Broker?>,
@@ -60,14 +61,25 @@ public class CachingStaticDataRepository(IStaticDataProvider backendRepository, 
         return contract;
     }
     
+    public Asset? Handle(GetAsset query)
+    {
+        if (!stateStore.Assets.TryGetValue(query.AssetId, out var asset))
+        {
+            asset = backendRepository.GetAsset(query.AssetId);
+            stateStore.Assets.Add(query.AssetId, asset);
+        }
+        
+        return asset;
+    }
+    
     public Asset? Handle(GetAssetByExternalId query)
     {
         if (!stateStore.AssetsByExternalId.TryGetValue(query.BrokerId, out var assets)
             || !assets.TryGetValue(query.ExternalId, out var asset))
         {
             asset = backendRepository.GetAssetByExternalId(query.BrokerId, query.ExternalId);
-            stateStore.ContractsByExternalId.TryAdd(query.BrokerId, new());
-            stateStore.ContractsByExternalId[query.BrokerId][query.ExternalId] = null;
+            stateStore.AssetsByExternalId.TryAdd(query.BrokerId, new());
+            stateStore.AssetsByExternalId[query.BrokerId][query.ExternalId] = asset;
         }
         
         return asset;
@@ -167,6 +179,7 @@ public class CachingStaticDataRepository(IStaticDataProvider backendRepository, 
         stateStore.Currencies.Clear();
         stateStore.ConversionPaths.Clear();
         stateStore.Brokers.Clear();
+        stateStore.Assets.Clear();
         stateStore.AssetsByExternalId.Clear();
     }
 }

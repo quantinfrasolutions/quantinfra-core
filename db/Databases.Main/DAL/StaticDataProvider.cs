@@ -48,14 +48,21 @@ public class StaticDataProvider(IServiceProvider serviceProvider) : IStaticDataP
     {
         using var scope = serviceProvider.CreateScope();
         using var context = scope.ServiceProvider.GetRequiredService<MainContext>();
-        return context.FxConversionContracts.Select(c => c.ContractId).ToList();
+        return context.FxConversionContracts.AsNoTracking().Select(c => c.ContractId).ToList();
+    }
+
+    public Asset? GetAsset(int assetId)
+    {
+        using var scope = serviceProvider.CreateScope();
+        using var context = scope.ServiceProvider.GetRequiredService<MainContext>();
+        return context.Assets.AsNoTracking().SingleOrDefault(a => a.AssetId == assetId);
     }
 
     public Asset? GetAssetByExternalId(int brokerId, string externalAssetId)
     {
         using var scope = serviceProvider.CreateScope();
         using var context = scope.ServiceProvider.GetRequiredService<MainContext>();
-        return context.Assets.SingleOrDefault(a => a.Name == externalAssetId);
+        return context.Assets.AsNoTracking().SingleOrDefault(a => a.Name == externalAssetId);
     }
 
     public IReadOnlyCollection<Contract> GetContracts(IEnumerable<int> contractIds)
@@ -115,7 +122,7 @@ public class StaticDataProvider(IServiceProvider serviceProvider) : IStaticDataP
                 .ThenInclude(c => c!.Template)
                     .ThenInclude(t => t.TradingSessions)
                     .ThenInclude(ts => ts.Days)
-                .AsNoTracking()
+            .AsNoTracking()
             .Single(s => s.StreamId == id);
     }
 
@@ -145,7 +152,7 @@ public class StaticDataProvider(IServiceProvider serviceProvider) : IStaticDataP
     {
         using var scope = serviceProvider.CreateScope();
         using var context = scope.ServiceProvider.GetRequiredService<MainContext>();
-        return context.Brokers.SingleOrDefault(b => b.BrokerId == brokerId);
+        return context.Brokers.AsNoTracking().SingleOrDefault(b => b.BrokerId == brokerId);
     }
 
     public string? GetContractOrderBookSubscriptionServiceName(int contractId)
@@ -153,7 +160,7 @@ public class StaticDataProvider(IServiceProvider serviceProvider) : IStaticDataP
         using var scope = serviceProvider.CreateScope();
         using var context = scope.ServiceProvider.GetRequiredService<MainContext>();
 
-        return context.BinanceUsdmOrderBookSubscriptions
+        return context.BinanceUsdmOrderBookSubscriptions.AsNoTracking()
             .SingleOrDefault(s => s.ContractId == contractId)?.ClientName;
     }
 
@@ -162,6 +169,6 @@ public class StaticDataProvider(IServiceProvider serviceProvider) : IStaticDataP
         using var scope = serviceProvider.CreateScope();
         using var context = scope.ServiceProvider.GetRequiredService<MainContext>();
         
-        return context.Streams.Where(s => streamIds.Contains(s.StreamId)).ToList();
+        return context.Streams.AsNoTracking().Where(s => streamIds.Contains(s.StreamId)).ToList();
     }
 }

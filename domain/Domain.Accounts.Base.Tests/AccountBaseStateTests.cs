@@ -51,6 +51,11 @@ public class AccountBaseStateTests
             Result = new Currency() { CurrencyId = 840, Decimals = 2 },
         };
 
+        var assetQueryHandler = new MockQueryHandler<GetAsset, Asset?>()
+        {
+            Result = new() { AssetId = 840, },
+        };
+
         _fxRateQueryHandler = new MockQueryHandler<GetConversionRate, decimal?>();
 
         var serviceProvider = new ServiceCollection()
@@ -64,6 +69,7 @@ public class AccountBaseStateTests
             .AddSingleton<IQueryHandler<GetContract, Contract>>(contractQueryHandler)
             .AddSingleton<IQueryHandler<GetCurrency, Currency>>(currencyQueryHandler)
             .AddSingleton<IQueryHandler<GetConversionRate, decimal?>>(_fxRateQueryHandler)
+            .AddSingleton<IQueryHandler<GetAsset, Asset?>>(assetQueryHandler)
             .AddSingleton<IProjectionWriter>(_projections)
             
             .BuildServiceProvider();

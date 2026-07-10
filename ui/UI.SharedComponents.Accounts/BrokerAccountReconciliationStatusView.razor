@@ -1,0 +1,111 @@
+@using QuantInfra.Common.Interfaces.Api.Accounts
+@using UI.Interfaces.Accounts
+@inject IUiAccountsRepository Repository
+
+<RadzenCard>
+    <RadzenStack>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                    @if (_status is { IsReconciled : true })
+                    {
+                        <RadzenText TextStyle="TextStyle.Body2">Account is reconciled</RadzenText>
+                    }
+                    @if (_status is { IsReconciled: false })
+                    {
+                        <RadzenText TextStyle="TextStyle.Body2">Account is not reconciled</RadzenText>
+                        <RadzenButton ButtonStyle="ButtonStyle.Success" Text="Clear errors" Variant="Variant.Text" Click="@Reconcile" IsBusy=@_reconcileInProgress />
+                    }
+                    <RadzenButton ButtonStyle="ButtonStyle.Primary" Text="Refresh" Variant="Variant.Text" Click="@Reload" IsBusy=@_isLoading Disabled=@_reconcileInProgress />
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
+        @if (_status is { IsReconciled: false })
+        {
+            <RadzenRow>
+                <RadzenTabs class="full-width-tabs">
+                    <Tabs>
+                        <RadzenTabsItem Text="@($"Messages ({_status.ReconciliationMessages.Count})")">
+                            <RadzenTable>
+                                <RadzenTableBody>
+                                    @foreach (var msg in _status.ReconciliationMessages)
+                                    {
+                                        <RadzenTableRow>
+                                            <RadzenTableCell>@msg</RadzenTableCell>
+                                        </RadzenTableRow>
+                                    }
+                                </RadzenTableBody>
+                            </RadzenTable>
+                        </RadzenTabsItem>
+                        <RadzenTabsItem Text="@($"Unknown assets ({_status.UnknownAssets.Count})")">
+                            <RadzenTable>
+                                <RadzenTableBody>
+                                    @foreach (var msg in _status.UnknownAssets)
+                                    {
+                                        <RadzenTableRow>
+                                            <RadzenTableCell>@msg</RadzenTableCell>
+                                        </RadzenTableRow>
+                                    }
+                                </RadzenTableBody>
+                            </RadzenTable>
+                        </RadzenTabsItem>
+                        <RadzenTabsItem Text="@($"Unknown contracts ({_status.UnknownContracts.Count})")">
+                            <RadzenTable>
+                                <RadzenTableBody>
+                                    @foreach (var msg in _status.UnknownContracts)
+                                    {
+                                        <RadzenTableRow>
+                                            <RadzenTableCell>@msg</RadzenTableCell>
+                                        </RadzenTableRow>
+                                    }
+                                </RadzenTableBody>
+                            </RadzenTable>
+                        </RadzenTabsItem>
+                    </Tabs>
+                </RadzenTabs>
+            </RadzenRow>
+        }
+    </RadzenStack>
+</RadzenCard>
+
+@code {
+    private BrokerAccountReconciliationStatus? _status;
+    private bool _isLoading;
+
+    [Parameter, EditorRequired] public int AccountId { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        await Reload();
+    }
+
+    private async Task Reload()
+    {
+        try
+        {
+            _isLoading = true;
+            _status = await Repository.GetBrokerAccountReconciliationStatus(AccountId);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private bool _reconcileInProgress;
+    private async Task Reconcile()
+    {
+        _reconcileInProgress = true;
+        try
+        {
+            await Repository.Reconcile(AccountId);
+            await Reload();
+        }
+        finally
+        {
+            _reconcileInProgress = false;
+        }
+    }
+
+}

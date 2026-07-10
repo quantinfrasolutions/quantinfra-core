@@ -212,7 +212,7 @@ public class MulticastSender : Disruptor.IEventHandler<OutgoingDisruptorMessage>
                 _transport.SendMessage(_multicastMessageFactory.CreateResponseMessage(_serviceName, data.Value));
             }
 
-            if (evt is BalanceOperationProcessedEvt { RequestId: not null })
+            if (evt is BalanceOperationProcessedEvt { RequestId: not null } || evt is AccountReconciliationStatusChangedEvt { RequestId: not null })
             {
                 _transport.SendMessage(_multicastMessageFactory.CreateResponseMessage(_serviceName, data.Value));
             }

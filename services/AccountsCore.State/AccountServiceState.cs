@@ -72,6 +72,7 @@ public class AccountServiceState :
         Dictionary<int, Strategy> strategyRecords,
         Dictionary<int, LastPrice> lastPrices,
         Dictionary<int, Contract?> contracts,
+        Dictionary<int, Asset?> assets,
         Dictionary<int, Dictionary<string, Asset?>> assetsByExternalId,
         Dictionary<int, Currency?> currencies,
         Dictionary<int, Dictionary<int, IReadOnlyCollection<FxConversionStep>>> conversionPaths,
@@ -91,6 +92,7 @@ public class AccountServiceState :
         // UninitializedEsaStates = esaStatesReadonly.ToList();
         UninitializedStrategyStates = strategyStatesReadonly.ToList();
         Contracts = contracts;
+        Assets = assets ?? new();
         AssetsByExternalId = assetsByExternalId ?? new();
         ContractsByExternalId = contracts.Values
             .Where(c => !string.IsNullOrEmpty(c?.ExternalContractId))
@@ -164,6 +166,7 @@ public class AccountServiceState :
     public Dictionary<int, LastPrice> LastPrices { get; private set; } = new();
     public Dictionary<int, Contract?> Contracts { get; private set; } = new();
     [JsonIgnore] public Dictionary<int, Dictionary<string, Contract?>> ContractsByExternalId { get; private set; } = new();
+    public Dictionary<int, Asset?> Assets { get; private set; } = new();
     public Dictionary<int, Dictionary<string, Asset?>> AssetsByExternalId { get; private set; } = new();
     public Dictionary<int, Currency?> Currencies { get; private set; } = new();
     public Dictionary<int, Dictionary<int, IReadOnlyCollection<FxConversionStep>>> ConversionPaths { get; private set; } = new();
@@ -209,6 +212,7 @@ public class AccountServiceState :
                     c => c
                 )
             );
+        Assets = state.Assets.Copy();
         AssetsByExternalId = state.AssetsByExternalId.Copy();
         Currencies = state.Currencies.Copy();
         ConversionPaths = state.ConversionPaths.Copy();

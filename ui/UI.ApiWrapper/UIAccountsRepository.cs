@@ -32,7 +32,13 @@ public partial class ApiRepository : IUiAccountsRepository
 
     public Task CreateAccount(CreateAccountRequest account) =>
         Call("Account created", "Could not create account", () => _wrapper.Client.CreateAccountAsync(account));
-    
+
+    public Task<BrokerAccountReconciliationStatus?> GetBrokerAccountReconciliationStatus(int accountId) =>
+        Retrieve("Reconciliation status", () => _wrapper.Client.GetBrokerAccountReconciliationStatusAsync(accountId));
+
+    public Task Reconcile(int accountId) =>
+        Call("Reconciliation command sent", "Failed", () => _wrapper.Client.ReconcileAsync(accountId));
+
 
     public Task<IEnumerable<BalanceOperationHistoryModel>> GetBalanceOperations(BalanceOperationsFilter filter) =>
         RetrieveCollection("balance operations", () => _wrapper.Client.GetBalanceOperationsHistoryAsync(filter.AccountId,

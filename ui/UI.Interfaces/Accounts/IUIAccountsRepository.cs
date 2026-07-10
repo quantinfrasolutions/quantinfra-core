@@ -11,6 +11,8 @@ public interface IUiAccountsRepository
     public Task<Dictionary<int, AccountListModel>> GetAccounts(bool refresh = false);
     public Task<IEnumerable<AccountListModel>> GetAccounts(AccountsFilter filter);
     public Task CreateAccount(CreateAccountRequest account);
+    public Task<BrokerAccountReconciliationStatus?> GetBrokerAccountReconciliationStatus(int accountId);
+    public Task Reconcile(int accountId);
     Task<IEnumerable<BalanceOperationHistoryModel>> GetBalanceOperations(BalanceOperationsFilter filter);
     Task CreateBalanceOperation(NewBalanceOperation request);
     Task<AccountListModel> GetAccount(int accountId);

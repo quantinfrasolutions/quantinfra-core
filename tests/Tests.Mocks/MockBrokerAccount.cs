@@ -6,6 +6,7 @@ using QuantInfra.Sdk.Accounts.ExternalAccounts;
 using QuantInfra.Sdk.Trading;
 using QuantInfra.Sdk.Trading.ExternalAccounts;
 using QuantInfra.Sdk.Trading.Orders;
+using QuantInfra.Sdk.Trading.Positions;
 
 namespace QuantInfra.Tests.Mocks;
 
@@ -94,6 +95,11 @@ public class MockBrokerAccount : IBrokerAccount
         throw new NotImplementedException();
     }
 
+    public void Reconcile(Instant processingDt, Guid? requestId)
+    {
+        throw new NotImplementedException();
+    }
+
     public void OnExternalBalanceOperation(ExternalBalanceOperation balanceOperation, Instant processingDt)
     {
         throw new NotImplementedException();
@@ -154,6 +160,12 @@ public class MockBrokerAccount : IBrokerAccount
     }
 
     public (decimal dailyReturn, decimal currentDrawdown) GetLiquidationInfo(IReadOnlyDictionary<int, double> lastPrices, Instant referenceDt)
+    {
+        throw new NotImplementedException();
+    }
+
+    public (IReadOnlyCollection<Position> positions, IReadOnlyDictionary<long, PositionValue> positionValues, IReadOnlyDictionary<int, BalanceValue> balanceValues,
+        IReadOnlyDictionary<int, PnLCalculatorOptions> pnLCalculatorOptions, bool success) MarkToMarket(Instant dt)
     {
         throw new NotImplementedException();
     }

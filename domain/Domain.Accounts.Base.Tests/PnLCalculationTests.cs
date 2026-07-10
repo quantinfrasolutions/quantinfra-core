@@ -65,6 +65,8 @@ public class PnLCalculationTests
             )
         );
         
+        _data.Assets.Add(840, new() { AssetId = 840 });
+        _data.Assets.Add(978, new() { AssetId = 978 });
         _data.Currencies.Add(840, new Currency { CurrencyId = 840, });
         _data.Currencies.Add(978, new Currency { CurrencyId = 978, });
 
@@ -78,6 +80,7 @@ public class PnLCalculationTests
             .AddSingleton<IEventHandler>(_events)
             .AddSingleton<IQueryHandler<GetContract, Contract>>(_data)
             .AddSingleton<IQueryHandler<GetCurrency, Currency>>(_data)
+            .AddSingleton<IQueryHandler<GetAsset, Asset?>>(_data)
             .AddSingleton<IQueryHandler<GetConversionRate, decimal?>>(_data)
             .AddSingleton<IQueryHandler<GetConversionPath, IReadOnlyCollection<FxConversionStep>>>(_data)
             .AddSingleton<IProjectionWriter>(_projections)
@@ -265,12 +268,14 @@ class StaticData :
     IQueryHandler<GetContract, Contract>,
     IQueryHandler<GetCurrency, Currency>,
     IQueryHandler<GetConversionRate, decimal?>,
-    IQueryHandler<GetConversionPath, IReadOnlyCollection<FxConversionStep>>
+    IQueryHandler<GetConversionPath, IReadOnlyCollection<FxConversionStep>>,
+    IQueryHandler<GetAsset, Asset?>
 {
     public Dictionary<long, Contract> Contracts { get; } = new();
     public Dictionary<long, Currency> Currencies { get; } = new();
     public Dictionary<string, decimal?> FxRates { get; } = new();
     public Dictionary<string, FxConversionStep> ConversionPaths { get; } = new();
+    public Dictionary<int, Asset> Assets { get; } = new();
     
     public Contract Handle(GetContract query) => Contracts[query.ContractId];
     public Currency Handle(GetCurrency query) => Currencies[query.CurrencyId];
@@ -286,4 +291,6 @@ class StaticData :
         ConversionPaths.TryGetValue($"{query.FromCurrencyId}/{query.ToCurrencyId}", out var path) 
             ? new List<FxConversionStep> { path } 
             : new List<FxConversionStep>();
+
+    public Asset? Handle(GetAsset query) => Assets[query.AssetId];
 }

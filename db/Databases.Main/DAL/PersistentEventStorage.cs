@@ -123,7 +123,7 @@ public class PersistentEventStorage(IServiceProvider serviceProvider) : IPersist
             case "QuantInfra.Domain.Events.Accounts.AccountsService.Primary.NewUnmappedContractRegisteredEvt":
                 var unmData = e.Data!.Deserialize<NewUnmappedContractRegisteredEvtData>();
                 return new NewUnmappedContractRegisteredEvt(e.EventId, e.AccountId!.Value,
-                    unmData.ExternalContractId, e.Version, e.Timestamp);
+                    unmData.ExternalContractId, unmData.ExternalAssetId, e.Version, e.Timestamp);
 
             case "QuantInfra.Domain.Events.Accounts.AccountsService.Primary.OrderCancelRejectEvt":
                 var ocrrData = e.Data != null 

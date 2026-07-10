@@ -22,6 +22,11 @@ public class TestStaticDataRepository : IStaticDataProvider
     private readonly HashSet<int> _fxConversionContracts = new();
     private readonly Dictionary<int, Dictionary<int, Tuple<int, bool>>> _fxConversions = new();
     public IReadOnlyCollection<int> GetFxConversionContractIds() => _fxConversionContracts;
+    
+    public Asset? GetAsset(int assetId)
+    {
+        throw new NotImplementedException();
+    }
 
     private readonly Dictionary<int, Dictionary<string, Asset>> _assetsByExternalId = new();
     public Asset? GetAssetByExternalId(int brokerId, string externalAssetId) =>

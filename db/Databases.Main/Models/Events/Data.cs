@@ -11,9 +11,10 @@ internal readonly struct ExternalExecutionReportEvtData(BrokerType brokerType, s
     public string? ExternalContractId { get; } = externalContractId;
 }
 
-internal readonly struct NewUnmappedContractRegisteredEvtData(string externalContractId)
+internal readonly struct NewUnmappedContractRegisteredEvtData(string? externalContractId, string? externalAssetId)
 {
-    public string ExternalContractId { get; } = externalContractId;
+    public string? ExternalContractId { get; } = externalContractId;
+    public string? ExternalAssetId { get; } = externalAssetId;
 }
 
 internal readonly struct StrategyLastCalculationTsEvtData(Instant ts)

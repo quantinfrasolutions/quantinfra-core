@@ -121,12 +121,13 @@ public class AccountBase : Processor, IAccount
     }
 
     public virtual void ProcessBalanceOperation(NewBalanceOperation request, Instant processingDt, Guid? requestId = null) 
-        => ProcessBalanceOperationInternal(request, processingDt, requestId);
+        => ProcessBalanceOperationInternal(request, processingDt, requestId, false);
 
     protected BalanceOperation? ProcessBalanceOperationInternal(
         NewBalanceOperation request,
         Instant processingDt,
-        Guid? requestId
+        Guid? requestId,
+        bool bookWithMissingFxRate
     )
     {
         if (LoggingEnabled && Logger.IsEnabled(LogLevel.Information)) 
@@ -138,8 +139,17 @@ public class AccountBase : Processor, IAccount
 
         decimal fxRate = 1m;
         
-        // TODO: request asset to confirm its existence and fail the command if it doesn't exist
+        var asset = Query<GetAsset, Asset?>(new(request.AssetId));
+        if (asset == null)
+        {
+            if (LoggingEnabled && Logger.IsEnabled(LogLevel.Error))
+            {
+                Logger.LogError($"AssetId {request.AssetId} not found, balance operation not created");
+            }
+            return null; // TODO: report command failure 
+        }
 
+        bool throwMissingFxException = false;
         if (request.AssetId != AccountCurrency.CurrencyId)
         {
             var retrievedFxRate = request.FxRate
@@ -148,10 +158,18 @@ public class AccountBase : Processor, IAccount
             if (retrievedFxRate == null)
             {
                 if (LoggingEnabled && Logger.IsEnabled(LogLevel.Warning))
-                    Logger.LogWarning("Cannot retrieve conversion rate from {assetId} to {currencyId}, balance operation was not created", request.AssetId, AccountCurrency.CurrencyId);
-                throw new MissingFxRateException($"Cannot retrieve conversion rate from {request.AssetId} to {AccountCurrency.CurrencyId}");
+                    Logger.LogWarning("Cannot retrieve conversion rate from {assetId} to {currencyId}", request.AssetId, AccountCurrency.CurrencyId);
+                
+                if (!bookWithMissingFxRate)
+                    throw new MissingFxRateException($"Cannot retrieve conversion rate from {request.AssetId} to {AccountCurrency.CurrencyId}");
+
+                throwMissingFxException = true;
+                fxRate = 0;
             }
-            fxRate = retrievedFxRate.Value;
+            else
+            {
+                fxRate = retrievedFxRate.Value;
+            }
         }
         
         var valueInAccountCcy = Math.Round(request.Amount * fxRate, AccountCurrency.Decimals);
@@ -169,6 +187,8 @@ public class AccountBase : Processor, IAccount
             requestId
         );
         AccountState.Apply(evt, true);
+        
+        if (throwMissingFxException) throw new MissingFxRateException($"Cannot retrieve conversion rate from {request.AssetId} to {AccountCurrency.CurrencyId}");
 
         if (AccountRecord.EnableSharePriceTracking && bo.AffectsShareCount)
         {
@@ -556,7 +576,7 @@ public class AccountBase : Processor, IAccount
         if (LoggingEnabled && Logger.IsEnabled(LogLevel.Information))
             Logger.LogInformation($"MarkToMarketEOD, referenceDt={referenceDt}, processingDt={processingDt}");
         
-        var (positionValues, balanceValues, options, success) = MarkToMarket(eodPrices, referenceDt);
+        var (_, positionValues, balanceValues, options, success) = MarkToMarket(eodPrices, referenceDt);
 
         var evt = new AccountEndOfDayEvt(
             EventIdProvider.GetNextEventId(),
@@ -623,10 +643,10 @@ public class AccountBase : Processor, IAccount
     }
 
     public (
+        IReadOnlyCollection<Position> positions, 
         IReadOnlyDictionary<long, PositionValue> positionValues, 
         IReadOnlyDictionary<int, BalanceValue> balanceValues, 
-        IReadOnlyDictionary<int, PnLCalculatorOptions> pnLCalculatorOptions, 
-        bool success
+        IReadOnlyDictionary<int, PnLCalculatorOptions> pnLCalculatorOptions, bool success
     ) MarkToMarket(Instant dt)
     {
         var prices = Query<GetLastKnownContractPrices, IReadOnlyDictionary<int, decimal>>(new());
@@ -634,6 +654,7 @@ public class AccountBase : Processor, IAccount
     }
     
     public (
+        IReadOnlyCollection<Position> positions,
         IReadOnlyDictionary<long, PositionValue> positionValues, 
         IReadOnlyDictionary<int, BalanceValue> balanceValues, 
         IReadOnlyDictionary<int, PnLCalculatorOptions> pnLCalculatorOptions, 
@@ -643,6 +664,7 @@ public class AccountBase : Processor, IAccount
         var success = true;
 
         Dictionary<int, PositionSum> values = new();
+        List<Position> positions = new();
         Dictionary<int, PnLCalculatorOptions> options = new();
         var positionValues = AccountState.Positions.ToDictionary(
             p => p.OpenTradeId,
@@ -677,6 +699,9 @@ public class AccountBase : Processor, IAccount
                     ? value 
                     : ConvertToAccountCurrency(value, contract.Template.SettlementCurrency.CurrencyId, prices, out successfulConversion, out fxRate);
                 success &= successfulConversion;
+
+                var (_, pos) = p.MarkToMarket(dt, price ?? p.SettlPrice, value, valueInAccountCcy, calculator);
+                positions.Add(pos);
                 
                 decimal equityValueInAccountCcy;
                 switch (contract.Template.SecurityType)
@@ -747,7 +772,7 @@ public class AccountBase : Processor, IAccount
                     totalAmount, value, fxRate);
             });
 
-        return (positionValues, balanceValues, options, success);
+        return (positions, positionValues, balanceValues, options, success);
     }
 
     class PositionSum

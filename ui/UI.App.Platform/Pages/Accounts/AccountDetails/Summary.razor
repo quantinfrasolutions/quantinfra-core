@@ -50,6 +50,15 @@
                 </RadzenColumn>
             }
         </RadzenRow>
+        
+        @if (AccountBase.Account.AccountType == AccountType.BrokerAccount)
+        {
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <BrokerAccountReconciliationStatusView AccountId="@AccountId" />
+                </RadzenColumn>
+            </RadzenRow>
+        }
     </RadzenStack>
 }
 

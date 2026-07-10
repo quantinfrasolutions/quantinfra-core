@@ -52,7 +52,7 @@ public class EventPersister(MainContext context) : IEventPersister
         var evtRecord = new Event(asName, evt.EventId, evt.GetType().FullName!, evt.Timestamp, evt.Version)
         {
             AccountId = evt.AccountId,
-            Data = JsonSerializer.SerializeToDocument(new NewUnmappedContractRegisteredEvtData(evt.ExternalContractId), 
+            Data = JsonSerializer.SerializeToDocument(new NewUnmappedContractRegisteredEvtData(evt.ExternalContractId, evt.ExternalAssetId), 
                 PersistentEventStorage.JsonSerializerOptions),
         };
         context.Events.Add(evtRecord);
