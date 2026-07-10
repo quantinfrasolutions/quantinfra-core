@@ -324,10 +324,15 @@ public class Service : IHostedService
             .AddSingleton<ReceiverFilter>(sp => sp.GetRequiredService<Router>().ReceiverFilter)
             
             .AddQuartz()
-            .AddQuartzHostedService(options =>
+            // .AddQuartzHostedService(options =>
+            // {
+            //     options.WaitForJobsToComplete = false;
+            // })
+            .Configure<QuartzHostedServiceOptions>(options =>
             {
                 options.WaitForJobsToComplete = false;
             })
+            .AddSingleton<QuartzHostedService>()
             
             .AddSingleton<QuantInfra.Common.ServiceBase.Handlers.Serializer, Serializer>()
             

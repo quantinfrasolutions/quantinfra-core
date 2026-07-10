@@ -12,8 +12,10 @@ namespace QuantInfra.Services.AccountsCore.Jobs
 		Config config
 	) : IJob
 	{
-		public Task Execute(IJobExecutionContext context) => Task.Run(() =>
+		private readonly int _delayMilliseconds = (int)config.MtmJobDelay.TotalSeconds;
+		public Task Execute(IJobExecutionContext context) => Task.Run(async () =>
 		{
+			await Task.Delay(_delayMilliseconds).ConfigureAwait(false);
 			logger.LogInformation("Sending an EndOfDayCmd");
 			publisher.PublishMessage("EndOfDayJob", 
 				new RunEndOfDayCmd(

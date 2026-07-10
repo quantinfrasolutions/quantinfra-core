@@ -224,6 +224,9 @@ public static class ConfigurationExtensions
     
         .AddSingleton<Persister>()
         
+        .AddSingleton<QuartzWrapper>()
+        .AddSingleton<IIncomingTransport>(sp => sp.GetRequiredService<QuartzWrapper>())
+        
         .AddSingleton<AccountsService>()
         .AddHostedService(sp => sp.GetRequiredService<AccountsService>());
 
