@@ -275,6 +275,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI.SharedComponents.Infrast
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI.SharedComponents.Strategies", "ui\UI.SharedComponents.Strategies\UI.SharedComponents.Strategies.csproj", "{9EE27F4E-3B41-4D29-A5C7-CC08FF7000D4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI.SharedComponents.Binance", "ui\UI.SharedComponents.Binance\UI.SharedComponents.Binance.csproj", "{7A0F1515-29B8-4949-939C-6B7E41BBC09D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -401,6 +403,7 @@ Global
 		{46C690F4-EE56-4142-8BBE-5DB0425B9979} = {F792314E-5C3F-40FF-807C-74509FB46836}
 		{E1450928-7407-4797-8392-AA4ABD6EF011} = {499664DF-2FD3-4A48-B723-78DD8D5A0372}
 		{9EE27F4E-3B41-4D29-A5C7-CC08FF7000D4} = {499664DF-2FD3-4A48-B723-78DD8D5A0372}
+		{7A0F1515-29B8-4949-939C-6B7E41BBC09D} = {499664DF-2FD3-4A48-B723-78DD8D5A0372}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{9FB43BE1-9878-4544-BA48-2BC901BC0AF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -851,5 +854,9 @@ Global
 		{9EE27F4E-3B41-4D29-A5C7-CC08FF7000D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9EE27F4E-3B41-4D29-A5C7-CC08FF7000D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9EE27F4E-3B41-4D29-A5C7-CC08FF7000D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A0F1515-29B8-4949-939C-6B7E41BBC09D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A0F1515-29B8-4949-939C-6B7E41BBC09D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A0F1515-29B8-4949-939C-6B7E41BBC09D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A0F1515-29B8-4949-939C-6B7E41BBC09D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -7,8 +7,6 @@ namespace UI.Interfaces.Accounts;
 
 public interface IUiAccountsRepository
 {
-    public Task<Dictionary<int, AccountListModel>> GetBrokerAccounts(bool refresh = false);
-    public Task<Dictionary<int, AccountListModel>> GetAccounts(bool refresh = false);
     public Task<IEnumerable<AccountListModel>> GetAccounts(AccountsFilter filter);
     public Task CreateAccount(CreateAccountRequest account);
     public Task<BrokerAccountReconciliationStatus?> GetBrokerAccountReconciliationStatus(int accountId);
@@ -27,7 +25,6 @@ public interface IUiAccountsRepository
     Task CancelOrder(OrderCancelRequest ocr);
     Task<IEnumerable<SubaccountListModel>> GetSubAccounts(SubaccountsFilter filter);
     Task<IEnumerable<SubaccountListModel>> GetBrokerAccountsForSsa(int accountId);
-    Task AssignBrokerAccountToSsa(int accountId, AssignSsaToBrokerAccountRequest request);
     Task CreateSubaccount(CreateSubaccountRequest r);
     Task<IEnumerable<SharePriceHistory>> GetSharePriceHistory(SharePriceHistoryFilter filter);
     Task CreateTradingAccountConfig(CreateTradingClientConfigRequest data);

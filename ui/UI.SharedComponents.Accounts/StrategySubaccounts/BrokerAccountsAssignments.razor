@@ -10,10 +10,11 @@
                   SearchFunc=@Repository.GetBrokerAccountsForSsa
                   Filter=@AccountId
                   RunSearchImmediately="true"
+                  SearchButtonText="Refresh"
                   @ref=_view>
         <SearchForm/>
         <CreateButton>
-            <AssignBrokerAccountDialog AccountId=@AccountId AssignmentChanged=@(() => _view.RunSearch())/>
+            <AssignBrokerAccountButton ShowButton="true" AccountId=@AccountId OnCompleted=@(() => _view.RunSearch())/>
         </CreateButton>
         <Columns>
             <RadzenDataGridColumn TItem="SubaccountListModel" Title="Broker Id" Property=@nameof(SubaccountListModel.BrokerId) Width="100px"/>

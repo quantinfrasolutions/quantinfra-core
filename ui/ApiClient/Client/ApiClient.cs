@@ -2831,7 +2831,6 @@ namespace QuantInfra.Api.Client
             }
         }
 
-        /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task CreateSubaccountAsync(int accountId, CreateSubaccountRequest body)
         {
@@ -2839,7 +2838,6 @@ namespace QuantInfra.Api.Client
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task CreateSubaccountAsync(int accountId, CreateSubaccountRequest body, System.Threading.CancellationToken cancellationToken)
         {
@@ -2891,8 +2889,20 @@ namespace QuantInfra.Api.Client
                         ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
+                        if (status_ == 400)
                         {
+                            var objectResponse_ = await ReadObjectResponseAsync<ValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new SwaggerException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new SwaggerException<ValidationProblemDetails>("Bad Request", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+
+                        if (status_ == 200 || status_ == 204)
+                        {
+
                             return;
                         }
                         else

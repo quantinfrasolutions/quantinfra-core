@@ -160,8 +160,32 @@ public class AccountsController(
 
     [HttpPost, Route("{accountId:int}/subaccounts")]
     [EndpointName(nameof(CreateSubaccount))]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateSubaccount([FromRoute] int accountId, [FromBody] CreateSubaccountRequest request)
     {
+        if (request.AccountId == 0) ModelState.AddModelError(nameof(request.AccountId), $"Account is required");
+        else
+        {
+            var account = await context.Accounts.AsNoTracking().SingleOrDefaultAsync(a => a.AccountId == request.AccountId);
+            if (account is null) ModelState.AddModelError(nameof(request.AccountId), $"Account {accountId} not found");
+        }
+        
+        if (request.SubaccountId == 0) ModelState.AddModelError(nameof(request.SubaccountId), $"Account is required");
+        else
+        {
+            var account = await context.Accounts.AsNoTracking().SingleOrDefaultAsync(a => a.AccountId == request.SubaccountId);
+            if (account is null) ModelState.AddModelError(nameof(request.SubaccountId), $"Account {request.SubaccountId} not found");
+            else
+            {
+                if (request.Classifier == SubaccountType.Broker)
+                {
+                    if (account.AccountType != AccountType.BrokerAccount) ModelState.AddModelError(nameof(request.SubaccountId), $"Account {request.SubaccountId} is not broker account");
+                }
+            }
+        }
+        
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
+        
         await managementClient.CreateSubaccountAsync(request);
         return Ok();
     }
@@ -592,333 +616,6 @@ public class AccountsController(
     
     #endregion
     
-    // #region Execution requests management
-    //
-    // [HttpGet, Route("execution-requests")]
-    // [EndpointName(nameof(GetExecutionRequests))]
-    // [Produces("application/json")]
-    // public async Task<IEnumerable<ExecutionRequestListView>> GetExecutionRequests([FromQuery] ExecutionRequestsFilter? filter = null)
-    // {
-    //     filter ??= new();
-    //
-    //     return await context.ExecutionRequests
-    //         .Where(er =>
-    //             (filter.ExecutionRequestId == null || filter.ExecutionRequestId == er.ExecutionRequestId)
-    //             && (filter.AccountId == null || er.AccountId == filter.AccountId)
-    //             && (filter.ContractId == null || filter.ContractId == er.ContractId)
-    //             && (filter.StrategyPositionId == null || filter.StrategyPositionId == er.StrategyPositionId)
-    //             && (filter.SignalGroupId == null || filter.SignalGroupId == er.SignalGroupId)
-    //             && (filter.IsActive == null || filter.IsActive == er.IsActive)
-    //             && (filter.TargetPositionId == null || filter.TargetPositionId == er.TargetPositionId)
-    //         )
-    //         .Include(er => er.Status)
-    //         .AsNoTracking()
-    //         .Select(er => new ExecutionRequestListView(er.Status, er.Status))
-    //         .ToListAsync();
-    // }
-    //
-    // [HttpPost, Route("{accountId:guid}/execution-requests")]
-    // [EndpointName(nameof(CreateExecutionRequest))]
-    // public async Task<IActionResult> CreateExecutionRequest([FromRoute] Guid accountId, [FromBody] CreateExecutionRequestRequest request)
-    // {
-    //     await commandBus.SendCommandAsync(new CreateExecutionRequestCmd(accountId, request.TargetPositionId, request.SignedQty,
-    //         request.Price, request.PositionEffect, SystemClock.Instance.GetCurrentInstant(), 
-    //         request.NumberOfRetries, request.ExecutionPolicyId
-    //     ));
-    //     await persistence.CommitAsync();
-    //     return Ok();
-    // }
-    //
-    // [HttpPost, Route("{accountId:guid}/execution-requests/{execRId:guid}")]
-    // [EndpointName(nameof(RetryExecutionRequest))]
-    // public async Task<IActionResult> RetryExecutionRequest([FromRoute] Guid accountId, [FromRoute] Guid execRId)
-    // {
-    //     await commandBus.SendCommandAsync(new RetryExecutionRequestCmd(accountId, execRId));
-    //     await persistence.CommitAsync();
-    //     return Ok();
-    // }
-    //
-    // [HttpDelete, Route("{accountId:guid}/execution-requests/{execRId:guid}")]
-    // [EndpointName(nameof(CancelExecutionRequest))]
-    // public async Task<IActionResult> CancelExecutionRequest([FromRoute] Guid accountId, [FromRoute] Guid execRId, [FromQuery] string? cxlReason = null)
-    // {
-    //     cxlReason ??= "Manual cancellation";
-    //     
-    //     await commandBus.SendCommandAsync(new CancelExecutionRequestCmd(accountId, execRId, cxlReason));
-    //     await persistence.CommitAsync();
-    //     return Ok();
-    // }
-    //
-    // #endregion
-    
-
-    // [HttpPost, Route("{accountId:guid}/fund/subscription")]
-    // [EndpointName(nameof(CreateFundSubscription))]
-    // public async Task<IActionResult> CreateFundSubscription([FromRoute] Guid accountId, [FromBody] FundSubscriptionRequest request)
-    // {
-    //     await commandBus.SendCommandAsync(new SubscribeFundToBookCmd(accountId, request.BookId, request.ReplicationFactor));
-    //     await persistence.CommitAsync();
-    //     return Ok();
-    // }
-    //
-    // [HttpPost, Route("{accountId:guid}/esa/subscription")]
-    // [EndpointName(nameof(CreateEsaSubscription))]
-    // public async Task<IActionResult> CreateEsaSubscription([FromRoute] Guid accountId, [FromBody] EsaSubscriptionRequest request)
-    // {
-    //     await commandBus.SendCommandAsync(new SubscribeEsaToStrategyCmd(accountId, request));
-    //     await persistence.CommitAsync();
-    //     return Ok();
-    // }
-    //
-    // [HttpGet, Route("execution-policies")]
-    // [EndpointName(nameof(GetExecutionPolicies))]
-    // [Produces("application/json")]
-    // public async Task<IEnumerable<ExecutionPolicyDefinition>> GetExecutionPolicies([FromQuery] ExecutionPoliciesFilter filter) =>
-    //     await executionPoliciesRepository.GetExecutionPoliciesAsync();
-    //
-    // [HttpGet, Route("{accountId:guid}/broker-account-assignments")]
-    // [EndpointName(nameof(GetBrokerAccountsForSsa))]
-    // [Produces("application/json")]
-    // public async Task<IEnumerable<BrokerAccountSubscription>> GetBrokerAccountsForSsa([FromRoute] Guid accountId)
-    // {
-    //     return await context.Accounts
-    //         .Include(a => a.Subaccounts.Where(sa => sa.Classifier == IStrategySubaccountState.BrokerAccountClassifier))
-    //         .ThenInclude(sa => sa.Subaccount)
-    //         .ThenInclude(a => a.Broker)
-    //         .Where(a => a.AccountId == accountId)
-    //         .AsNoTracking()
-    //         .SelectMany(a => a.Subaccounts.Select(sa => new BrokerAccountSubscription(
-    //             new(sa.SubaccountId, sa.Subaccount.AccountType, sa.Subaccount.Name),
-    //             sa.Subaccount.BrokerId!.Value,
-    //             sa.Subaccount.Broker!.Name
-    //         )))
-    //         .ToListAsync();
-    // }
-    //
-    // [HttpPost, Route("{accountId:guid}/broker-account-assignments")]
-    // [EndpointName(nameof(AssignBrokerAccountToSsa))]
-    // public async Task<IActionResult> AssignBrokerAccountToSsa([FromRoute] Guid accountId, [FromBody] AssignSsaToBrokerAccountRequest request)
-    // {
-    //     await commandBus.SendCommandAsync(new AssignSsaToBrokerAccountCmd(accountId, request.BrokerAccountId));
-    //     await persistence.CommitAsync();
-    //     return Ok();
-    // }
-
-    // #region Target positions
-    //
-    // [HttpGet, Route("{accountId:guid}/target-positions")]
-    // [EndpointName(nameof(GetTargetPositions))]
-    // [Produces("application/json")]
-    // public async Task<IEnumerable<TargetPositionListView>> GetTargetPositions([FromRoute] Guid accountId)
-    // {
-    //     var account = await queryBus.QueryAsync<GetExecutableSubaccount, IExecutableSubaccount>(new(accountId));
-    //     return account.GetReconciledPositions();
-    //     // var newInvestment = account.AccountState.GetInvestmentInfo().Investment;
-    //     // var strategyInvestment = 100000; // TODO need to get the correct strategy investment from the signal group and and the account
-    //     //
-    //     // return (await _context.TargetPositionsView
-    //     //     .Where(tp => tp.AccountId == accountId)
-    //     //     .AsNoTracking()
-    //     //     .ToListAsync()
-    //     //     ).Select(tp =>
-    //     //     {
-    //     //         var contract = _queryBus.Query<GetContract, Contract>(new(tp.ContractId));
-    //     //         var expectedTV = contract.NormalizeVolume(strategyInvestment == 0 ? 0 : tp.Investment / strategyInvestment * tp.StrategyVolume);
-    //     //         var expectedNewInvTv = newInvestment != tp.Investment 
-    //     //             ? contract.NormalizeVolume(strategyInvestment == 0 ? 0 : newInvestment / strategyInvestment * tp.StrategyVolume)
-    //     //             : (decimal?)null;
-    //     //         
-    //     //         return new TargetPositionListView(tp.AccountId, tp.TargetPositionId, tp.PositionId, tp.SignalGroupId,
-    //     //             tp.ContractId, tp.Ticker, tp.StrategyPositionId, tp.StrategyVolume, tp.StrategyOpenPrice,
-    //     //             tp.TargetVolume, tp.ActualVolume, tp.ActualOpenPrice, tp.Pending, tp.InProgress, tp.ActiveExecRsCount, tp.ExecRsCount, 
-    //     //             expectedTV, expectedNewInvTv);
-    //     //     });
-    // }
-    //
-    // [HttpGet, Route("target-positions-history")]
-    // [EndpointName(nameof(GetTargetPositionsHistory))]
-    // [Produces("application/json")]
-    // public async Task<IEnumerable<TargetPositionHistoryListView>> GetTargetPositionsHistory([FromQuery] TargetPositionsHistoryFilter? filter = null)
-    // {
-    //     filter ??= new();
-    //
-    //     return (await context.TargetPositionsHistory
-    //             .Where(tp =>
-    //                 (filter.AccountId == null || tp.AccountId == filter.AccountId)
-    //                 && (filter.ContractId == null || tp.ContractId == filter.ContractId)
-    //                 && (filter.StrategyPositionId == null || tp.StrategyPositionId == filter.StrategyPositionId)
-    //                 && (filter.SignalGroupId == null || tp.SignalGroupId == filter.SignalGroupId)
-    //                 && (fromDt == null || tp.Dt >= fromDt)
-    //                 && (toDt == null || tp.Dt < toDt)
-    //             )
-    //             .Include(tp => tp.Account)
-    //             .Include(tp => tp.Contract)
-    //             .Include(tp => tp.ExecutionRequests).ThenInclude(er => er.Status)
-    //             .Include(tp => tp.Trade)
-    //             .OrderByDescending(tp => tp.Dt)
-    //             .Skip(filter.Offset)
-    //             .Take(filter.Limit)
-    //             .ToListAsync())
-    //         .Select(tp =>
-    //         {
-    //             var ers = tp.ExecutionRequests.Count > 0 ?
-    //                 tp.ExecutionRequests
-    //                     .Select(er => new
-    //                     {
-    //                         Count = 1, ActiveCount = er.IsActive ? 1 : 0, Filled = er.Status.SignedFilledQty,
-    //                         Pending = er.Status.SignedPendingQty,
-    //                         InProgress = er.IsActive
-    //                             ? er.Status.SignedQty - er.Status.SignedFilledQty - er.Status.SignedPendingQty
-    //                             : 0
-    //                     })
-    //                     .Aggregate((memo, i) => new
-    //                     {
-    //                         Count = memo.Count + i.Count,
-    //                         ActiveCount = memo.ActiveCount + i.ActiveCount,
-    //                         Filled = memo.Filled + i.Filled,
-    //                         Pending = memo.Pending + i.Pending,
-    //                         InProgress = memo.InProgress + i.InProgress,
-    //                     })
-    //                 : new
-    //                 {
-    //                     Count = 0,
-    //                     ActiveCount = 0,
-    //                     Filled = 0m,
-    //                     Pending = 0m,
-    //                     InProgress = 0m,
-    //                 };
-    //
-    //             return new TargetPositionHistoryListView(tp, tp.Account.Name, tp.Contract.Ticker, tp.Trade?.Price,
-    //                 ers.Count, ers.ActiveCount, ers.Filled, ers.Pending, ers.InProgress, null); // TODO
-    //         });
-    // }
-    //
-    // [HttpPost, Route("{accountId:guid}/target-positions/reconcile")]
-    // [EndpointName(nameof(ReconcileTargetPositions))]
-    // public async Task<IActionResult> ReconcileTargetPositions([FromRoute] Guid accountId)
-    // {
-    //     await commandBus.SendCommandAsync(new ReconcileTargetPositionsCmd(accountId));
-    //     await persistence.CommitAsync();
-    //     return Ok();
-    // }
-    //
-    // #endregion
-    
-    // #region Fund account
-    //
-    // [HttpGet, Route("{accountId:guid}/fund/trades")]
-    // [EndpointName(nameof(GetFundAccountTrades))]
-    // [Produces("application/json")]
-    // public async Task<IEnumerable<FundAccountTradeView>> GetFundAccountTrades([FromRoute] Guid accountId, [FromQuery] FundAccountTradesFilter? filter = null)
-    // {
-    //     filter ??= new();
-    //     
-    //     var account = (await GetAccounts(new() { AccountId = accountId })).SingleOrDefault();
-    //     
-    //     // TODO: this cannot show the results if the subscription has been removed recently
-    //     if (account?.AccountType != AccountType.Fund || account?.BookSubscription == null)
-    //         return new List<FundAccountTradeView>();
-    //
-    //     var bookId = account.BookSubscription.BookId;
-    //     
-    //     // TODO: use GetEffectiveStrategyFactors
-    //     var book = await queryBus.QueryAsync<GetBook, IBook>(new(bookId));
-    //     var strategyIds = book.GetEffectiveStrategyFactors().Keys.ToList();
-    //     
-    //     var trades = await context.Trades
-    //         .Where(t => 
-    //             t.Account.Strategy != null 
-    //             && strategyIds.Contains(t.Account.Strategy.StrategyId)
-    //             && (!filter.From.HasValue || t.Dt >= filter.From) 
-    //             && (!filter.To.HasValue || t.Dt < filter.To)
-    //         )
-    //         .Include(t => t.Account)
-    //             .ThenInclude(a => a.Strategy)
-    //         .Include(t => t.Contract)
-    //         .AsNoTracking()
-    //         .Select(t => new FundAccountTradeView(t, t.Account.Name, t.Contract.Ticker, t.Account.Strategy!.Name, t.Account.Strategy.StrategyId))
-    //         .ToListAsync();
-    //
-    //     return trades;
-    // }
-    //
-    // [HttpGet, Route("{accountId:guid}/fund/strategy-subaccounts")]
-    // [EndpointName(nameof(GetStrategySubaccounts))]
-    // [Produces("application/json")]
-    // public async Task<IReadOnlyCollection<StrategySubaccountListView>> GetStrategySubaccounts([FromRoute] Guid accountId)
-    // {
-    //     var account = (await GetAccounts(new() { AccountId = accountId })).SingleOrDefault();
-    //     
-    //     // TODO: this cannot show the results if the subscription has been removed recently
-    //     if (account?.AccountType != AccountType.Fund || account?.BookSubscription == null)
-    //         return new List<StrategySubaccountListView>();
-    //
-    //     var bookId = account.BookSubscription.BookId;
-    //     
-    //     // TODO: use GetEffectiveStrategyFactors
-    //     var book = await queryBus.QueryAsync<GetBook, IBook>(new(bookId));
-    //     var factors = book.GetEffectiveStrategyFactors();
-    //     var strategyIds = factors.Keys.ToList();
-    //
-    //     var strategies = await context.Strategies
-    //         .Where(s => strategyIds.Contains(s.StrategyId))
-    //         .Include(s => s.Account)
-    //         .ThenInclude(a => a.Currency).ThenInclude(c => c.Asset)
-    //         .AsNoTracking()
-    //         .ToListAsync();
-    //     
-    //     var subaccounts = await context.Subaccounts
-    //         .Where(sa => 
-    //             sa.AccountId == accountId 
-    //             && sa.Classifier ==  IFundAccountState.StrategySubaccountClassifier
-    //         )
-    //         .Include(sa => sa.Subaccount)
-    //             .ThenInclude(a => a.Currency)
-    //                 .ThenInclude(c => c.Asset)
-    //         .Include(sa => sa.Subaccount)
-    //             .ThenInclude(sa => sa.InvestmentHistory.OrderByDescending(ih => ih.Dt).Take(1))
-    //         // .Include(sa => sa.Subaccount)
-    //         //     .ThenInclude(a => a.Subaccounts
-    //         //         .Where(sa => sa.Classifier == IStrategySubaccountState.FundAccountClassifier && sa.CorrelationAccountId == accountId).Take(1)
-    //         //     )
-    //         //         .ThenInclude(sa => sa.Subaccount)
-    //         //             .ThenInclude(a => a.InvestmentHistory.OrderByDescending(ih => ih.Dt).Take(1))
-    //         .AsNoTracking()
-    //         .ToListAsync();
-    //
-    //     var res = strategies.FullOuterJoin(subaccounts,
-    //         s => s.StrategyId,
-    //         sa => sa.CorrelationAccountId,
-    //         (s, sa, id) => new StrategySubaccountListView
-    //         {
-    //             StrategyId = id,
-    //             StrategyName = s?.Name,
-    //             StrategyCcyId = s?.Account?.CurrencyId,
-    //             StrategyCcyName = s?.Account?.Currency?.Asset?.Name,
-    //             AccountId = sa?.SubaccountId,
-    //             AccountName = sa?.Subaccount?.Name,
-    //             AccountType = sa?.Subaccount?.AccountType,
-    //             AccountCcyId = sa?.Subaccount?.CurrencyId,
-    //             AccountCcyName = sa?.Subaccount?.Currency?.Asset?.Name,
-    //             DesiredInvestment = 0,
-    //             Share = factors.GetValueOrDefault(id!.Value, 0),
-    //             // SubaccountId = sa?.Subaccount?.Subaccounts?.SingleOrDefault()?.SubaccountId,
-    //             // Investment = sa?.Subaccount?.Subaccounts?.SingleOrDefault()?.Subaccount.InvestmentHistory.SingleOrDefault()?.Investment ?? 0,
-    //             Investment = sa?.Subaccount?.InvestmentHistory.SingleOrDefault()?.Investment ?? 0,
-    //         });
-    //
-    //     return res.ToList();
-    // }
-    //
-    // [HttpPost, Route("{accountId:guid}/fund/strategy-subaccounts")]
-    // [EndpointName(nameof(AssignStrategySubaccount))]
-    // public async Task<IActionResult> AssignStrategySubaccount([FromRoute] Guid accountId, [FromBody] AssignSsaToFundAccountRequest request)
-    // {
-    //     await commandBus.SendCommandAsync(new AssignSsaToFundCmd(accountId, request.StrategyId, request.SsaId));
-    //     await persistence.CommitAsync();
-    //     return Ok();
-    // }
-    // #endregion
     
     private async Task<Dictionary<int, string>> GetContractNames(List<int> contractIds) =>
         (await context.Contracts

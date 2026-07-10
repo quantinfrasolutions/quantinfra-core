@@ -23,10 +23,8 @@ public class TestStaticDataRepository : IStaticDataProvider
     private readonly Dictionary<int, Dictionary<int, Tuple<int, bool>>> _fxConversions = new();
     public IReadOnlyCollection<int> GetFxConversionContractIds() => _fxConversionContracts;
     
-    public Asset? GetAsset(int assetId)
-    {
-        throw new NotImplementedException();
-    }
+    private readonly Dictionary<int, Asset> _assets = new();
+    public Asset? GetAsset(int assetId) => _assets.GetValueOrDefault(assetId);
 
     private readonly Dictionary<int, Dictionary<string, Asset>> _assetsByExternalId = new();
     public Asset? GetAssetByExternalId(int brokerId, string externalAssetId) =>
@@ -99,6 +97,7 @@ public class TestStaticDataRepository : IStaticDataProvider
 
     public void TryAddCurrency(Currency currency)
     {
+        _assets.TryAdd(currency.CurrencyId, currency.Asset);
         _currencies.TryAdd(currency.CurrencyId, currency);
     }
 }

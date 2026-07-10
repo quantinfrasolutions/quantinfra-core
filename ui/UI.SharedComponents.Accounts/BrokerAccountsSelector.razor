@@ -1,0 +1,40 @@
+﻿@using QuantInfra.Common.Interfaces.Api.Accounts
+@using QuantInfra.Sdk.Accounts
+@using UI.Interfaces.Accounts
+@using UI.SharedComponents.Base
+
+@inject IUiAccountsRepository Repository
+
+@typeparam TValue
+
+<SearchSelector TItem="AccountListModel"
+                TValue="int"
+                ValueProperty="@nameof(AccountListModel.AccountId)"
+                ValueSelector="@(a => a.AccountId)"
+                SearchFunc="@DoSearch"
+                Value="@NullableUtils.AsInt(Value)"
+                ValueChanged="@(v => NullableUtils.OnInnerValueChanged(v, Required, ValueChanged))"
+                IsRequired="@Required"
+                PreloadData="true"
+                @bind-Loading="@_isLoading">
+    <ValueTemplate Context="account">
+        (@account.AccountId) @account.Name
+    </ValueTemplate>
+</SearchSelector>
+
+@code {
+    private bool _isLoading;
+    
+    [Parameter] public TValue Value { get; set; }
+    [Parameter] public EventCallback<TValue> ValueChanged { get; set; }
+
+    [Parameter] public bool Required { get; set; } = true;
+    
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+
+    private Task<IEnumerable<AccountListModel>> DoSearch(string? filter)
+    {
+        return Repository.GetAccounts(new() { AccountTypes = [AccountType.BrokerAccount] });
+    }
+}

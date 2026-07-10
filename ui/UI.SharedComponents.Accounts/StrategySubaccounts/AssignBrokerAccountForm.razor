@@ -1,0 +1,55 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using QuantInfra.Common.Interfaces.Api.Accounts
+@using QuantInfra.Sdk.Accounts
+@using UI.Interfaces.Accounts
+@using UI.SharedComponents.Base
+
+@inject IUiAccountsRepository Repository
+
+@if (_request is not null)
+{
+    <CreateItemForm TItem="CreateSubaccountRequest"
+                    Item="@_request"
+                    CreateFunc="@Repository.CreateSubaccount"
+                    OnCompleted="@OnCompleted"
+                    @bind-IsLoading=@_isLoading>
+        <Fields Context="request">
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenFormField Text="Broker account" Variant="Variant.Text">
+                        <ChildContent>
+                            <BrokerAccountsSelector @bind-Value=@request.SubaccountId Required="true" Disabled=@_isLoading/>
+                        </ChildContent>
+                        <Helper>
+                            <ValidationMessage For="@(() => request.SubaccountId)" class="rz-message rz-messages-error"/>
+                        </Helper>
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+        </Fields>
+    </CreateItemForm>
+}
+
+@code {
+    private bool _isLoading;
+    private int _accountId;
+    private CreateSubaccountRequest? _request;
+    
+    [Parameter] public EventCallback OnCompleted { get; set; }
+
+    [Parameter, EditorRequired]
+    public int AccountId
+    {
+        get => _accountId;
+        set
+        {
+            if (value != 0 && _accountId != value)
+            {
+                _accountId = value;
+                _request = new() { AccountId = _accountId, Classifier = SubaccountType.Broker };
+                StateHasChanged();
+            }
+        }
+    }
+
+}

@@ -1,0 +1,16 @@
+@using UI.SharedComponents.Base
+<CreateItemButton TForm="AssignBrokerAccountForm"
+                  Text="Assign"
+                  ShowButton="@ShowButton"
+                  DialogTitle="Assign broker account"
+                  OnCompleted="@OnCompleted"
+                  FormParams="@(new Dictionary<string, object>()
+                              {
+                                  { "AccountId", AccountId }
+                              })"/>
+
+@code {
+    [Parameter] public bool ShowButton { get; set; }
+    [Parameter] public EventCallback OnCompleted { get; set; }
+    [Parameter, EditorRequired] public int AccountId { get; set; } 
+}
