@@ -35,12 +35,12 @@ public class EmbeddedMarketDataService : IHostedService
         _incomingTransports = incomingTransports;
         
         _inputDisruptor.SetDefaultExceptionHandler(new DisruptorExceptionHandler<IncomingDisruptorMessage>(
-            exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<IncomingDisruptorMessage>>()));
+            _inputDisruptor, exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<IncomingDisruptorMessage>>()));
         
         if (config.PersistMarketData) _outputDisruptor.HandleEventsWith(multicast).Then(persister);
         else _outputDisruptor.HandleEventsWith(multicast);
         _outputDisruptor.SetDefaultExceptionHandler(new DisruptorExceptionHandler<OutgoingDisruptorMessage>(
-            exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<OutgoingDisruptorMessage>>()));
+            _outputDisruptor, exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<OutgoingDisruptorMessage>>()));
     }
     
     public async Task StartAsync(CancellationToken cancellationToken)

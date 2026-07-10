@@ -28,15 +28,30 @@ public class HostedComponent : IComponentExceptionHandler
     public ComponentStatus Status { get; private set; } = ComponentStatus.Stopped;
     public Exception? Exception { get; private set; }
 
+    private Task? _startupExceptionTask = null;
+    private ManualResetEventSlim? _startupExceptionEvent = null;
+    private Exception? _startupException = null;
+    
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         Exception = null;
+        var ct = new CancellationTokenSource();
+        
         try
         {
             _logger.LogInformation($"Starting component {Name}");
             _serviceProvider = _buildServiceProvider(this);
             var services = _getStartupServices(_serviceProvider).ToList();
-            await Task.WhenAll(services.Select(s => s.StartAsync(CancellationToken.None)));
+            
+            _startupExceptionEvent = new();
+            _startupExceptionTask = Task.Run(() => _startupExceptionEvent.Wait(ct.Token), cancellationToken);
+            var startupTask = Task.WhenAll(services.Select(s => s.StartAsync(CancellationToken.None)));
+
+            if (await Task.WhenAny(startupTask, _startupExceptionTask) == _startupExceptionTask)
+            {
+                throw _startupException!;
+            }
+
             Status = ComponentStatus.Running;
         }
         catch (Exception e)
@@ -53,11 +68,25 @@ public class HostedComponent : IComponentExceptionHandler
                 _logger.LogError(stopEx, "Error starting component {Name}", Name);
             }
         }
+        finally
+        {
+            await ct.CancelAsync();
+            _startupExceptionTask = null;
+            _startupException = null;
+            _startupExceptionEvent = null;
+        }
     }
 
-    public async Task StopAsync(CancellationToken cancellationToken)
+    public Task StopAsync(CancellationToken cancellationToken)
     {
-        if (Status != ComponentStatus.Running) return;
+        if (Status != ComponentStatus.Running) return Task.CompletedTask;
+        return StopAsync(cancellationToken);
+    }
+
+    private async Task StopAsyncInternal(CancellationToken cancellationToken)
+    {
+        if (_serviceProvider is null) return;
+        
         _logger.LogInformation("Stopping component {Name}", Name);
         try
         {
@@ -78,7 +107,13 @@ public class HostedComponent : IComponentExceptionHandler
     {
         Status = ComponentStatus.Failed;
         Exception = exception;
-        Task.Run(async () => await StopAsync(CancellationToken.None));
+        if (_startupExceptionTask is {IsCompleted: false})
+        {
+            _startupException = exception;
+            _startupExceptionEvent!.Set();
+            return;
+        }
+        Task.Run(async () => await StopAsyncInternal(CancellationToken.None));
     }
 }
 

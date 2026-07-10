@@ -100,11 +100,11 @@ public class AccountsService : IHostedService
         
         // Even in case of the monolith app, if AS fails, let the whole application fail
         _inputDisruptor.SetDefaultExceptionHandler(new DisruptorExceptionHandler<IncomingDisruptorMessage>(
-            exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<IncomingDisruptorMessage>>()));
+            _inputDisruptor, exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<IncomingDisruptorMessage>>()));
         var handlers = _outputDisruptor.HandleEventsWith(_sender);
         if (config.PersistEventsAndProjections) handlers.Then(_persister);
         _outputDisruptor.SetDefaultExceptionHandler(new DisruptorExceptionHandler<OutgoingDisruptorMessage>(
-            exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<OutgoingDisruptorMessage>>()));
+            _outputDisruptor, exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<OutgoingDisruptorMessage>>()));
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)

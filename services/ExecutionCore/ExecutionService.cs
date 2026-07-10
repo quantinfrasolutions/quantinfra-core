@@ -56,10 +56,10 @@ public class ExecutionService : IHostedService
         if (config.Monolith) _inputDisruptor.HandleEventsWith(bpl);
         else _inputDisruptor.HandleEventsWith(parser).Then(bpl);
         _inputDisruptor.SetDefaultExceptionHandler(new DisruptorExceptionHandler<IncomingDisruptorMessage>(
-            exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<IncomingDisruptorMessage>>()));
+            _inputDisruptor, exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<IncomingDisruptorMessage>>()));
         _outputDisruptor.HandleEventsWith(_sender);
         _outputDisruptor.SetDefaultExceptionHandler(new DisruptorExceptionHandler<OutgoingDisruptorMessage>(
-            exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<OutgoingDisruptorMessage>>()));
+            _outputDisruptor, exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<OutgoingDisruptorMessage>>()));
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)

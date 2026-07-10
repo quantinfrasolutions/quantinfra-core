@@ -90,10 +90,10 @@ namespace QuantInfra.Services.StrategiesCore
             else _inputDisruptor.HandleEventsWith(parser).Then(bpl);
 
             _inputDisruptor.SetDefaultExceptionHandler(new DisruptorExceptionHandler<IncomingDisruptorMessage>(
-                exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<IncomingDisruptorMessage>>()));
+                _inputDisruptor, exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<IncomingDisruptorMessage>>()));
             _outputDisruptor.HandleEventsWith(sender);
             _outputDisruptor.SetDefaultExceptionHandler(new DisruptorExceptionHandler<OutgoingDisruptorMessage>(
-                exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<OutgoingDisruptorMessage>>()));
+                _outputDisruptor, exceptionHandler, loggerFactory.CreateLogger<DisruptorExceptionHandler<OutgoingDisruptorMessage>>()));
 
             if (config.WritePerformanceMetrics)
             {
