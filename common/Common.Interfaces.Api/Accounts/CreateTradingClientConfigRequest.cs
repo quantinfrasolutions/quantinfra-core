@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using QuantInfra.Sdk.Accounts;
 
 namespace QuantInfra.Common.Interfaces.Api.Accounts;
@@ -19,10 +20,10 @@ public class CreateTradingClientConfigRequest
     }
 
     public int AccountId { get; set; }
-    public string ExecutionServiceName { get; set; }
+    [Required(ErrorMessage = "Execution service is required")] public string ExecutionServiceName { get; set; }
     public string? ExternalAccountId { get; set; }
-    public string TradingClientClassName { get; set; }
-    public string TradingClientParamsSerialized { get; set; }
+    [Required(ErrorMessage = "Class name is required")] public string TradingClientClassName { get; set; }
+    public string? TradingClientParamsSerialized { get; set; }
     public string? TradingClientSecret { get; set; }
     public bool WritePerformanceMetrics { get; set; }
 

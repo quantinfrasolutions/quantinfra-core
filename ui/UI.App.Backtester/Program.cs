@@ -11,19 +11,19 @@ using UI.SharedComponents;
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5262/") /*new Uri(builder.HostEnvironment.BaseAddress)*/ });
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 builder.Services.AddLogging();
 builder.Services.AddSingleton<ILogger>(sp => sp.GetService<ILoggerFactory>()!.CreateLogger("Logger"));
 builder.Services.AddRadzenComponents();
 
 builder.Services
-    .ConfigureBacktestingApiServiceWrapper(builder.Configuration, replaceBaseUri: "http://localhost:5262/" /*builder.HostEnvironment.BaseAddress*/)
+    .ConfigureBacktestingApiServiceWrapper(builder.Configuration, replaceBaseUri: builder.HostEnvironment.BaseAddress)
     .AddScopedBacktestingApiWrapper()
     .AddBacktestingApiRepository();
 
 builder.Services
-    .ConfigureApiServiceWrapper(builder.Configuration, replaceBaseUri: "http://localhost:5262/" /*builder.HostEnvironment.BaseAddress*/)
+    .ConfigureApiServiceWrapper(builder.Configuration, replaceBaseUri: builder.HostEnvironment.BaseAddress)
     .AddScopedApiWrapper()
     .AddApiRepository()
     .UseApiStaticDataRepository();

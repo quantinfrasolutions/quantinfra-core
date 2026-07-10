@@ -1,11 +1,11 @@
 @page "/strategies/{StrategyId:int}/trading"
-@using UI.SharedComponents.Accounts
+@using UI.SharedComponents.Accounts.Trading
 
 @layout StrategyBase
 
 @if (StrategyBase?.Strategy != null)
 {
-    <AccountTradingView AccountId=@StrategyBase.Strategy.Account.AccountId AccountType=@StrategyBase.Strategy.Account.AccountType />
+    <AccountTradingView Account=@StrategyBase.Strategy.Account />
 }
 
 @code {

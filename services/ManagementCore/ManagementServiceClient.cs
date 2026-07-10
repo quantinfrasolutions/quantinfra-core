@@ -11,14 +11,14 @@ namespace QuantInfra.Services.ManagementCore;
 
 public class ManagementServiceClient(ManagementService service) : IManagementServiceClient
 {
-    public Task CreateAccountAsync(CreateAccountRequest request) => service.CreateAccountAsync(request, 0);
+    public Task<int> CreateAccountAsync(CreateAccountRequest request) => service.CreateAccountAsync(request, 0);
 
     public Task CreateSubaccountAsync(CreateSubaccountRequest request) => service.CreateSubaccountAsync(request, 0);
 
     public Task<IReadOnlyDictionary<int, decimal>> GetBalancesAsync(int accountId) =>
         service.GetBalancesAsync(accountId);
 
-    public Task CreateBalanceOperationAsync(NewBalanceOperation request) => service.CreateBalanceOperationAsync(request, 0);
+    public Task<int> CreateBalanceOperationAsync(NewBalanceOperation request) => service.CreateBalanceOperationAsync(request, 0);
 
     public Task<IReadOnlyCollection<Position>> GetActivePositionsAsync(int accountId) =>
         service.GetPositionsAsync(accountId);

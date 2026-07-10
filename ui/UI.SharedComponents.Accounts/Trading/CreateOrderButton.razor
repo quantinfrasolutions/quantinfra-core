@@ -1,0 +1,29 @@
+@using QuantInfra.Sdk.Accounts
+@using UI.SharedComponents.Base
+<CreateItemButton TForm="CreateOrderForm"
+                  ShowButton="@ShowButton"
+                  DialogTitle="New order"
+                  OnCompleted="@OnCompleted"
+                  Text="@Text"
+                  Icon="@Icon"
+                  ButtonStyle="@ButtonStyle"
+                  FormParams="@(new Dictionary<string, object>()
+                              {
+                                  { "AccountId", Account.AccountId },
+                                  { "ContractId", ContractId },
+                                  { "PositionAccounting", Account.PositionAccounting },
+                                  { "SignedQty", SignedQty },
+                                  { "StrategyPositionId", StrategyPositionId },
+                              })"/>
+
+@code {
+    [Parameter] public bool ShowButton { get; set; }
+    [Parameter] public string? Text { get; set; } = "New order";
+    [Parameter] public string? Icon { get; set; } = "add";
+    [Parameter] public ButtonStyle ButtonStyle { get; set; } = ButtonStyle.Success;
+    [Parameter] public EventCallback OnCompleted { get; set; }
+    [Parameter, EditorRequired] public AccountRecordV6 Account { get; set; }
+    [Parameter] public int ContractId { get; set; }
+    [Parameter] public decimal SignedQty { get; set; }
+    [Parameter] public string? StrategyPositionId { get; set; }
+}

@@ -35,7 +35,9 @@ public partial class MainContext : IStrategyRecordsRepository
         
         var accountModel = CreateAccountInternal(request.Account, userId);
         var model = new StrategyModel(0, request.Name, request.ClassName, request.Params, request.RequiredBarStorages,
-            request.Symbols, request.LiquidationParameters, request.UseSignalGroups, 
+            request.Symbols, 
+            null, //request.LiquidationParameters, 
+            request.UseSignalGroups, 
             request.StartImmediately ? StrategyStatus.Running : StrategyStatus.Stopped, 0, request.StrategyServiceName, 
             accountModel);
         Strategies.Add(model);

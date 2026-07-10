@@ -1,0 +1,47 @@
+﻿@using QuantInfra.Common.Interfaces.Api.StaticData
+@using UI.Interfaces.StaticData
+
+@inject IUiStaticDataRepository Repository
+
+@typeparam TValue
+
+<SearchSelector TItem="ContractListView"
+                TValue="int"
+                ValueProperty="@nameof(ContractListView.ContractId)"
+                ValueSelector="@(a => a.ContractId)"
+                SearchFunc="@DoSearch"
+                Value="@NullableUtils.AsInt(Value)"
+                ValueChanged="@(v => NullableUtils.OnInnerValueChanged(v, Required, ValueChanged))"
+                IsRequired="@Required"
+                @bind-Loading="@_isLoading"
+                @ref="_selector">
+    <ValueTemplate Context="contract">
+        (@contract.ContractId) @contract.Ticker
+    </ValueTemplate>
+</SearchSelector>
+
+@code {
+    private bool _isLoading;
+    private SearchSelector<int, ContractListView> _selector;
+
+    [Parameter] public TValue Value { get; set; }
+    [Parameter] public EventCallback<TValue> ValueChanged { get; set; }
+
+    [Parameter] public bool Required { get; set; } = true;
+    
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+
+    public ContractListView? Item => _selector?.Item;
+
+    private async Task<IEnumerable<ContractListView>> DoSearch(string? filter)
+    {
+        List<Task<IEnumerable<ContractListView>>> tasks = [Repository.GetContracts(new() { Ticker = filter })];
+        if (int.TryParse(filter, out var contractId))
+        {
+            tasks.Add(Repository.GetContracts(new() { ContractIds = [contractId] }));
+        }
+
+        return (await Task.WhenAll(tasks)).SelectMany(t => t);
+    }
+}

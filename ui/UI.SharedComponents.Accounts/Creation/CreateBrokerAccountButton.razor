@@ -1,0 +1,16 @@
+@using QuantInfra.Common.Accounts.Abstractions
+@using QuantInfra.Sdk.Accounts
+@using UI.SharedComponents.Base
+<CreateItemButton TForm="CreateBrokerAccountForm"
+                  ShowButton="@ShowButton"
+                  DialogTitle="Create broker account"
+                  OnCompleted="@OnCompleted"
+                  FormParams="@(new Dictionary<string, object>()
+                              {
+                                  { "CreateAccountRequest", new CreateAccountRequest() { AccountType = AccountType.BrokerAccount } }
+                              })"/>
+
+@code {
+    [Parameter] public bool ShowButton { get; set; }
+    [Parameter] public EventCallback OnCompleted { get; set; }
+}

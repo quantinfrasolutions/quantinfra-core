@@ -63,7 +63,7 @@ public class TradesTests
             2,
             securityType,
             2,
-            PnLCalculatorType.Default, 0.01m, 0.01m, 1m
+            new PnLCalculatorOptions(PnLCalculatorType.Default, 0.01m, 0.01m, 2)
         ), true);
         
         var balances = _state.Balances;
@@ -94,7 +94,7 @@ public class TradesTests
             2,
             SecurityType.FX,
             2,
-            PnLCalculatorType.Default, 0.01m, 0.01m, 1m
+            new PnLCalculatorOptions(PnLCalculatorType.Default, 0.01m, 0.01m, 2)
         ), true);
         
         var positions = _state.Positions.ToList();
@@ -129,7 +129,7 @@ public class TradesTests
             2,
             securityType,
             2,
-            PnLCalculatorType.Default, 0.01m, 0.01m, 1m
+            new PnLCalculatorOptions(PnLCalculatorType.Default, 0.01m, 0.01m, 2)
         ), true);
         
         var positions = _state.Positions.ToList();
@@ -165,7 +165,7 @@ public class TradesTests
             8,
             securityType,
             8,
-            PnLCalculatorType.InverseFutures, 0.1m, 0.1m, 1m
+            new PnLCalculatorOptions(PnLCalculatorType.Default, 0.01m, 0.01m, 2)
         ), true);
         
         var positions = _state.Positions.ToList();

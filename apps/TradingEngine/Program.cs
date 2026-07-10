@@ -1,16 +1,13 @@
-using System.Reflection;
 using QuantInfra.Common.Utils.ExecutableAppBase;
+using QuantInfra.Core.Services.Api.StaticData;
 using QuantInfra.Services.Api;
 using QuantInfra.Services.MonolithService;
 
 
-var addHostedService = Assembly.GetEntryAssembly()?.GetName().Name != "GetDocument.Insider";
-        
 var host = new AppBase(args)
     .UseJsonFileConfiguration()
     .UseEnvironmentVariables()
-    .ConfigureControllers(null, typeof(AccountsController).Assembly)
-    .AddOpenApiDocumentGenerator()
+    .ConfigureControllers(null, typeof(AccountsController).Assembly, typeof(StaticDataController).Assembly)
     .AddCors()
     .AddJsonOptions()
     .AddLogging()

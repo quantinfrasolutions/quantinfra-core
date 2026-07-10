@@ -1,0 +1,70 @@
+@using QuantInfra.Common.Interfaces.Api.Accounts
+@using QuantInfra.Common.Interfaces.Api.Strategies
+@using QuantInfra.Sdk.Accounts
+@using UI.Interfaces.Accounts
+@using UI.SharedComponents.Base
+
+@inject IUiAccountsRepository Repository
+
+@if (Account is not null)
+{
+    <EditableView TItem="PositionView"
+                  TFilter="int"
+                  EmptyText="No active positions"
+                  SearchFunc=@Repository.GetActivePositions
+                  Filter=@Account.AccountId
+                  RunSearchImmediately=@RunSearchImmediately
+                  SearchButtonText="Refresh"
+                  Variant=@Variant
+                  HideRefreshButton=@HideRefreshButton
+                  AllowSorting="true"
+                  ButtonsColumnWidth="52px"
+                  DefaultOrderBy=@(nameof(PositionView.ContractName))
+                  @ref=_view>
+        <SearchForm />
+        <CustomItemButtons Context="position">
+            <CreateOrderButton Account="@Account" Text=@null ButtonStyle="ButtonStyle.Danger" Icon="close" ShowButton="true"
+                               ContractId="@position.ContractId" SignedQty="@(-position.SignedVolume)" StrategyPositionId="@position.StrategyPositionId" />
+        </CustomItemButtons>
+        <Columns>
+            @if (!HideAccount)
+            {
+                <RadzenDataGridColumn TItem="PositionView" Title="AccountId" Property=@nameof(PositionView.AccountId) Width="120px" />
+                <RadzenDataGridColumn TItem="PositionView" Title="Account Name" Property="AccountName" Width="120px" />
+            }
+            <RadzenDataGridColumn TItem="PositionView" Title="Contract" Property=@nameof(PositionView.ContractId) Width="120px" />
+            <RadzenDataGridColumn TItem="PositionView" Title="Ticker" Property=@nameof(PositionView.ContractName) Width="120px" />
+            <RadzenDataGridColumn TItem="PositionView" Property="Volume" Title="Volume" Width="120px"/>
+            <RadzenDataGridColumn TItem="PositionView" Property="Side" Title="Side" Width="80px"/>
+            <RadzenDataGridColumn TItem="PositionView" Property="OpenDt" Title="OpenDt" Width="200px"/>
+            <RadzenDataGridColumn TItem="PositionView" Property="OpenPrice" Title="OpenPrice" Width="100px"/>
+            <RadzenDataGridColumn TItem="PositionView" Property="HistoryOpenDt" Title="HistoryOpenDt" Width="200px"/>
+            <RadzenDataGridColumn TItem="PositionView" Property="SettlPrice" Title="SettlPrice" Width="100px"/>
+            <RadzenDataGridColumn TItem="PositionView" Property="Commission" Title="Commission" Width="100px"/>
+            <RadzenDataGridColumn TItem="PositionView" Property=@nameof(PositionView.OpenTradeId) Title="PositionId" Width="120px"/>
+            <RadzenDataGridColumn TItem="PositionView" Property="StrategyPositionId" Title="StrategyPositionId" Width="120px"/>
+        </Columns>
+    </EditableView>
+}
+
+@code {
+    [Parameter, EditorRequired] public AccountRecordV6 Account { get; set; }
+    [Parameter] public bool HideAccount { get; set; }
+    [Parameter] public bool HideFilter { get; set; }
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public Variant Variant { get; set; } = Variant.Filled;
+    [Parameter] public bool StrategyVariant { get; set; }
+    [Parameter] public StrategyViewBrief? Strategy { get; set; }
+    [Parameter] public bool AutoRefresh { get; set; } = true;
+    [Parameter] public EventCallback ReloadRequested { get; set; }
+    [Parameter] public bool HideRefreshButton { get; set; }
+    
+    private EditableView<PositionView, int> _view;
+    public Task Refresh() => _view.RunSearch();
+    
+    private async Task OnPositionChanged()
+    {
+        await ReloadRequested.InvokeAsync();
+        if (AutoRefresh) await Refresh();
+    }
+}

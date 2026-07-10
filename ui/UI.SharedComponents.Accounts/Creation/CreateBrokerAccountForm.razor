@@ -1,0 +1,99 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using QuantInfra.Common.Accounts.Abstractions
+@using QuantInfra.Sdk.Accounts
+@using UI.Interfaces.Accounts
+@using UI.SharedComponents.Base
+@using UI.SharedComponents.Infrastructure
+@using UI.SharedComponents.StaticData.Assets
+@using UI.SharedComponents.StaticData.Brokers
+
+@inject IUiAccountsRepository Repository
+
+<CreateItemForm TItem="CreateAccountRequest"
+                Item="@(CreateAccountRequest ?? new())"
+                CreateFunc="@Repository.CreateAccount"
+                OnCompleted="@OnCompleted"
+                @bind-IsLoading=@_isLoading>
+    <Fields Context="request">
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Accounts Service" Variant="Variant.Text">
+                    <ChildContent>
+                        <AccountsServiceSelector TValue="string" @bind-Value=@request.AccountServiceName />
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.AccountServiceName)" class="rz-message rz-messages-error"/>
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Name" Variant="Variant.Text">
+                    <ChildContent>
+                        <RadzenTextBox @bind-Value=@request.Name Name="Name" Disabled=@_isLoading/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.Name)" class="rz-message rz-messages-error"/>
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Broker" Variant="Variant.Text">
+                    <ChildContent>
+                        <BrokersSelector TValue="int" Value=@(request.BrokerId ?? 0) ValueChanged="@(b => request.BrokerId = b)" Disabled="@_isLoading" Required="true"/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.BrokerId)" class="rz-message rz-messages-error"/>
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Currency" Variant="Variant.Text">
+                    <ChildContent>
+                        <CurrenciesSelector TValue="int" @bind-Value=@request.CurrencyId Disabled="@_isLoading" Required="true"/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.CurrencyId)" class="rz-message rz-messages-error"/>
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenFormField Text="Position tracking" Variant="Variant.Text">
+                <ChildContent>
+                    <RadzenDropDown @bind-Value="@request.PositionAccounting"
+                                    Data=@(Enum.GetValues(typeof(PositionAccounting)).Cast<Enum>())
+                                    Disabled=@_isLoading
+                                    AllowClear="false"/>
+                </ChildContent>
+                <Helper>
+                    <ValidationMessage For="@(() => request.PositionAccounting)" class="rz-message rz-messages-error"/>
+                </Helper>
+            </RadzenFormField>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenCheckBox TValue="bool" @bind-Value=@request.EnableSharePriceTracking Disabled=@_isLoading Name="EnableMt"/>
+                <RadzenLabel Text="Enable share price tracking" Component="EnableMt" class="rz-ms-2"/>
+            </RadzenColumn>
+        </RadzenRow>
+        @* @if (_account.EnableSharePriceTracking) *@
+        @* { *@
+        @*     <RadzenRow> *@
+        @*         <RadzenCheckBox TValue="bool" @bind-Value=@_account.IncludeUnrealizedPnLToMtm Disabled=@_isLoading Name="IncludeUnrealizedPnLToMtm"/> *@
+        @*         <RadzenLabel Text="Include unrealized PnL to returns" Component="IncludeUnrealizedPnLToMtm" class="rz-ms-2"/> *@
+        @*     </RadzenRow> *@
+        @* } *@
+    </Fields>
+</CreateItemForm>
+
+@code {
+    private bool _isLoading;
+    [Parameter] public EventCallback OnCompleted { get; set; }
+    [Parameter] public CreateAccountRequest? CreateAccountRequest { get; set; }
+}

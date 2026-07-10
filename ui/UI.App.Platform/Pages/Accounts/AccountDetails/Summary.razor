@@ -2,7 +2,7 @@
 @using Radzen
 @using Radzen.Blazor
 @using UI.SharedComponents.Accounts
-@using UI.SharedComponents.Components.Accounts
+@using UI.SharedComponents.Accounts.TradingClients
 
 @page "/accounts/{AccountId:int}"
 @page "/accounts/{AccountId:int}/summary"
@@ -26,19 +26,21 @@
                     <RadzenCard class="details-form-card">
                         <RadzenStack AlignItems="AlignItems.Stretch">
                             <RadzenRow>
-                                <RadzenText TextStyle="TextStyle.DisplayH6">Trading client configuration</RadzenText>
+                                <RadzenColumn Size="12">
+                                    <RadzenText TextStyle="TextStyle.DisplayH6">Trading client configuration</RadzenText>
+                                </RadzenColumn>
                             </RadzenRow>
                             <RadzenRow>
-                                @if (AccountBase.Account.TradingClientConfig == null)
-                                {
-                                    <RadzenText TextStyle="TextStyle.Body2">Trading client not configured for this broker account.</RadzenText>
-                                }
-                                else
-                                {
-                                    <TradingClientConfigForm AccountId=@AccountId 
-                                                                    Data=@new(AccountBase.Account.TradingClientConfig)
-                                                                    ReadOnly="true" />
-                                }
+                                <RadzenColumn Size="12">
+                                    @if (AccountBase.Account.TradingClientConfig == null)
+                                    {
+                                        <RadzenText TextStyle="TextStyle.Body2">Trading client not configured for this broker account.</RadzenText>
+                                    }
+                                    else
+                                    {
+                                        <TradingClientConfigView Config=@new(AccountBase.Account.TradingClientConfig)/>
+                                    }
+                                </RadzenColumn>
                             </RadzenRow>
                             <RadzenRow JustifyContent="JustifyContent.End">
                                 <TradingAccountConfigButtons Account=@AccountBase.Account OnCompleted=@AccountBase.Reload />

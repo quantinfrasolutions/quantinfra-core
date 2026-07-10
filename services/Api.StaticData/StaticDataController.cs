@@ -356,9 +356,8 @@ public class StaticDataController(MainContext context, IStaticDataRepositoryRead
     [Route("assets")]
     [EndpointName("GetAssets")]
     [Produces("application/json")]
-    public async Task<IEnumerable<AssetView>> GetAssets([FromQuery] AssetFilter? filter = null)
+    public async Task<IEnumerable<AssetView>> GetAssets([FromQuery] AssetFilter filter)
     {
-        filter ??= new();
         filter.Name = filter.Name?.ToLower();
 
         return (
@@ -366,7 +365,7 @@ public class StaticDataController(MainContext context, IStaticDataRepositoryRead
                 .Where(a =>
                     (filter.Id == null || filter.Id == a.AssetId)
                     && (string.IsNullOrEmpty(filter.Name) || a.Name.ToLower().Contains(filter.Name))
-                    && (filter.AssetType == null || filter.AssetType == a.AssetType)
+                    && (filter.AssetType == null || (AssetType)filter.AssetType == a.AssetType)
                 )
                 .GroupJoin(
                     context.Currencies.Include(c => c.BrokerOverrides),
@@ -592,7 +591,7 @@ public class StaticDataController(MainContext context, IStaticDataRepositoryRead
     [Route("contracts")]
     [EndpointName("GetContracts")]
     [Produces("application/json")]
-    public async Task<IEnumerable<ContractListView>> GetContracts([FromQuery] ContractsFilter? filter = null)
+    public async Task<IEnumerable<ContractListView>> GetContracts([FromQuery] ContractsFilter? filter)
     {
         filter ??= new();
         return await sdRepository.GetContractsAsync(filter);
@@ -774,11 +773,9 @@ public class StaticDataController(MainContext context, IStaticDataRepositoryRead
     [Route("commission-structures")]
     [EndpointName("GetCommissionStructures")]
     [Produces("application/json")]
-    public async Task<IEnumerable<CommissionStructure>> GetCommissionStructures([FromQuery] CommissionsFilter? filter)
+    public async Task<IEnumerable<CommissionStructure>> GetCommissionStructures([FromQuery] CommissionsFilter filter)
     {
-        filter ??= new();
         if (!string.IsNullOrEmpty(filter.Name)) filter.Name = filter.Name.ToLower();
-
         return await context
             .Commissions
             .Where(cs =>

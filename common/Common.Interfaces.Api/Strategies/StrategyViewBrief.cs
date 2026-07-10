@@ -8,7 +8,7 @@ public class StrategyViewBrief
 {
     public StrategyViewBrief(int strategyId, string name, string strategyClassName,
         string @params, IReadOnlyDictionary<string, BriefView<int>> symbols,
-        IReadOnlyDictionary<string, BarStorageView> requiredBarStorages, StrategyStatus status, bool useSignalGroups, AccountViewBrief account,
+        IReadOnlyDictionary<string, BarStorageView> requiredBarStorages, StrategyStatus status, bool useSignalGroups, AccountListModel account,
         BriefView<int> currency, string strategyServiceName, LiquidationParameters? liquidationParameters)
     {
         StrategyId = strategyId;
@@ -35,7 +35,7 @@ public class StrategyViewBrief
     public IReadOnlyDictionary<string, BarStorageView> RequiredBarStorages { get; init; }
     public StrategyStatus Status { get; init; }
     public bool UseSignalGroups { get; init; }
-    public AccountViewBrief Account { get; init; }
+    public AccountListModel Account { get; init; }
     public BriefView<int> Currency { get; init; }
     
     public TParams? DeserializeParams<TParams>() where TParams : class

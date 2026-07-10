@@ -1,0 +1,19 @@
+@using UI.SharedComponents.Base
+<CreateItemButton TForm="CreateBalanceOperationForm"
+                  ShowButton="@ShowButton"
+                  DialogTitle="Create asset"
+                  OnCompleted="@OnCompleted"
+                  FormParams="@(new Dictionary<string, object>()
+                              {
+                                  { nameof(AccountId), AccountId },
+                                  { nameof(AccountCurrencyId), AccountCurrencyId },
+                                  { nameof(HideAccountSelector), HideAccountSelector }
+                              })"/>
+
+@code {
+    [Parameter] public bool ShowButton { get; set; }
+    [Parameter] public EventCallback OnCompleted { get; set; }
+    [Parameter] public int? AccountId { get; set; } 
+    [Parameter] public int? AccountCurrencyId { get; set; } 
+    [Parameter] public bool HideAccountSelector { get; set; }
+}

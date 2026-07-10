@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Databases", "Databases", "{8440C192-9A65-4DAD-8B76-AE56665BBC8F}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "db", "db", "{8440C192-9A65-4DAD-8B76-AE56665BBC8F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAL.MarketDataHistory", "db\DAL.MarketDataHistory\DAL.MarketDataHistory.csproj", "{9FB43BE1-9878-4544-BA48-2BC901BC0AF0}"
 EndProject
@@ -8,7 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Databases.Main", "db\Databa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Databases.MarketDataHistory", "db\Databases.MarketDataHistory\Databases.MarketDataHistory.csproj", "{BFC1A721-3FD1-4EA2-8769-4AC650CCECE2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{473CE92D-0AE7-41AB-AB9D-FDFE65199CA0}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "domain", "domain", "{473CE92D-0AE7-41AB-AB9D-FDFE65199CA0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain.AccountRecordsStateManager", "domain\Domain.AccountRecordsStateManager\Domain.AccountRecordsStateManager.csproj", "{5577A645-F5F6-463C-8C77-56D8498561DF}"
 EndProject
@@ -32,7 +32,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain.Accounts.Base.Tests"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain.MarketData", "domain\Domain.MarketData\Domain.MarketData.csproj", "{CD08F4E4-EB2D-4554-9657-0DC950F2FE7C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{4DA9B9F5-BEC3-454F-BE4E-3811E48CAA31}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{4DA9B9F5-BEC3-454F-BE4E-3811E48CAA31}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Infrastructure.Abstractions", "common\Common.Infrastructure.Abstractions\Common.Infrastructure.Abstractions.csproj", "{78915996-2C2A-4845-8CAC-28C243040215}"
 EndProject
@@ -76,7 +76,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain.Commands.Accounts.Ac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain.Commands.Strategies.AccountsService", "domain\commands\Domain.Commands.Strategies.AccountsService\Domain.Commands.Strategies.AccountsService.csproj", "{89B04E7E-6BC3-46CE-9BBB-EF0D0066AC1F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C0F3E1A0-4C64-4819-828D-714E2989DF03}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{C0F3E1A0-4C64-4819-828D-714E2989DF03}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Mocks", "tests\Tests.Mocks\Tests.Mocks.csproj", "{A9469ADF-8F9E-4243-9ADE-3C9C4005FFF4}"
 EndProject
@@ -96,7 +96,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Strategies.Abstracti
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.StaticData.Abstractions", "common\Common.StaticData.Abstractions\Common.StaticData.Abstractions.csproj", "{D6D6256D-402A-442A-8350-BE73F6CD1EC8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{25A91144-8B12-4FF1-99E8-F61EC8D0C5F8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "services", "services", "{25A91144-8B12-4FF1-99E8-F61EC8D0C5F8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccountsCore.State", "services\AccountsCore.State\AccountsCore.State.csproj", "{E5B78791-104C-43FA-9BC1-E6F5B1C6D030}"
 EndProject
@@ -142,7 +142,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Trading.Infrastructu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagementCore", "services\ManagementCore\ManagementCore.csproj", "{E932F692-D6D4-4BD4-BB1A-27EE9C70F151}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Apps", "Apps", "{0F7D487C-C73D-4B17-9C1E-D8F6D04D9A04}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "apps", "apps", "{0F7D487C-C73D-4B17-9C1E-D8F6D04D9A04}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Utils.ExecutableAppBase", "common\Common.Utils.ExecutableAppBase\Common.Utils.ExecutableAppBase.csproj", "{F315B023-550D-489F-91B6-EB3ECE6B3BE1}"
 EndProject
@@ -156,7 +156,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonolithService", "services
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "services\Api\Api.csproj", "{B89CFB16-038D-42BE-AB55-13361781EB0F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{499664DF-2FD3-4A48-B723-78DD8D5A0372}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ui", "ui", "{499664DF-2FD3-4A48-B723-78DD8D5A0372}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI.Interfaces", "ui\UI.Interfaces\UI.Interfaces.csproj", "{4F1422B1-7BB5-4E57-B1BA-ED68130BAC39}"
 EndProject
@@ -174,7 +174,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiClient", "ui\ApiClient\A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI.ApiWrapper", "ui\UI.ApiWrapper\UI.ApiWrapper.csproj", "{AC4C8955-2AD3-4A54-A051-8F881982BF24}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Connectors", "Connectors", "{4CAB4004-74B9-4CDD-9DF3-FD287491BD29}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "connectors", "connectors", "{4CAB4004-74B9-4CDD-9DF3-FD287491BD29}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Connectors.Common", "connectors\Connectors.Common\Connectors.Common.csproj", "{5952F9F6-8AC3-43B7-9B98-C5F0994460B2}"
 EndProject
@@ -202,15 +202,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ibkr.TwsApi.MarketDataClien
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ibkr.TwsApi.TradingClient", "connectors\Ibkr\Ibkr.TwsApi.TradingClient\Ibkr.TwsApi.TradingClient.csproj", "{69BB6B61-F7B2-45DB-B057-8A8E1A3491E0}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deployment", "Deployment", "{F792314E-5C3F-40FF-807C-74509FB46836}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TradingEngine", "TradingEngine", "{1D97E12E-A630-461D-9567-86675A44F8D6}"
-	ProjectSection(SolutionItems) = preProject
-		deployment\trading-engine\.env.local = deployment\trading-engine\.env.local
-		deployment\trading-engine\docker-run.sh = deployment\trading-engine\docker-run.sh
-		deployment\trading-engine\docker-run-local.sh = deployment\trading-engine\docker-run-local.sh
-		deployment\trading-engine\.env = deployment\trading-engine\.env
-	EndProjectSection
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deployment", "deployment", "{F792314E-5C3F-40FF-807C-74509FB46836}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Utils.Cryptography", "common\Common.Utils.Cryptography\Common.Utils.Cryptography.csproj", "{EB0E875B-6B7D-41D7-9A67-525B79796939}"
 EndProject
@@ -234,7 +226,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI.Interfaces.Backtesting",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI.SharedComponents.Backtesting", "ui\UI.SharedComponents.Backtesting\UI.SharedComponents.Backtesting.csproj", "{709E772B-56C5-46A7-8E6A-27ED5CC096B0}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backtesting", "Backtesting", "{052FCE92-B7AE-47BB-9BE1-E3252E5E500B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "backtesting", "backtesting", "{052FCE92-B7AE-47BB-9BE1-E3252E5E500B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileResultsRepository", "backtesting\FileResultsRepository\FileResultsRepository.csproj", "{E29DFE9C-5931-43C9-8063-1BAC6CD6CCC5}"
 EndProject
@@ -257,6 +249,31 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalTestServerWrapper", "backtesting\LocalTestServerWrapper\LocalTestServerWrapper.csproj", "{EB661C85-89EA-4619-BF0E-1E273FA99813}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api.StaticData", "services\Api.StaticData\Api.StaticData.csproj", "{A76722F8-2665-487C-BC66-080482571CA5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{D628DDB8-3BA1-40EB-9455-0510AA9C84B1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{8F121863-88E7-4B5B-BE90-2AB3ACAA2B4B}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\publish-trading-platform.yml = .github\workflows\publish-trading-platform.yml
+		.github\workflows\run-unit-tests.yml = .github\workflows\run-unit-tests.yml
+		.github\workflows\publish-tester.yml = .github\workflows\publish-tester.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "trading-engine", "trading-engine", "{27C64D78-7FB0-4E1D-B40D-EED43D889541}"
+	ProjectSection(SolutionItems) = preProject
+		deployment\trading-engine\docker-run.sh = deployment\trading-engine\docker-run.sh
+		deployment\trading-engine\.env = deployment\trading-engine\.env
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tester-ui", "tester-ui", "{46C690F4-EE56-4142-8BBE-5DB0425B9979}"
+	ProjectSection(SolutionItems) = preProject
+		deployment\tester-ui\docker-run.sh = deployment\tester-ui\docker-run.sh
+		deployment\tester-ui\.env = deployment\tester-ui\.env
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI.SharedComponents.Infrastructure", "ui\UI.SharedComponents.Infrastructure\UI.SharedComponents.Infrastructure.csproj", "{E1450928-7407-4797-8392-AA4ABD6EF011}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI.SharedComponents.Strategies", "ui\UI.SharedComponents.Strategies\UI.SharedComponents.Strategies.csproj", "{9EE27F4E-3B41-4D29-A5C7-CC08FF7000D4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -357,7 +374,6 @@ Global
 		{F5C088E1-07F1-4932-B8E1-9704C385A035} = {1BBD5AF8-1E25-424A-9D6C-723A0C058889}
 		{5C9EE7AA-C2BB-4F94-A851-7CAE69D79231} = {1BBD5AF8-1E25-424A-9D6C-723A0C058889}
 		{69BB6B61-F7B2-45DB-B057-8A8E1A3491E0} = {1BBD5AF8-1E25-424A-9D6C-723A0C058889}
-		{1D97E12E-A630-461D-9567-86675A44F8D6} = {F792314E-5C3F-40FF-807C-74509FB46836}
 		{EB0E875B-6B7D-41D7-9A67-525B79796939} = {4DA9B9F5-BEC3-454F-BE4E-3811E48CAA31}
 		{4D77751B-3FBF-4EE9-8597-F6CAEF0013D7} = {25A91144-8B12-4FF1-99E8-F61EC8D0C5F8}
 		{AF30C24D-FDC8-42FD-9B01-0771E8FBD91F} = {25A91144-8B12-4FF1-99E8-F61EC8D0C5F8}
@@ -380,6 +396,11 @@ Global
 		{8A60C50A-2C0C-47C8-B406-938699693FD0} = {0F7D487C-C73D-4B17-9C1E-D8F6D04D9A04}
 		{EB661C85-89EA-4619-BF0E-1E273FA99813} = {052FCE92-B7AE-47BB-9BE1-E3252E5E500B}
 		{A76722F8-2665-487C-BC66-080482571CA5} = {25A91144-8B12-4FF1-99E8-F61EC8D0C5F8}
+		{8F121863-88E7-4B5B-BE90-2AB3ACAA2B4B} = {D628DDB8-3BA1-40EB-9455-0510AA9C84B1}
+		{27C64D78-7FB0-4E1D-B40D-EED43D889541} = {F792314E-5C3F-40FF-807C-74509FB46836}
+		{46C690F4-EE56-4142-8BBE-5DB0425B9979} = {F792314E-5C3F-40FF-807C-74509FB46836}
+		{E1450928-7407-4797-8392-AA4ABD6EF011} = {499664DF-2FD3-4A48-B723-78DD8D5A0372}
+		{9EE27F4E-3B41-4D29-A5C7-CC08FF7000D4} = {499664DF-2FD3-4A48-B723-78DD8D5A0372}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{9FB43BE1-9878-4544-BA48-2BC901BC0AF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -822,5 +843,13 @@ Global
 		{A76722F8-2665-487C-BC66-080482571CA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A76722F8-2665-487C-BC66-080482571CA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A76722F8-2665-487C-BC66-080482571CA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1450928-7407-4797-8392-AA4ABD6EF011}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1450928-7407-4797-8392-AA4ABD6EF011}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1450928-7407-4797-8392-AA4ABD6EF011}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1450928-7407-4797-8392-AA4ABD6EF011}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EE27F4E-3B41-4D29-A5C7-CC08FF7000D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EE27F4E-3B41-4D29-A5C7-CC08FF7000D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EE27F4E-3B41-4D29-A5C7-CC08FF7000D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EE27F4E-3B41-4D29-A5C7-CC08FF7000D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

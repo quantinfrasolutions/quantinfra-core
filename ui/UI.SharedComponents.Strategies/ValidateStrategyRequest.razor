@@ -1,0 +1,70 @@
+@using QuantInfra.Common.Interfaces.Api.Strategies
+@using UI.Interfaces
+@using UI.Interfaces.Strategies
+
+@inject IUiStrategiesRepository Repository
+
+@if (_result is not null)
+{
+    if (_result.Success)
+    {
+        <StrategySummary Strategy=@_result.Strategy />
+    }
+    else
+    {
+        foreach (var error in _result.Errors)
+        {
+            <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
+                @error
+            </RadzenAlert>
+        }
+    }
+}
+else if (_isLoading)
+{
+    <RadzenStack>
+        <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+            <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Primary" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate"  />
+        </RadzenRow>
+    </RadzenStack>
+}
+
+@code {
+    private ValidateStrategyResult? _result;
+    [Parameter] public EventCallback<bool> OnValidated { get; set; }
+
+    private bool _isLoading = false;
+
+    public async Task<bool> Validate(CreateStrategyRequest request)
+    {
+        _isLoading = true;
+        _result = null;
+        StateHasChanged();
+        try
+        {
+            _result = await Repository.ValidateNewStrategy(request);
+            await OnValidated.InvokeAsync(_result.Success);
+            return _result.Success;
+        }
+        catch (ValidationException e)
+        {
+            throw;
+        }
+        catch (Exception e)
+        {
+            _result = new ValidateStrategyResult
+            {
+                Success = false,
+                Errors = [e.Message],
+            };
+            await OnValidated.InvokeAsync(false);
+            return false;
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+}

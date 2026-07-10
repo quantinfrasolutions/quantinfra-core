@@ -22,6 +22,7 @@
       <ProjectReference Include="..\UI.SharedComponents.Accounts\UI.SharedComponents.Accounts.csproj" />
       <ProjectReference Include="..\UI.SharedComponents.Base\UI.SharedComponents.Base.csproj" />
       <ProjectReference Include="..\UI.SharedComponents.StaticData\UI.SharedComponents.StaticData.csproj" />
+      <ProjectReference Include="..\UI.SharedComponents.Strategies\UI.SharedComponents.Strategies.csproj" />
       <ProjectReference Include="..\UI.SharedComponents\UI.SharedComponents.csproj" />
     </ItemGroup>
 

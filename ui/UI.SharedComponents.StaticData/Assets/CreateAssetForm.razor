@@ -1,0 +1,67 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using QuantInfra.Common.Interfaces.Api.StaticData
+@using QuantInfra.Sdk.StaticData
+@using UI.Interfaces.StaticData
+@using UI.SharedComponents.Base
+
+@inject IUiStaticDataRepository Repository
+
+<CreateItemForm TItem="CreateAssetRequest"
+                CreateFunc="@Repository.CreateAsset"
+                OnCompleted="@OnCompleted"
+                @bind-IsLoading=@_isLoading>
+    <Fields Context="request">
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Name" Variant="Variant.Text">
+                    <ChildContent>
+                        <RadzenTextBox @bind-Value=@request.Name Name="Name" Disabled=@_isLoading />
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.Name)" class="rz-message rz-messages-error" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Asset type" Variant="Variant.Text">
+                    <ChildContent>
+                        <RadzenDropDown @bind-Value=@request.AssetType Data=@(Enum.GetValues(typeof(AssetType)).Cast<Enum>()) 
+                                        Name="AssetType" Disabled=@_isLoading/>
+                    </ChildContent>
+                    <Helper>
+                        <RadzenRequiredValidator Component="AssetType" Text="Required" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        @if (request.AssetType == AssetType.Currency)
+        {
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenFormField Text="Decimals" Variant="Variant.Text">
+                        <ChildContent>
+                            <RadzenNumeric @bind-Value=@request.Decimals Name="Decimals" Min="0" Max="18" Step="1" ShowUpDown="false" Disabled=@_isLoading/>
+                        </ChildContent>
+                        <Helper>
+                            <RadzenRequiredValidator Component="Decimals" Text="Required" />
+                        </Helper>
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+        }
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Description" Variant="Variant.Text">
+                    <RadzenTextBox @bind-Value=@request.Description Disabled=@_isLoading/>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+    </Fields>
+</CreateItemForm>
+
+@code {
+    private bool _isLoading;
+    [Parameter] public EventCallback OnCompleted { get; set; }
+}

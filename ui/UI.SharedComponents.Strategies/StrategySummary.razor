@@ -1,0 +1,115 @@
+﻿@using QuantInfra.Common.Interfaces.Api
+@using QuantInfra.Common.Interfaces.Api.MarketData
+@using QuantInfra.Common.Interfaces.Api.Strategies
+
+
+<RadzenStack Gap="1rem">
+    <RadzenRow>
+        <RadzenFormField Text="ID" Variant="Variant.Text">
+            <RadzenNumeric Value=@Strategy.StrategyId Disabled="true" ShowUpDown="false" />
+        </RadzenFormField>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenFormField Text="StrategiesService instance" Variant="Variant.Text">
+            <ChildContent>
+                <RadzenTextBox Value=@Strategy.StrategyServiceName Disabled="true"/>
+            </ChildContent>
+            <End>
+                <RadzenLink Icon="search" Path=@($"/infrastructure/ss/{Strategy.StrategyServiceName}")/>
+            </End>
+        </RadzenFormField>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenFormField Text="Name" Variant="Variant.Text">
+            <RadzenTextBox Value=@Strategy.Name Disabled="true"/>
+        </RadzenFormField>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenFormField Text="Class name" Variant="Variant.Text">
+            <RadzenTextBox Value=@Strategy.StrategyClassName Disabled="true"/>
+        </RadzenFormField>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenFormField Text="Status" Variant="Variant.Text">
+            <RadzenTextBox Value=@Strategy.Status.ToString() Disabled="true"/>
+        </RadzenFormField>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenFieldset Text="Candles">
+            <RadzenDataGrid TItem="KeyValuePair<string, BarStorageView>"
+                            Density="Density.Compact"
+                            Data=@Strategy.RequiredBarStorages>
+                <Columns>
+                    <RadzenDataGridColumn Title="Name" Property="Key"/>
+                    <RadzenDataGridColumn Title="Type" Property="Value.IdType"/>
+                    <RadzenDataGridColumn Title="Id" Property="Value.Id"/>
+                    <RadzenDataGridColumn Title="Ticker" Property="Value.Ticker"/>
+                    <RadzenDataGridColumn Title="Aggregation" Property="Value.AggregationType"/>
+                    <RadzenDataGridColumn Title="Timeframe" Property="Value.Timeframe"/>
+                    <RadzenDataGridColumn Title="Offset" Property="Value.Offset"/>
+                    <RadzenDataGridColumn MinWidth="0px"/>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenFieldset>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenFieldset Text="Symbols">
+            <RadzenDataGrid TItem="KeyValuePair<string, BriefView<int>>"
+                            Density="Density.Compact"
+                            Data=@Strategy.Symbols>
+                <Columns>
+                    <RadzenDataGridColumn Title="Name" Property="Key" Width="100px"/>
+                    <RadzenDataGridColumn Title="Id" Property="Value.Id" Width="100px"/>
+                    <RadzenDataGridColumn Title="Ticker" Property="Value.Name" Width="150px"/>
+                    <RadzenDataGridColumn MinWidth="0px"/>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenFieldset>
+    </RadzenRow>
+    <RadzenRow>
+        @* TODO *@
+        @* <RadzenFieldset Text="Params"> *@
+        @*     <RadzenDataGrid TItem="KeyValuePair<string, string>" Data="Strategy.Params" class="headerless"> *@
+        @*         <Columns> *@
+        @*             <RadzenDataGridColumn TItem="KeyValuePair<string, string>" Property="Key" Width="120px"/> *@
+        @*             <RadzenDataGridColumn TItem="KeyValuePair<string, string>" Property="Value" Width="200px"/> *@
+        @*             <RadzenDataGridColumn MinWidth="0px" /> *@
+        @*         </Columns> *@
+        @*     </RadzenDataGrid> *@
+        @* </RadzenFieldset> *@
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenFieldset Text="Account">
+            <RadzenStack Gap="1rem">
+                <RadzenRow>
+                    <RadzenFormField Text="Account type" Variant="Variant.Text">
+                        <RadzenTextBox Value=@Strategy.Account.AccountType.ToString() Disabled="true"/>
+                    </RadzenFormField>
+                </RadzenRow>
+                <RadzenRow>
+                    <RadzenFormField Text="Account Id" Variant="Variant.Text">
+                        <RadzenTextBox Value=@Strategy.Account.AccountId.ToString() Disabled="true"/>
+                    </RadzenFormField>
+                </RadzenRow>
+                <RadzenRow>
+                    <RadzenFormField Text="Account name" Variant="Variant.Text">
+                        <ChildContent>
+                            <RadzenTextBox Value=@Strategy.Account.Name Disabled="true"/>
+                        </ChildContent>
+                        <End>
+                            <RadzenLink Icon="search" Path=@($"/accounts/{Strategy.Account.AccountId}")/>
+                        </End>
+                    </RadzenFormField>
+                </RadzenRow>
+                <RadzenRow>
+                </RadzenRow>
+            </RadzenStack>
+        </RadzenFieldset>
+    </RadzenRow>
+</RadzenStack>
+
+
+@code {
+    [Parameter, EditorRequired] public StrategyViewBrief Strategy { get; set; }
+}
+

@@ -5,7 +5,8 @@
 
 @if (AccountBase.Account != null)
 {
-    <UI.SharedComponents.Components.Accounts.OrdersHistory HideAccount="true" Filter=@(new OrderFilter() { AccountId = AccountBase.Account.AccountId })/>
+    <UI.SharedComponents.Accounts.Reporting.OrdersHistory HideAccount="true" 
+                                                           Filter="@(new OrderFilter() { AccountId = AccountBase.Account.AccountId })" />
 }
 
 @code {

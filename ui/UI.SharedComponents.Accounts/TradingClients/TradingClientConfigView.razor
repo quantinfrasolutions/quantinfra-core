@@ -1,0 +1,38 @@
+@using QuantInfra.Sdk.Accounts
+<RadzenTemplateForm TItem="TradingClientConfig"
+                    Data="@Config">
+    <RadzenStack>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Execution service" Variant="Variant.Text">
+                    <RadzenTextBox Value="@Config.ExecutionServiceName" Disabled="true" />
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Variant="Variant.Text" Text="External account ID">
+                    <RadzenTextBox Value=@Config.ExternalAccountId Disabled="true"/>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Variant="Variant.Text" Text="Trading client class name">
+                    <RadzenTextBox Value=@Config.TradingClientClassName Disabled="true"/>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Variant="Variant.Text" Text="Params JSON">
+                    <RadzenTextArea Value=@Config.TradingClientParamsSerialized Disabled="true"/>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenStack>
+</RadzenTemplateForm>
+
+@code {
+    [Parameter, EditorRequired] public TradingClientConfig Config { get; set; }
+}

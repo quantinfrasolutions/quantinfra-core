@@ -14,11 +14,11 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(UseLocalSdkReference)' == 'true'">
-        <ProjectReference Include="../../../quantinfra-sdk/src/QuantInfra.Sdk.Package/QuantInfra.Sdk.Package.csproj" />
+        <ProjectReference Include="..\..\..\quantinfra-sdk\src\QuantInfra.Sdk.Package\QuantInfra.Sdk.Package.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(UseLocalSdkReference)' != 'true'">
-        <PackageReference Include="QuantInfra.Sdk" Version="0.9.0-beta6" />
+        <PackageReference Include="QuantInfra.Sdk" Version="0.9.1-beta1" />
     </ItemGroup>
 
 </Project>

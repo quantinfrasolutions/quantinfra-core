@@ -1,11 +1,14 @@
 @page "/accounts/{AccountId:int}/reporting/positions-history"
 @using QuantInfra.Common.Interfaces.Api.Accounts
+@using UI.Interfaces.Accounts
 
 @layout Reporting
 
+@inject IUiAccountsRepository Repository
+
 @if (AccountBase.Account != null)
 {
-    <UI.SharedComponents.Components.Accounts.PositionsHistory HideAccount="true" Filter=@(new PositionHistoryFilter() { AccountId = AccountBase.Account.AccountId })/>
+    <UI.SharedComponents.Accounts.Reporting.PositionsHistory Repository="@Repository" HideAccount="true" Filter=@(new PositionHistoryFilter() { AccountId = AccountBase.Account.AccountId })/>
 }
 
 @code {

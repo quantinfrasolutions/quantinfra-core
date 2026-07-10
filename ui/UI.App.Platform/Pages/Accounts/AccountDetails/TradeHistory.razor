@@ -1,10 +1,14 @@
 @using QuantInfra.Common.Interfaces.Api.Accounts
+@using UI.Interfaces.Accounts
+@using UI.SharedComponents.Accounts.Reporting
 
 @page "/accounts/{AccountId:int}/reporting/trade-history"
 
 @layout Reporting
 
-<UI.SharedComponents.Components.Accounts.TradesHistory SingleAccount="true" Filter=@(new TradeFilter { AccountId = AccountId }) />
+@inject IUiAccountsRepository Repository
+
+<TradesHistory Repository="@Repository" SingleAccount="true" Filter=@(new TradeFilter { AccountId = AccountId }) />
 
 @code {
     [Parameter] public int AccountId { get; set; }

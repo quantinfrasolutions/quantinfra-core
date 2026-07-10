@@ -17,12 +17,10 @@ var app = ConsoleApp.Create()
     {
         var env = conf.AddGlobalOption<bool>("-e|--env", "Use environment variables");
         var file = conf.AddGlobalOption<string>("-f|--file", "Use config file");
-        // var input = conf.AddGlobalOption<bool>("-i|--input", "Use command line arguments");
 
         var configurationBuilder = new ConfigurationBuilder();
         if (!string.IsNullOrEmpty(file)) configurationBuilder.AddJsonFile(file, optional: false);
         if (env) configurationBuilder.AddEnvironmentVariables();
-        // if (input) configurationBuilder.AddCommandLine(args);
         
         return new GlobalOptions(configurationBuilder.Build());
     })

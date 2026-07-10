@@ -66,6 +66,10 @@ public sealed partial class ApiRepository
         {
             return await apiMethod(filter);
         }
+        catch (SwaggerException<ValidationProblemDetails> ex)
+        {
+            throw new ValidationException(ex.Result);
+        }
         catch (Exception ex)
         {
             _notificationService.Notify(NotificationSeverity.Error, ex.Message);

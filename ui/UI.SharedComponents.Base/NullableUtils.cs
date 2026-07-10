@@ -39,4 +39,12 @@ public class NullableUtils
         result = value == 0 ? null : value;
         return valueChanged.InvokeAsync((T)result!);
     }
+
+    public static Task OnInnerValueChanged<T>(string value, bool isRequired, EventCallback<T> valueChanged)
+    {
+        object? result;
+        if (isRequired && string.IsNullOrEmpty(value)) return Task.CompletedTask;
+        result = string.IsNullOrEmpty(value) ? null : value;
+        return valueChanged.InvokeAsync((T)result!);
+    }
 }

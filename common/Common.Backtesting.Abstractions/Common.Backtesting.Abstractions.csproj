@@ -10,11 +10,11 @@
     </PropertyGroup>
 
     <ItemGroup Condition="'$(UseLocalSdkReference)' == 'true'">
-        <ProjectReference Include="../../../quantinfra-sdk/src/QuantInfra.Sdk.Backtesting/QuantInfra.Sdk.Backtesting.csproj" />
+        <ProjectReference Include="..\..\..\quantinfra-sdk\src\QuantInfra.Sdk.Backtesting\QuantInfra.Sdk.Backtesting.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(UseLocalSdkReference)' != 'true'">
-        <PackageReference Include="QuantInfra.Sdk.Backtesting" Version="0.9.0-beta6" />
+        <PackageReference Include="QuantInfra.Sdk.Backtesting" Version="0.9.1-beta1" />
     </ItemGroup>
 
     <ItemGroup>

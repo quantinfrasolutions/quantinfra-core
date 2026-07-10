@@ -1,0 +1,84 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using QuantInfra.Common.Interfaces.Api.Accounts
+@using UI.Interfaces.Accounts
+@using UI.SharedComponents.Base
+@using UI.SharedComponents.Infrastructure
+
+@inject IUiAccountsRepository Repository
+
+<CreateItemForm TItem="CreateTradingClientConfigRequest"
+                Item="@(Request ?? new())"
+                CreateFunc="@Repository.CreateTradingAccountConfig"
+                OnCompleted="@OnCompleted"
+                @bind-IsLoading=@_isLoading>
+    <Fields Context="request">
+        
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Execution service" Variant="Variant.Text">
+                    <ChildContent>
+                        <ExecutionServiceSelector TValue="string" @bind-Value=@request.ExecutionServiceName Disabled="@_isLoading"/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.ExecutionServiceName)" class="rz-message rz-messages-error"/>
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Variant="Variant.Text" Text="External account ID">
+                    <ChildContent>
+                        <RadzenTextBox @bind-Value=@request.ExternalAccountId Disabled=@(_isLoading)/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.ExternalAccountId)" class="rz-message rz-messages-error"/>
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Variant="Variant.Text" Text="Trading client class name">
+                    <ChildContent>
+                        <RadzenTextBox @bind-Value=@request.TradingClientClassName Disabled=@(_isLoading)/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.TradingClientClassName)" class="rz-message rz-messages-error"/>
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Variant="Variant.Text" Text="API Secret">
+                    <ChildContent>
+                        <RadzenTextBox @bind-Value=@request.TradingClientSecret Disabled=@(_isLoading)/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.TradingClientSecret)" class="rz-message rz-messages-error"/>
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Variant="Variant.Text" Text="Params JSON">
+                    <ChildContent>
+                        <RadzenTextArea @bind-Value=@request.TradingClientParamsSerialized Disabled=@(_isLoading)/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.TradingClientParamsSerialized)" class="rz-message rz-messages-error"/>
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+    </Fields>
+</CreateItemForm>
+
+@code {
+    private bool _isLoading;
+    
+    [Parameter] public EventCallback OnCompleted { get; set; }
+    [Parameter] public CreateTradingClientConfigRequest Request { get; set; }
+}

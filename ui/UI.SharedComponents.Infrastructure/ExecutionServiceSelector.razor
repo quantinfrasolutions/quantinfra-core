@@ -1,0 +1,39 @@
+@using QuantInfra.Common.Interfaces.Api.Infrastructure
+@using UI.Interfaces.Infrastructure
+@using UI.SharedComponents.Base
+
+@inject IUiInfrastructureRepository Repository
+
+@typeparam TValue
+
+<SearchSelector TItem="ExecutionServiceListView"
+                TValue="string"
+                ValueProperty="@nameof(ExecutionServiceListView.Name)"
+                ValueSelector="@(a => a.Name)"
+                SearchFunc="@DoSearch"
+                Value="@(Value as string)"
+                ValueChanged="@(v => NullableUtils.OnInnerValueChanged(v, Required, ValueChanged))"
+                IsRequired="@Required"
+                @bind-Loading="@_isLoading"
+                PreloadData="true">
+    <ValueTemplate Context="es">
+        @es.Name
+    </ValueTemplate>
+</SearchSelector>
+
+@code {
+    private bool _isLoading;
+    
+    [Parameter] public TValue Value { get; set; }
+    [Parameter] public EventCallback<TValue> ValueChanged { get; set; }
+
+    [Parameter] public bool Required { get; set; } = true;
+    
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+
+    private Task<IEnumerable<ExecutionServiceListView>> DoSearch(string? filter)
+    {
+        return Repository.GetExecutionServiceInstances(new());
+    }
+}

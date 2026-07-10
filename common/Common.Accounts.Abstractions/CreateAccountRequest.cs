@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using QuantInfra.Sdk.Accounts;
 
 namespace QuantInfra.Common.Accounts.Abstractions;
@@ -32,10 +33,13 @@ public class CreateAccountRequest
     public string? Name { get; set; }
     public AccountType AccountType { get; set; }
     public int CurrencyId { get; set; } = 840;
-    public PositionAccounting PositionAccounting { get; set; } = PositionAccounting.Hedged;
+    public PositionAccounting PositionAccounting { get; set; } = PositionAccounting.Netted;
     public bool EnableSharePriceTracking { get; set; }
     public bool IncludeUnrealizedPnLToMtm { get; set; }
     public int? BrokerId { get; set; }
+    
+    [Required(ErrorMessage = "Account service is required")] 
     public string AccountServiceName { get; set; }
+    
     public bool AddInitialInvestment { get; set; }
 }

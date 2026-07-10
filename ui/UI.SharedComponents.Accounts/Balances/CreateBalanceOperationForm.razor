@@ -1,0 +1,158 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using QuantInfra.Sdk.Accounting
+@using UI.Interfaces.Accounts
+@using UI.SharedComponents.Base
+@using UI.SharedComponents.StaticData.Assets
+
+@inject IUiAccountsRepository Repository
+
+@if (_request is not null)
+{
+    <CreateItemForm TItem="NewBalanceOperation"
+                    Item="@_request"
+                    CreateFunc="@Repository.CreateBalanceOperation"
+                    OnCompleted="@OnCompleted"
+                    @bind-IsLoading=@_isLoading>
+        <Fields Context="request">
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenFormField Text="Currency" Variant="Variant.Text">
+                        <ChildContent>
+                            <CurrenciesSelector TValue="int" @bind-Value=@request.AssetId Disabled=@_isLoading Required="true"/>
+                        </ChildContent>
+                        <Helper>
+                            <ValidationMessage For="@(() => request.AssetId)" class="rz-message rz-messages-error"/>
+                        </Helper>
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenFormField Text="Amount" Variant="Variant.Text">
+                        <ChildContent>
+                            <RadzenNumeric TValue="decimal" @bind-Value=@request.Amount Disabled=@_isLoading/>
+                        </ChildContent>
+                        <Helper>
+                            <ValidationMessage For="@(() => request.Amount)" class="rz-message rz-messages-error"/>
+                        </Helper>
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenFormField Text="FX Rate" Variant="Variant.Text">
+                        <ChildContent>
+                            <RadzenNumeric TValue="decimal?" @bind-Value=@request.FxRate Disabled=@_isLoading/>
+                        </ChildContent>
+                        <Helper>
+                            <ValidationMessage For="@(() => request.FxRate)" class="rz-message rz-messages-error"/>
+                        </Helper>
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenFormField Text="External ID" Variant="Variant.Text">
+                        <ChildContent>
+                            <RadzenTextBox @bind-Value=@request.ExternalId Disabled=@_isLoading/>
+                        </ChildContent>
+                        <Helper>
+                            <ValidationMessage For="@(() => request.ExternalId)" class="rz-message rz-messages-error"/>
+                        </Helper>
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenFormField Text="Description" Variant="Variant.Text">
+                        <ChildContent>
+                            <RadzenTextBox @bind-Value=@request.Description Disabled=@_isLoading/>
+                        </ChildContent>
+                        <Helper>
+                            <ValidationMessage For="@(() => request.Description)" class="rz-message rz-messages-error"/>
+                        </Helper>
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenCheckBox TValue="bool" Value=@request.IsCorrection
+                                    ValueChanged="@(v => OnIsCorrectionChanged(request, v))"
+                                    Disabled=@_isLoading Name="IsCorrection"/>
+                    <RadzenLabel Text="Is correction" Component="IsCorrection" class="rz-ms-2"/>
+                </RadzenColumn>
+            </RadzenRow>
+
+            @if (request.IsCorrection)
+            {
+                <RadzenRow>
+                    <RadzenColumn Size="12">
+                        <RadzenCheckBox TValue="bool" @bind-Value=@request.AffectsPnL Disabled=@_isLoading Name="AffectsPnL"/>
+                        <RadzenLabel Text="Affects PnL" Component="AffectsPnL" class="rz-ms-2"/>
+                    </RadzenColumn>
+                </RadzenRow>
+
+                <RadzenRow>
+                    <RadzenColumn Size="12">
+                        <RadzenCheckBox TValue="bool" @bind-Value=@request.AffectsInvestment Disabled=@_isLoading Name="AffectsInvestment"/>
+                        <RadzenLabel Text="Affects investment" Component="AffectsInvestment" class="rz-ms-2"/>
+                    </RadzenColumn>
+                </RadzenRow>
+
+                <RadzenRow>
+                    <RadzenColumn Size="12">
+                        <RadzenCheckBox TValue="bool" @bind-Value=@request.AffectsBalance Disabled=@_isLoading Name="AffectsBalance"/>
+                        <RadzenLabel Text="Affects balance" Component="AffectsBalance" class="rz-ms-2"/>
+                    </RadzenColumn>
+                </RadzenRow>
+
+                <RadzenRow>
+                    <RadzenColumn Size="12">
+                        <RadzenCheckBox TValue="bool" @bind-Value=@request.AffectsShareCount Disabled=@_isLoading Name="AffectsShareCount"/>
+                        <RadzenLabel Text="Affects share count" Component="AffectsShareCount" class="rz-ms-2"/>
+                    </RadzenColumn>
+                </RadzenRow>
+            }
+
+        </Fields>
+    </CreateItemForm>
+}
+
+@code {
+    private bool _isLoading;
+    private NewBalanceOperation? _request = null;
+    [Parameter] public EventCallback OnCompleted { get; set; }
+    [Parameter] public int? AccountId { get; set; } 
+    [Parameter] public int? AccountCurrencyId { get; set; } 
+    [Parameter] public bool HideAccountSelector { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (_request is null)
+        {
+            _request = new()
+            {
+                AccountId = AccountId ?? 0,
+                AssetId = AccountCurrencyId ?? 0,
+            };
+        }
+    }
+
+    private void OnIsCorrectionChanged(NewBalanceOperation request, bool isCorrection)
+    {
+        request.IsCorrection = isCorrection;
+        if (!isCorrection)
+        {
+            request.AffectsPnL = false;
+            request.AffectsBalance = true;
+            request.AffectsInvestment = true;
+            request.AffectsShareCount = true;
+        }
+    }
+
+}

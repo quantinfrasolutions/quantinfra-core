@@ -1,0 +1,132 @@
+@using UI.Interfaces.Strategies
+@using QuantInfra.Common.Interfaces.Api
+@using QuantInfra.Common.Interfaces.Api.Strategies
+
+@inject IUiStrategiesRepository Repository
+@inject TooltipService TooltipService
+
+@if (Filter != null)
+{
+    <EditableView TItem="StrategyViewBrief"
+                  TFilter="StrategiesFilter"
+                  EmptyText="No strategies found"
+                  SearchButtonText="Refresh"
+                  SearchFunc=@Repository.GetStrategies
+                  Filter=@Filter
+                  AllowSelectRow=@AllowSelect
+                  SelectionMode="DataGridSelectionMode.Single"
+                  SelectAction=@OnRowSelected
+                  Variant=@Variant
+                  LookIntoHref=@GetLookIntoHref
+                  HideActionsColumn=@(!EnableActions)
+                  RunSearchImmediately=@RunSearchImmediately
+                  @ref="_view">
+        <SearchForm>
+            <StrategiesFilterForm @bind-Filter=@Filter />
+        </SearchForm>
+        <CreateButton>
+            @if (EnableActions)
+            {
+                <CreateStrategyButton ShowButton="true" OnCompleted="@(() => _view.RunSearch())" />
+            }
+        </CreateButton>
+        @* <CustomButtons> *@
+        @*     @if (selectedStrategies?.Count > 0) *@
+        @*     { *@
+        @*         <ControlPanel.Components.Strategies.StrategyButtonsMulti Strategies="selectedStrategies" /> *@
+        @*     } *@
+        @* </CustomButtons> *@
+        <Columns>
+            @if (Columns.Contains("StrategyServiceName"))
+            {
+                <RadzenDataGridColumn TItem="StrategyViewBrief" Title="Instance" Property=@nameof(StrategyViewBrief.StrategyServiceName) Width="120px"/>
+            }
+            @if (Columns.Contains("StrategyId"))
+            {
+                <RadzenDataGridColumn TItem="StrategyViewBrief" Title="Strategy Id" Property=@nameof(StrategyViewBrief.StrategyId) Width="150px"/>
+            }
+            @if (Columns.Contains("IsActive"))
+            {
+                <RadzenDataGridColumn TItem="StrategyViewBrief" Title="Status" Property=@nameof(StrategyViewBrief.Status) Width="100px"/>
+            }
+            @if (Columns.Contains("Name"))
+            {
+                <RadzenDataGridColumn TItem="StrategyViewBrief" Title="Name" Property=@nameof(StrategyViewBrief.Name) Width="280px"/>
+            }
+            @if (Columns.Contains("StrategyClassName"))
+            {
+                <RadzenDataGridColumn TItem="StrategyViewBrief" Title="Class name" Width="220px">
+                    <Template Context="strategy">
+                        <RadzenText TextStyle="TextStyle.Body2" MouseEnter="@(args => ShowTooltip(args, strategy.StrategyClassName, new TooltipOptions { Position = TooltipPosition.Right }))">
+                            @strategy.StrategyClassName.Split('.').Last()
+                        </RadzenText>
+                    </Template>
+                </RadzenDataGridColumn>
+            }
+            @if (Columns.Contains("Symbols"))
+            {
+                <RadzenDataGridColumn TItem="StrategyViewBrief" Property="Symbols" Title="Symbols" Width="250px">
+                    <Template Context="strategy">
+                        @if (strategy.Symbols.Count == 1)
+                        {
+                            <RadzenText TextStyle="TextStyle.Body2">
+                                @{
+                                    var symbol = @strategy.Symbols.Values.First();
+                                }
+                                @symbol.Name (@symbol.Id)
+                            </RadzenText>
+                        }
+                        else
+                        {
+                            <RadzenText TextStyle="TextStyle.Body2" MouseEnter=@(args => ShowSymbolsTooltip(args, strategy.Symbols, new() { Position = TooltipPosition.Right }))>
+                                Multiple
+                            </RadzenText>
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+            }
+            @* TODO: move to CustomItemButtons *@
+            @* <RadzenDataGridColumn TItem="StrategyViewBrief" MinWidth="150px"> *@
+            @*     <Template Context="strategy"> *@
+            @*         $1$ <StrategyButtons Strategy="@strategy" OnCompleted="@(() => Refresh(true))" /> TODO #1# *@
+            @*         <StrategyButtons Strategy="@strategy"/> *@
+            @*     </Template> *@
+            @* </RadzenDataGridColumn> *@
+        </Columns>
+    </EditableView>
+}
+
+@code {
+    private EditableView<StrategyViewBrief, StrategiesFilter> _view;
+
+    [Parameter] public StrategiesFilter? Filter { get; set; }
+    [Parameter] public bool RunSearchImmediately { get; set; }
+    [Parameter] public bool AllowSelect { get; set; }
+    [Parameter] public Action<StrategyViewBrief>? ValueChanged { get; set; }
+    [Parameter] public Variant Variant { get; set; } = Variant.Filled;
+    [Parameter] public List<string> Columns { get; set; }
+    [Parameter] public bool EnableActions { get; set; } = true;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        Filter ??= new();
+        Columns ??= ["StrategyServiceName", "StrategyId", "IsActive", "Name", "StrategyClassName", "RequiredBarStorages", "Symbols"];
+    }
+
+    private string GetLookIntoHref(StrategyViewBrief a) => $"/strategies/{a.StrategyId}";
+    private void OnRowSelected(StrategyViewBrief c) => ValueChanged?.Invoke(c);
+    private void ShowTooltip(ElementReference elementReference, string text, TooltipOptions options = null) => 
+        TooltipService.Open(elementReference, text, options);
+    
+    private void ShowSymbolsTooltip(ElementReference elementReference, IReadOnlyDictionary<string, BriefView<int>> symbols, TooltipOptions options = null) => 
+        TooltipService.Open(elementReference, ds =>
+                @<ul>
+                    @foreach (var i in symbols)
+                    {
+                        <li>@i.Key: @i.Value.Name (@i.Value.Id)</li>
+                    }
+                </ul>
+            , options);
+    
+}

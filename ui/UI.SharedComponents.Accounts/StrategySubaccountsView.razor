@@ -1,0 +1,37 @@
+@using UI.Interfaces.Accounts
+@using QuantInfra.Common.Interfaces.Api.Accounts
+@using QuantInfra.Sdk.Accounts
+@using UI.SharedComponents.Base
+
+@inject IUiAccountsRepository Repository
+
+<EditableView TItem="AccountListModel"
+              TFilter="AccountsFilter"
+              EmptyText="No accounts found"
+              SearchFunc=@Repository.GetAccounts
+              Filter=@_filter
+              RunSearchImmediately="true"
+              LookIntoHref="@GetLookIntoHref"
+            >
+    <SearchForm>
+        <AccountsFilterForm @bind-Filter=@_filter HideAccountType="true" />
+    </SearchForm>
+    <Columns>
+        <RadzenDataGridColumn TItem="AccountListModel" Title="Account Id" Property=@nameof(AccountListModel.AccountId) Width="120px" />
+        <RadzenDataGridColumn TItem="AccountListModel" Property=@nameof(AccountListModel.Name) Title="Name" Width="220px"/>
+        <RadzenDataGridColumn TItem="AccountListModel" Property=@nameof(AccountListModel.StrategyId) Title="Strategy Id" Width="120px"/>
+        <RadzenDataGridColumn TItem="AccountListModel" Property=@nameof(AccountListModel.StrategyName) Title="Strategy" Width="220px">
+            <Template Context="account">
+                <RadzenText TextStyle="TextStyle.Body2">
+                    <RadzenLink Path=@($"/strategies/{account.StrategyId}") Text=@(account.StrategyName) />
+                </RadzenText>
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</EditableView>
+
+@code {
+    AccountsFilter _filter = new() { AccountTypes = [AccountType.StrategySubAccount] };
+
+    string GetLookIntoHref(AccountListModel a) => $"/accounts/{a.AccountId}";
+}

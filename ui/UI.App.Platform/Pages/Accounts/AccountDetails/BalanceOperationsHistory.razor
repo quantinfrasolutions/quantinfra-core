@@ -4,7 +4,7 @@
 
 @layout Reporting
 
-<UI.SharedComponents.Components.Accounts.BalanceOperationsHistory SingleAccount="true" Filter=@(new BalanceOperationsFilter { AccountId = AccountId }) />
+<UI.SharedComponents.Accounts.Reporting.BalanceOperationsHistory SingleAccount="true" Filter=@(new BalanceOperationsFilter { AccountId = AccountId }) />
 
 @code {
     [Parameter] public int AccountId { get; set; }

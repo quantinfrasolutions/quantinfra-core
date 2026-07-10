@@ -1,0 +1,103 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using QuantInfra.Common.Interfaces.Api.StaticData
+@using QuantInfra.Sdk.StaticData.Synthetics
+@using UI.Interfaces.StaticData
+@using UI.SharedComponents.Base
+@using UI.SharedComponents.StaticData.Assets
+@using UI.SharedComponents.StaticData.Datafeeds
+
+@inject IUiStaticDataRepository Repository
+
+<CreateItemForm TItem="CreateContractRequest"
+                CreateFunc="@Repository.CreateContract"
+                OnCompleted="@OnCompleted">
+    <Fields Context="request">
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Ticker" Variant="Variant.Text">
+                    <ChildContent>
+                        <RadzenTextBox @bind-Value=@request.Ticker/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.Ticker)" class="rz-message rz-messages-error"/>
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Template" Variant="Variant.Text">
+                    <ChildContent>
+                        <ContractTemplatesSelector TValue="int" @bind-Value=@request.TemplateId Required="true"/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.TemplateId)" class="rz-message rz-messages-error"/>
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Asset" Variant="Variant.Text">
+                    <ChildContent>
+                        <AssetsSelector TValue="int?" @bind-Value=@request.AssetId Required="false" />
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.AssetId)" class="rz-message rz-messages-error"/>
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Default datafeed" Variant="Variant.Text">
+                    <ChildContent>
+                        <DatafeedsSelector TValue="int" @bind-Value=@request.DefaultDatafeedId />
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.DefaultDatafeedId)" class="rz-message rz-messages-error"/>
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="External contract ID" Variant="Variant.Text">
+                    <RadzenTextBox @bind-Value=@request.ExternalContractId/>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Description" Variant="Variant.Text">
+                    <RadzenTextBox @bind-Value=@request.Description/>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="First trading date" Variant="Variant.Text">
+                    <RadzenDatePicker @bind-Value=@request.FirstTradingDate DateFormat="yyyy-MM-dd" ShowTime="false"/>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow><RadzenColumn Size="12">
+            <RadzenFormField Text="Expiration date" Variant="Variant.Text">
+                <RadzenDatePicker @bind-Value=@request.ExpirationDate DateFormat="yyyy-MM-dd" ShowTime="false" />
+            </RadzenFormField>
+        </RadzenColumn></RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Synthetic type" Variant="Variant.Text">
+                    <RadzenDropDown @bind-Value=@request.SyntheticContractType
+                                    Data=@(Enum.GetValues(typeof(SyntheticContractType)).Cast<Enum>())
+                                    AllowClear="true"/>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+    </Fields>
+</CreateItemForm>
+
+@code {
+    [Parameter] public EventCallback OnCompleted { get; set; }
+}

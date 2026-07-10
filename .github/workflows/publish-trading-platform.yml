@@ -86,7 +86,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./apps/QuantInfra.Core.Apps.MonolithTradingService/Dockerfile
+          file: ./apps/TradingEngine/Dockerfile
           push: true
           platforms: ${{ steps.platforms.outputs.value }}
           tags: |

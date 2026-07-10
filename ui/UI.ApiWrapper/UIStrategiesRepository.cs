@@ -40,7 +40,7 @@ public partial class ApiRepository : IUiStrategiesRepository, IUiStrategyClasses
         
 
     public Task<ValidateStrategyResult> ValidateNewStrategy(CreateStrategyRequest request) =>
-        Retrieve("", new EmptyFilter(), _ => _wrapper.Client.ValidateStrategyRequestAsync(request));
+        Retrieve("", "", _ => _wrapper.Client.ValidateStrategyRequestAsync(request));
     // RetrieveCollection("execution stats", () => _wrapper.ApiClient.GetStrategyExecutionStatsAsync(filter.StrategyId,
         //     filter.AccountId, filter.ContractId,
         //     InstantToString(filter.FromDt), InstantToString(filter.ToDt), filter.GroupByAccount, filter.GroupBySignalGroup, filter.GroupByTimeOfDay,

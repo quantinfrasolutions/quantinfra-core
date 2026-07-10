@@ -13,7 +13,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Include="appsettings.Development.json" />
+      <None Include="appsettings.Development.json">
+        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
@@ -24,6 +26,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\common\Common.Utils.ExecutableAppBase\Common.Utils.ExecutableAppBase.csproj" />
       <ProjectReference Include="..\..\connectors\Binance\Binance.Futures.USDM\Binance.Futures.USDM.csproj" />
+      <ProjectReference Include="..\..\services\Api.StaticData\Api.StaticData.csproj" />
       <ProjectReference Include="..\..\services\Api\Api.csproj" />
       <ProjectReference Include="..\..\services\MonolithService\MonolithService.csproj" />
       <ProjectReference Include="..\..\ui\UI.App.Platform\UI.App.Platform.csproj" />
@@ -34,7 +37,8 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(UseLocalSdkReference)' != 'true'">
-        <PackageReference Include="QuantInfra.Sdk.StandardIndicators" Version="0.9.0-beta3" />
+        <PackageReference Include="QuantInfra.Sdk" Version="0.9.1-beta1" />
+        <PackageReference Include="QuantInfra.Sdk.StandardIndicators" Version="0.9.1-beta1" />
     </ItemGroup>
 
 </Project>

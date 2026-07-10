@@ -3,7 +3,7 @@
 
 @layout Reporting
 
-<UI.SharedComponents.Components.Accounts.SharePriceHistory SingleAccount="true" Filter=@(new SharePriceHistoryFilter { AccountId = AccountId }) />
+<UI.SharedComponents.Accounts.Reporting.SharePriceHistory SingleAccount="true" Filter=@(new SharePriceHistoryFilter { AccountId = AccountId }) />
 
 @code {
     [Parameter] public int AccountId { get; set; }

@@ -1,4 +1,4 @@
-@using UI.SharedComponents.Accounts
+@using UI.SharedComponents.Accounts.Trading
 
 @page "/accounts/{AccountId:int}/trading"
 
@@ -6,7 +6,7 @@
 
 @if (AccountBase?.Account != null)
 {
-    <AccountTradingView AccountId=@AccountBase.Account.AccountId AccountType=@AccountBase.Account.AccountType />
+    <AccountTradingView Account=@AccountBase.Account />
 }
 
 @code {

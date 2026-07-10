@@ -10,10 +10,10 @@ namespace QuantInfra.Common.Interfaces.Api.Management;
 
 public interface IManagementServiceClient
 {
-    Task CreateAccountAsync(CreateAccountRequest request);
+    Task<int> CreateAccountAsync(CreateAccountRequest request);
     Task CreateSubaccountAsync(CreateSubaccountRequest request);
     Task<IReadOnlyDictionary<int, decimal>> GetBalancesAsync(int accountId);
-    Task CreateBalanceOperationAsync(NewBalanceOperation request);
+    Task<int> CreateBalanceOperationAsync(NewBalanceOperation request);
     Task<IReadOnlyCollection<Position>> GetActivePositionsAsync(int accountId);
     Task<IReadOnlyCollection<OrderStatus>> GetActiveOrdersAsync(int accountId);
     Task PlaceOrderAsync(NewOrderSingle nos);

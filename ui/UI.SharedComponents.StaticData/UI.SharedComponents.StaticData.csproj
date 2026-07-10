@@ -20,4 +20,47 @@
       <ProjectReference Include="..\UI.SharedComponents.Base\UI.SharedComponents.Base.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <AdditionalFiles Include="Assets\AssetsFilterForm.razor" />
+      <AdditionalFiles Include="Assets\AssetsSelector.razor" />
+      <AdditionalFiles Include="Assets\AssetsView.razor" />
+      <AdditionalFiles Include="Assets\CreateAssetButton.razor" />
+      <AdditionalFiles Include="Assets\CreateAssetForm.razor" />
+      <AdditionalFiles Include="Assets\CurrenciesSelector.razor" />
+      <AdditionalFiles Include="Brokers\BrokersFilterForm.razor" />
+      <AdditionalFiles Include="Brokers\BrokersSelector.razor" />
+      <AdditionalFiles Include="Brokers\BrokersView.razor" />
+      <AdditionalFiles Include="Commissions\CommissionDetails.razor" />
+      <AdditionalFiles Include="Commissions\CommissionSelector.razor" />
+      <AdditionalFiles Include="Commissions\CommissionsView.razor" />
+      <AdditionalFiles Include="Commissions\CreateCommissionButton.razor" />
+      <AdditionalFiles Include="Commissions\CreateCommissionForm.razor" />
+      <AdditionalFiles Include="Contracts\ContractDetails.razor" />
+      <AdditionalFiles Include="Contracts\ContractForm.razor" />
+      <AdditionalFiles Include="Contracts\ContractsFilterForm.razor" />
+      <AdditionalFiles Include="Contracts\ContractsSelector.razor" />
+      <AdditionalFiles Include="Contracts\ContractsView.razor" />
+      <AdditionalFiles Include="Contracts\ContractTemplateFilterForm.razor" />
+      <AdditionalFiles Include="Contracts\ContractTemplatesSelector.razor" />
+      <AdditionalFiles Include="Contracts\ContractTemplatesView.razor" />
+      <AdditionalFiles Include="Contracts\ContractView.razor" />
+      <AdditionalFiles Include="Contracts\CreateContractButton.razor" />
+      <AdditionalFiles Include="Contracts\CreateContractForm.razor" />
+      <AdditionalFiles Include="Contracts\CreateContractTemplateButton.razor" />
+      <AdditionalFiles Include="Contracts\CreateContractTemplateForm.razor" />
+      <AdditionalFiles Include="Datafeeds\CreateDatafeedButton.razor" />
+      <AdditionalFiles Include="Datafeeds\CreateDatafeedForm.razor" />
+      <AdditionalFiles Include="Datafeeds\DatafeedsSelector.razor" />
+      <AdditionalFiles Include="Datafeeds\DatafeedsView.razor" />
+      <AdditionalFiles Include="Exchanges\CreateExchangeButton.razor" />
+      <AdditionalFiles Include="Exchanges\CreateExchangeForm.razor" />
+      <AdditionalFiles Include="Exchanges\ExchangesSelector.razor" />
+      <AdditionalFiles Include="Exchanges\ExchangesView.razor" />
+      <AdditionalFiles Include="Streams\CreateStreamButton.razor" />
+      <AdditionalFiles Include="Streams\CreateStreamForm.razor" />
+      <AdditionalFiles Include="Streams\StreamFilterForm.razor" />
+      <AdditionalFiles Include="Streams\StreamsSelector.razor" />
+      <AdditionalFiles Include="Streams\StreamsView.razor" />
+    </ItemGroup>
+
 </Project>

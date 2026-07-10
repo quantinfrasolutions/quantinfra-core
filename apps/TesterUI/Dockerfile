@@ -4,7 +4,12 @@ WORKDIR /src
 COPY . .
 
 RUN dotnet restore \
-    apps/TesterUI/TesterUI.csproj
+    apps/TesterUI/TesterUI.csproj 
+
+RUN dotnet publish --no-restore \
+    apps/StrategyTesterCli/StrategyTesterCli.csproj \
+    -c Release \
+    -o /cli
 
 RUN dotnet publish --no-restore \
     apps/TesterUI/TesterUI.csproj \
@@ -16,8 +21,9 @@ LABEL org.opencontainers.image.source=https://github.com/quantinfrasolutions/qua
 
 WORKDIR /app
 COPY --from=publish /app .
+COPY --from=publish /cli ./cli/
 
 EXPOSE 8080
-ENTRYPOINT ["dotnet", "TesterUI.dll"]
+ENTRYPOINT ["dotnet", "StrategyTester.dll"]
 
 #MUST BE RUN FROM THE SOLUTION ROOT!

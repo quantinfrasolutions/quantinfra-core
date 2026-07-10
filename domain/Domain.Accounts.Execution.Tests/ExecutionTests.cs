@@ -660,7 +660,7 @@ public class ExecutionTests
             2,
             SecurityType.Stock,
             2,
-            PnLCalculatorType.Default, 0.01m, 0.01m, 1m
+            new PnLCalculatorOptions(PnLCalculatorType.Default, 0.01m, 0.01m, 2)
         ), true);
         _internalTradesHistory.Events.Clear();
         
@@ -708,7 +708,7 @@ public class ExecutionTests
             2,
             SecurityType.Stock,
             2,
-            PnLCalculatorType.Default, 0.01m, 0.01m, 1m
+            new PnLCalculatorOptions(PnLCalculatorType.Default, 0.01m, 0.01m, 2)
         ), true);
         _internalTradesHistory.Events.Clear();
         
@@ -974,11 +974,11 @@ public class ExecutionTests
             null, null, Side.Buy, 3, 50000, 0, _clock.GetCurrentInstant(), null, null, null, 840, 1, 150000, null, null, false);
         
         _baState.Apply(new TradeEvt(_idsProvider.GetNextEventId(), _brokerAccountId, t1, _baState.GetNextVersion(), _clock.GetCurrentInstant(), 10000, 2, SecurityType.Stock, 2,
-            PnLCalculatorType.Default, 0.01m, 0.01m, 1m), true);
+            new PnLCalculatorOptions(PnLCalculatorType.Default, 0.01m, 0.01m, 2)), true);
         _baState.Apply(new TradeEvt(_idsProvider.GetNextEventId(), _brokerAccountId, t2, _baState.GetNextVersion(), _clock.GetCurrentInstant(), 10000, 2, SecurityType.Stock, 2,
-            PnLCalculatorType.Default, 0.01m, 0.01m, 1m), true);
+            new PnLCalculatorOptions(PnLCalculatorType.Default, 0.01m, 0.01m, 2)), true);
         _baState.Apply(new TradeEvt(_idsProvider.GetNextEventId(), _brokerAccountId, t3, _baState.GetNextVersion(), _clock.GetCurrentInstant(), 10000, 2, SecurityType.Stock, 2,
-            PnLCalculatorType.Default, 0.01m, 0.01m, 1m), true);
+            new PnLCalculatorOptions(PnLCalculatorType.Default, 0.01m, 0.01m, 2)), true);
         _internalTradesHistory.Events.Clear();
     
         var snapshot = new AccountPositionsSnapshot

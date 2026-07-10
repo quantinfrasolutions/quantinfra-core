@@ -1,0 +1,230 @@
+@using System.Globalization
+@using Microsoft.AspNetCore.Components.Forms
+@using QuantInfra.Sdk.Accounts
+@using QuantInfra.Sdk.Trading
+@using QuantInfra.Sdk.Trading.Orders
+@using UI.Interfaces.Accounts
+@using UI.SharedComponents.Base
+@using UI.SharedComponents.StaticData.Contracts
+
+@inject IUiAccountsRepository Repository
+
+<CreateItemForm TItem="NewOrderSingleModel"
+                Item=@_nos
+                CreateFunc="@(nos => Repository.SendNewOrder(nos.ToNewOrderSingle()))"
+                OnCompleted="@OnCompleted"
+                @bind-IsLoading=@_isLoading>
+    <Fields Context="nos">
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenStack>
+                    <RadzenRow>
+                        <RadzenColumn Size="12">
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+                                <RadzenText TextStyle="TextStyle.Body2" Text="Side"/>
+                                <RadzenSelectBar TValue="Side" @bind-Value=@nos.Side>
+                                    <Items>
+                                        <RadzenSelectBarItem Value="Side.Buy" Text="BUY"/>
+                                        <RadzenSelectBarItem Value="Side.Sell" Text="SELL"/>
+                                    </Items>
+                                </RadzenSelectBar>
+                            </RadzenStack>
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow>
+                        <RadzenColumn Size="12">
+                            <ValidationMessage For="@(() => nos.Side)" class="rz-message rz-messages-error"/>
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
+        
+        @* @if (!HideAccountSelector || _nos.AccountId == 0) *@
+        @*  { *@
+        @*      <RadzenRow> *@
+        @*          <AccountsSelector @bind-Value=@_nos.AccountId @bind-Value:after=@(() => AccountId = _nos.AccountId)/> *@
+        @*      </RadzenRow> *@
+        @*  } *@
+        
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="ClOrdId" Variant="Variant.Text">
+                    <ChildContent>
+                        <RadzenTextBox @bind-Value="@nos.ClOrdId"/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => nos.ClOrdId)" class="rz-message rz-messages-error" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Contract" Variant="Variant.Text">
+                    <ChildContent>
+                        <ContractsSelector @bind-Value="@nos.ContractId" @ref="_contract"/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => nos.ContractId)" class="rz-message rz-messages-error" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenStack>
+                    <RadzenRow>
+                        <RadzenColumn Size="12">
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+                                <RadzenText TextStyle="TextStyle.Body2" Text="Order type"/>
+                                <RadzenSelectBar TValue="OrdType" @bind-Value=@nos.OrdType>
+                                    <Items>
+                                        <RadzenSelectBarItem Value="OrdType.Market" Text="Market" />
+                                        <RadzenSelectBarItem Value="OrdType.Limit" Text="Limit" />
+                                        <RadzenSelectBarItem Value="OrdType.StopMarket" Text="Stop" />
+                                        <RadzenSelectBarItem Value="OrdType.StopLimit" Text="StopLimit" />
+                                        <RadzenSelectBarItem Value="OrdType.MarketIfTouched" Text="MIT" />
+                                    </Items>
+                                </RadzenSelectBar>
+                            </RadzenStack>
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow>
+                        <RadzenColumn Size="12">
+                            <ValidationMessage For="@(() => nos.OrdType)" class="rz-message rz-messages-error"/>
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
+        
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Qty" Variant="Variant.Text">
+                    <ChildContent>
+                        <RadzenNumeric TValue="decimal" @bind-Value="_nos.OrderQty"
+                                       Min="@_contract?.Item?.Template.MinSize"
+                                       Max="@_contract?.Item?.Template.MaxSize"
+                                       Step="@(_contract?.Item?.Template.SizeIncrement.ToString(CultureInfo.InvariantCulture) ?? "1")"
+                                       ShowUpDown="false"/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => nos.OrderQty)" class="rz-message rz-messages-error" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        
+        @if (_nos.OrdType == OrdType.Limit || _nos.OrdType == OrdType.StopLimit)
+        {
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenFormField Text="Price" Variant="Variant.Text">
+                        <ChildContent>
+                            <RadzenNumeric TValue="decimal?" @bind-Value="_nos.Price"
+                                           Step="@(_contract?.Item?.Template.TickSize.ToString(CultureInfo.InvariantCulture) ?? "0.00000001")"/>
+                        </ChildContent>
+                        <Helper>
+                            <ValidationMessage For="@(() => nos.Price)" class="rz-message rz-messages-error" />
+                        </Helper>
+                    </RadzenFormField>
+            
+                </RadzenColumn>
+            </RadzenRow>
+        }
+        
+        @if (_nos.OrdType == OrdType.StopMarket || _nos.OrdType == OrdType.StopLimit || _nos.OrdType == OrdType.MarketIfTouched)
+        {
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenFormField Text="StopPx" Variant="Variant.Text">
+                        <ChildContent>
+                            <RadzenNumeric TValue="decimal?" @bind-Value="_nos.StopPx"
+                                           Step="@(_contract?.Item?.Template.TickSize.ToString(CultureInfo.InvariantCulture) ?? "0.00000001")"/>
+                        </ChildContent>
+                        <Helper>
+                            <ValidationMessage For="@(() => nos.StopPx)" class="rz-message rz-messages-error" />
+                        </Helper>
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+        }
+        
+        @if (PositionAccounting == PositionAccounting.Hedged)
+        {
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenFormField Text="StrategyPositionId" Variant="Variant.Text">
+                        <ChildContent>
+                            <RadzenTextBox @bind-Value="nos.StrategyPositionId"/>
+                        </ChildContent>
+                        <Helper>
+                            <ValidationMessage For="@(() => nos.StrategyPositionId)" class="rz-message rz-messages-error" />
+                        </Helper>
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenStack>
+                        <RadzenRow>
+                            <RadzenColumn Size="12">
+                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+                                    <RadzenText TextStyle="TextStyle.Body2" Text="Position effect"/>
+                                    <RadzenSelectBar TValue="PositionEffect?" @bind-Value=@nos.PositionEffect>
+                                        <Items>
+                                            <RadzenSelectBarItem Value="PositionEffect.Open" Text="Open"/>
+                                            <RadzenSelectBarItem Value="PositionEffect.Close" Text="Close"/>
+                                        </Items>
+                                    </RadzenSelectBar>
+                                </RadzenStack>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn Size="12">
+                                <ValidationMessage For="@(() => nos.PositionEffect)" class="rz-message rz-messages-error"/>
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+        }
+    </Fields>
+</CreateItemForm>
+
+@code {
+    private bool _isLoading;
+    private NewOrderSingleModel _nos = new();
+    private ContractsSelector<int> _contract;
+    
+    [Parameter] public EventCallback OnCompleted { get; set; }
+    [Parameter, EditorRequired] public int AccountId { get; set; }
+    [Parameter] public PositionAccounting PositionAccounting { get; set; } = PositionAccounting.Netted;
+    [Parameter] public int ContractId { get; set; }
+    [Parameter] public decimal SignedQty { get; set; }
+    [Parameter] public string? StrategyPositionId { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        _nos = new() { AccountId = AccountId };
+        if (SignedQty != 0)
+        {
+            _nos.Side = SignedQty.FromSign();
+            _nos.OrderQty = Math.Abs(SignedQty);
+        }
+
+        if (ContractId != 0)
+        {
+            _nos.ContractId = ContractId;
+        }
+
+        if (PositionAccounting == PositionAccounting.Hedged && !string.IsNullOrEmpty(StrategyPositionId))
+        {
+            _nos.PositionEffect = PositionEffect.Close;
+            _nos.StrategyPositionId = StrategyPositionId;
+        }
+    }
+}

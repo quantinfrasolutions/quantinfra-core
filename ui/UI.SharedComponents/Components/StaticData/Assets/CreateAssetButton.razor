@@ -1,9 +1,0 @@
-<CreateItemButton TForm="CreateAssetForm"
-                  ShowButton="@ShowButton"
-                  DialogTitle="Create asset"
-                  OnCompleted="@OnCompleted"/>
-
-@code {
-    [Parameter] public bool ShowButton { get; set; }
-    [Parameter] public EventCallback OnCompleted { get; set; }
-}

@@ -23,9 +23,40 @@
 
 @code {
     private List<TItem> _data = new();
+    private bool _dataLoaded;
 
     [Parameter]
-    public TValue Value { get; set; }
+    public TValue Value
+    {
+        get => _value;
+        set
+        {
+            var comparer = EqualityComparer<TValue>.Default;
+            if (comparer.Equals(_value, value)) return;
+            
+            _value = value;
+            
+            if (PreloadData) return;
+            if (comparer.Equals(_value, default)) return;
+            Task.Run(async () =>
+            {
+                await _semaphore.WaitAsync();
+                try
+                {
+                    if (!_data.Any(x => comparer.Equals(ValueSelector(x), Value)))
+                    {
+                        await LoadData(Value.ToString());
+                        StateHasChanged();
+                    }
+                }
+                catch { }
+                finally
+                {
+                    _semaphore.Release();
+                }
+            });
+        }
+    }
 
     [Parameter] public EventCallback<TValue> ValueChanged { get; set; }
     
@@ -39,39 +70,49 @@
     [Parameter] public string FilterPlaceholder { get; set; } = "Start typing";
     [Parameter] public bool PreloadData { get; set; }
     [Parameter] public bool IsRequired { get; set; }
-
-    SemaphoreSlim _semaphore = new(1);
-
-    protected override async Task OnParametersSetAsync()
+    
+    public TItem? Item
     {
-        await base.OnParametersSetAsync();
-        if (PreloadData)
+        get
         {
-            await _semaphore.WaitAsync();
-            try
-            {
-                await LoadData(null);
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
-        }
-
-        await _semaphore.WaitAsync();
-        var comparer = EqualityComparer<TValue>.Default;
-        if (Value is not null && !comparer.Equals(Value, default(TValue)) && !_data.Any(x => comparer.Equals(ValueSelector(x), Value)))
-        {
-            try
-            {
-                await LoadData(Value.ToString());
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
+            var comparer = EqualityComparer<TValue>.Default;
+            return _data.SingleOrDefault(i => comparer.Equals(ValueSelector(i), Value));
         }
     }
+
+    SemaphoreSlim _semaphore = new(1);
+    private TValue _value;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await _semaphore.WaitAsync();
+        
+        if (PreloadData)
+        {
+            try { await LoadData(null); }
+            finally { _semaphore.Release(); }
+        }
+    }
+
+    // protected override async Task OnParametersSetAsync()
+    // {
+    //     await base.OnParametersSetAsync();
+        // await _semaphore.WaitAsync();
+        
+        // var comparer = EqualityComparer<TValue>.Default;
+        // if (Value is not null && !comparer.Equals(Value, default(TValue)) && !_data.Any(x => comparer.Equals(ValueSelector(x), Value)))
+        // {
+        //     try
+        //     {
+        //         await LoadData(Value.ToString());
+        //     }
+        //     finally
+        //     {
+        //         _semaphore.Release();
+        //     }
+        // }
+    @* } *@
 
     private async Task LoadData(string? filter)
     {

@@ -27,6 +27,7 @@ public static class ConfigurationExtensions
             .UseMainDbInfrastructureRepository()
             .UseMainDbAccountRecordsRepository()
             .UseMainDbStrategyRecordsRepository()
+            .UseMainDbStaticDataRepositoryReadOnly()
             .UseTradingAccountsRepository()
             
             .AddSingleton<FileSecretProviderConfig>(sp => new() { FilePath = Path.Combine(sp.GetRequiredService<Config>().WorkingDirPath, ".secret") })

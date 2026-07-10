@@ -1,0 +1,17 @@
+@using QuantInfra.Common.Interfaces.Api.Accounts
+@using UI.SharedComponents.Base
+<CreateItemButton TForm="TradingClientConfigForm"
+                  ShowButton="@ShowButton"
+                  DialogTitle="Configure trading client"
+                  OnCompleted="@OnCompleted"
+                  FormParams=@(new Dictionary<string, object>
+                              {
+                                  { "Request", new CreateTradingClientConfigRequest() { AccountId = AccountId } }
+                              }) 
+                  />
+
+@code {
+    [Parameter, EditorRequired] public int AccountId { get; set; }
+    [Parameter] public bool ShowButton { get; set; }
+    [Parameter] public EventCallback OnCompleted { get; set; }
+}

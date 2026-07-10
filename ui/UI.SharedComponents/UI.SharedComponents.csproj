@@ -34,6 +34,26 @@
     <UpToDateCheckInput Remove="Components\Books\CorrelationMatrix.razor" />
     <UpToDateCheckInput Remove="Components\Books\CreateBookDialog.razor" />
     <UpToDateCheckInput Remove="Components\Books\CreateBookForm.razor" />
+    <UpToDateCheckInput Remove="Components\StaticData\Brokers\BrokersFilterForm.razor" />
+    <UpToDateCheckInput Remove="Components\StaticData\Brokers\BrokersSelector.razor" />
+    <UpToDateCheckInput Remove="Components\StaticData\Brokers\BrokersView.razor" />
+    <UpToDateCheckInput Remove="Components\StaticData\Contracts\ContractDetails.razor" />
+    <UpToDateCheckInput Remove="Components\StaticData\Contracts\ContractForm.razor" />
+    <UpToDateCheckInput Remove="Components\StaticData\Contracts\ContractsFilterForm.razor" />
+    <UpToDateCheckInput Remove="Components\StaticData\Contracts\ContractsSelector.razor" />
+    <UpToDateCheckInput Remove="Components\StaticData\Contracts\ContractsView.razor" />
+    <UpToDateCheckInput Remove="Components\StaticData\Contracts\ContractTemplateFilterForm.razor" />
+    <UpToDateCheckInput Remove="Components\StaticData\Contracts\ContractTemplatesSelector.razor" />
+    <UpToDateCheckInput Remove="Components\StaticData\Contracts\ContractTemplatesView.razor" />
+    <UpToDateCheckInput Remove="Components\StaticData\Contracts\ContractView.razor" />
+    <UpToDateCheckInput Remove="Components\StaticData\Contracts\CreateContractButton.razor" />
+    <UpToDateCheckInput Remove="Components\StaticData\Contracts\CreateContractForm.razor" />
+    <UpToDateCheckInput Remove="Components\StaticData\Contracts\CreateContractTemplateButton.razor" />
+    <UpToDateCheckInput Remove="Components\StaticData\Contracts\CreateContractTemplateForm.razor" />
+    <UpToDateCheckInput Remove="Components\StaticData\Exchanges\CreateExchangeButton.razor" />
+    <UpToDateCheckInput Remove="Components\StaticData\Exchanges\CreateExchangeForm.razor" />
+    <UpToDateCheckInput Remove="Components\StaticData\Exchanges\ExchangesSelector.razor" />
+    <UpToDateCheckInput Remove="Components\StaticData\Exchanges\ExchangesView.razor" />
   </ItemGroup>
   
 

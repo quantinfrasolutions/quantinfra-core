@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using QuantInfra.Common.Interfaces.Api;
@@ -11,6 +12,7 @@ using QuantInfra.Common.Strategies.Abstractions;
 using QuantInfra.Databases.Main;
 using QuantInfra.Sdk.MarketData;
 using QuantInfra.Sdk.Strategies;
+using ValidationProblemDetails = Microsoft.AspNetCore.Mvc.ValidationProblemDetails;
 
 namespace QuantInfra.Services.Api;
 
@@ -33,6 +35,8 @@ public class StrategiesController(
             .Include(s => s.Account)
                 .ThenInclude(a => a.Currency)
                     .ThenInclude(c => c.Asset)
+            .Include(s => s.Account)
+                .ThenInclude(a => a.Broker)
             .Where(s => (filter.Status == null || filter.Status.Contains(s.Status))
                 && (filter.ClassNames == null || filter.ClassNames.Count == 0 || filter.ClassNames.Contains(s.ClassName))
                 && (filter.StrategyIds == null || filter.StrategyIds.Count == 0 || filter.StrategyIds.Contains(s.StrategyId))
@@ -69,7 +73,8 @@ public class StrategiesController(
                 bs => new BarStorageView(bs.Value, bs.Value.IdType == IdType.Contract ? contracts[bs.Value.Id] : streams[bs.Value.Id])
             ),
             s.Status, s.UseSignalGroups,
-            new(s.AccountId, s.Account.AccountType, s.Account.Name),
+            new(s.Account, s.Account.Currency.Asset.Name, s.Account.Broker?.Name, s.Account.Broker?.BrokerType,
+                null, s.StrategyId, s.Name),
             new BriefView<int>(s.Account.CurrencyId, s.Account.Currency.Asset.Name),
             s.StrategyServiceName, s.LiquidationParameters
         ));
@@ -77,6 +82,7 @@ public class StrategiesController(
 
     [HttpPost]
     [EndpointName("CreateStrategy")]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateStrategy([FromBody] CreateStrategyRequest request)
     {
         await managementClient.CreateStrategyAsync(request);
@@ -85,6 +91,8 @@ public class StrategiesController(
     
     [HttpPost, Route("validate")]
     [EndpointName(nameof(ValidateStrategyRequest))]
+    [ProducesResponseType(typeof(ValidateStrategyResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ValidateStrategyResult> ValidateStrategyRequest([FromBody] CreateStrategyRequest request)
     {
         try
@@ -162,10 +170,16 @@ public class StrategiesController(
                     ),
                 request.StartImmediately ? StrategyStatus.Running : StrategyStatus.Stopped,
                 request.UseSignalGroups,
-                new AccountViewBrief(0, request.Account.AccountType, request.Account.Name),
+                new AccountListModel(
+                    new(request.Account.AccountServiceName, request.Account.Name, request.Account.CurrencyId, 
+                        request.Account.AccountType, request.Account.PositionAccounting, null, 
+                        request.Account.EnableSharePriceTracking, request.Account.IncludeUnrealizedPnLToMtm, null),
+                    currency.Asset.Name, null, null,
+                    null, 0, request.Name
+                ),
                 new(currency.CurrencyId, currency.Asset.Name),
                 request.StrategyServiceName,
-                request.LiquidationParameters
+                null //request.LiquidationParameters
             );
 
             return new ValidateStrategyResult

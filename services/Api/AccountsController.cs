@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -9,8 +10,10 @@ using QuantInfra.Common.Interfaces.Api.Management;
 using QuantInfra.Databases.Main;
 using QuantInfra.Sdk.Accounting;
 using QuantInfra.Sdk.Accounts;
+using QuantInfra.Sdk.StaticData;
 using QuantInfra.Sdk.Trading;
 using QuantInfra.Sdk.Trading.Orders;
+using ValidationProblemDetails = Microsoft.AspNetCore.Mvc.ValidationProblemDetails;
 
 namespace QuantInfra.Services.Api;
 
@@ -22,7 +25,7 @@ public class AccountsController(
 ) : Controller
 {
     [HttpGet]
-    [EndpointName("GetAccounts")]
+    [EndpointName(nameof(GetAccounts))]
     [Produces("application/json")]
     public Task<IReadOnlyCollection<AccountListModel>> GetAccounts([FromQuery] AccountsFilter? filter) =>
         GetAccountsInternal(filter, false);
@@ -66,11 +69,45 @@ public class AccountsController(
     }
 
     [HttpPost]
-    [EndpointName("CreateAccount")]
+    [EndpointName(nameof(CreateAccount))]
+    [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateAccount([FromBody] CreateAccountRequest request)
     {
-        await managementClient.CreateAccountAsync(request);
-        return Ok();
+        if (string.IsNullOrEmpty(request.Name)) ModelState.AddModelError(nameof(request.Name), "Name is required");
+        else
+        {
+            var existingAcc = await context.Accounts.AsNoTracking().SingleOrDefaultAsync(a => a.Name.ToLower() == request.Name!.ToLower());
+            if (existingAcc != null) ModelState.AddModelError(nameof(request.Name), $"Duplicate name ({existingAcc.AccountId})");
+        }
+        
+        if (request.CurrencyId == 0) ModelState.AddModelError(nameof(request.CurrencyId), $"Currency is required");
+        else
+        {
+            var currency = await context.Currencies.AsNoTracking().SingleOrDefaultAsync(c => c.CurrencyId == request.CurrencyId);
+            if (currency is null) ModelState.AddModelError(nameof(request.CurrencyId), $"Currency {request.CurrencyId} not found");
+        }
+        
+        if (request.AccountType != AccountType.BrokerAccount) ModelState.AddModelError(nameof(request.AccountType), $"Creating accounts of type {request.AccountType} is not allowed");
+
+        if (request.AccountType == AccountType.BrokerAccount)
+        {
+            if (!request.BrokerId.HasValue || request.BrokerId == 0) ModelState.AddModelError(nameof(request.BrokerId), $"Broker is required");
+            else
+            {
+                if (await context.Brokers.AsNoTracking().SingleOrDefaultAsync(b => b.BrokerId == request.BrokerId!.Value) is null)
+                    ModelState.AddModelError(nameof(request.BrokerId), $"Broker {request.BrokerId} not found");
+            }
+        }
+        
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
+        
+        var accountId = await managementClient.CreateAccountAsync(request);
+        return CreatedAtAction(
+            nameof(GetAccounts),
+            null,
+            accountId
+        );
     }
 
     [HttpGet, Route("{accountId:int}")]
@@ -122,10 +159,28 @@ public class AccountsController(
     }
 
     [HttpPost, Route("{accountId:int}/trading-client")]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [EndpointName(nameof(CreateTradingClientConfig))]
-    public async Task CreateTradingClientConfig([FromBody] CreateTradingClientConfigRequest request)
+    public async Task<IActionResult> CreateTradingClientConfig([FromBody] CreateTradingClientConfigRequest request)
     {
+        if (request.AccountId == 0) ModelState.AddModelError(nameof(request.AccountId), $"Account is required");
+        else
+        {
+            var account = await context.Accounts.AsNoTracking().SingleOrDefaultAsync(a => a.AccountId == request.AccountId);
+            if (account is null) ModelState.AddModelError(nameof(request.AccountId), $"Account {request.AccountId} not found");
+        }
+        
+        if (string.IsNullOrEmpty(request.ExecutionServiceName)) ModelState.AddModelError(nameof(request.ExecutionServiceName), $"Execution service is required");
+        else
+        {
+            var es = await context.ExecutionServiceInstances.AsNoTracking().SingleOrDefaultAsync(s => s.Name == request.ExecutionServiceName);
+            if (es is null) ModelState.AddModelError(nameof(request.ExecutionServiceName), $"Execution service {request.ExecutionServiceName} not found");
+        }
+        
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
+        
         await managementClient.CreateTradingClientConfig(request.ToConfig());
+        return Ok();
     }
     
     [HttpDelete, Route("{accountId:int}/trading-client")]
@@ -177,11 +232,42 @@ public class AccountsController(
     }
     
     [HttpPost, Route("balance-operations")]
-    [EndpointName("CreateBalanceOperation")]
+    [EndpointName(nameof(CreateBalanceOperation))]
+    [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateBalanceOperation([FromRoute] int accountId, [FromBody] NewBalanceOperation request)
     {
-        await managementClient.CreateBalanceOperationAsync(request);
-        return Ok();
+        if (request.AccountId == 0) ModelState.AddModelError(nameof(request.AccountId), "Account is required");
+        else
+        {
+            var acc =  await context.Accounts.AsNoTracking().SingleOrDefaultAsync(a => a.AccountId == request.AccountId);
+            if (acc == null) ModelState.AddModelError(nameof(request.AccountId), $"Account {request.AccountId} not found");
+        }
+        
+        if (request.AssetId == 0) ModelState.AddModelError(nameof(request.AssetId), "Asset is required");
+        else
+        {
+            var asset = await context.Assets.AsNoTracking().SingleOrDefaultAsync(a => a.AssetId == request.AssetId);
+            if (asset is null) ModelState.AddModelError(nameof(request.AssetId), $"Asset {request.AssetId} not found");
+            else if (asset.AssetType != AssetType.Currency) ModelState.AddModelError(nameof(request.AssetId), $"Asset {request.AssetId} is not a currency");
+        }
+
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
+        
+        if (!request.IsCorrection)
+        {
+            request.AffectsPnL = false;
+            request.AffectsBalance = true;
+            request.AffectsInvestment = true;
+            request.AffectsShareCount = true;
+        }
+        
+        var boId = await managementClient.CreateBalanceOperationAsync(request);
+        return CreatedAtAction(
+            nameof(GetBalanceOperationsHistory),
+            null,
+            boId
+        );
     }
 
     [HttpGet, Route("{accountId:int}/share-price-history")]
@@ -338,8 +424,60 @@ public class AccountsController(
 
     [HttpPost, Route("orders")]
     [EndpointName(nameof(NewOrder))]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> NewOrder([FromBody] NewOrderSingle nos)
     {
+        if (nos.AccountId == 0) ModelState.AddModelError(nameof(nos.AccountId), "Account is required");
+        else
+        {
+            var account = await context.Accounts.AsNoTracking().SingleOrDefaultAsync(a => a.AccountId == nos.AccountId);
+            if (account is null) ModelState.AddModelError(nameof(nos.AccountId), $"Account {nos.AccountId} not found");
+        }
+
+        Contract? contract = null;
+        if (nos.ContractId == 0) ModelState.AddModelError(nameof(nos.ContractId), "Contract is required");
+        else
+        {
+            contract = await context.Contracts
+                .Include(c => c.Template)
+                .AsNoTracking()
+                .SingleOrDefaultAsync(c => c.ContractId == nos.ContractId);
+            if (contract is null) ModelState.AddModelError(nameof(nos.ContractId), $"Contract {nos.ContractId} not found");
+        }
+
+        if (nos.OrdType == OrdType.Limit || nos.OrdType == OrdType.StopLimit || nos.OrdType == OrdType.MarketIfTouched)
+        {
+            if (!nos.Price.HasValue) ModelState.AddModelError(nameof(nos.Price), "Price is required");
+            if (nos.Price.HasValue && contract is not null)
+            {
+                if (contract.NormalizePrice(nos.Price.Value) != nos.Price.Value)
+                    ModelState.AddModelError(nameof(nos.Price), $"Tick is {contract.Template.TickSize}");
+            }
+        }
+
+        if (nos.OrdType == OrdType.StopLimit || nos.OrdType == OrdType.StopMarket)
+        {
+            if (!nos.StopPx.HasValue) ModelState.AddModelError(nameof(nos.StopPx), "StopPx is required");
+            if (nos.StopPx.HasValue && contract is not null)
+            {
+                if (contract.NormalizePrice(nos.StopPx.Value) != nos.StopPx.Value)
+                    ModelState.AddModelError(nameof(nos.StopPx), $"Tick is {contract.Template.TickSize}");
+            }
+        }
+        
+        if (nos.OrderQty <= 0) ModelState.AddModelError(nameof(nos.OrderQty), "OrderQty must be positive");
+        if (contract is not null)
+        {
+            if (nos.OrderQty < contract.Template.MinSize)
+                ModelState.AddModelError(nameof(nos.OrderQty), $"Min size is {contract.Template.MinSize}");
+            if (nos.OrderQty > contract.Template.MaxSize)
+                ModelState.AddModelError(nameof(nos.OrderQty), $"Max size is {contract.Template.MaxSize}");
+            if (contract.NormalizeVolume(nos.OrderQty) != nos.OrderQty)
+                ModelState.AddModelError(nameof(nos.OrderQty), $"Size increment is {contract.Template.SizeIncrement}");
+        }
+        
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
+        
         await managementClient.PlaceOrderAsync(nos);
         return Ok();
     }

@@ -675,8 +675,12 @@ public class BrokerAccount : AccountBase, IBrokerAccount
         var contract = Query<GetContractByExternalId, Contract?>(new(AccountRecord.BrokerId!.Value, positionReport.ExternalContractId));
         if (contract == null)
         {
-            // TODO
-            throw new NotImplementedException("Position for an unknown contract");
+            if (!string.IsNullOrEmpty(positionReport.ExternalContractId) && !_accountState.UnmappedExternalContractIds.Contains(positionReport.ExternalContractId))
+            {
+                var evt = new NewUnmappedContractRegisteredEvt(EventIdProvider.GetNextEventId(), AccountId, positionReport.ExternalContractId, _accountState.GetNextVersion(), processingDt);
+                _accountState.Apply(evt, true);
+                return;
+            }
         }
 
         // EnsureContractIdAddedToUsed(contract.ContractId, referenceDt, processingDt);
@@ -850,8 +854,13 @@ public class BrokerAccount : AccountBase, IBrokerAccount
 
             if (contract == null)
             {
-                // TODO
-                throw new NotImplementedException("Position for an unknown contract");
+                if (!string.IsNullOrEmpty(p.ExternalContractId) && !_accountState.UnmappedExternalContractIds.Contains(p.ExternalContractId))
+                {
+                    var evt = new NewUnmappedContractRegisteredEvt(EventIdProvider.GetNextEventId(), AccountId, p.ExternalContractId, _accountState.GetNextVersion(), processingDt);
+                    _accountState.Apply(evt, true);
+                }
+                
+                continue;
             }
 
             if (!expectedPositions.Remove(contract.ContractId, out var ep))

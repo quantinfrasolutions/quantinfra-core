@@ -1,0 +1,68 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.Extensions.Logging
+@using QuantInfra.Common.Interfaces.Api
+
+@typeparam TItem where TItem : new()
+@inject ILogger Logger
+
+@if (Item != null)
+{
+    <RadzenTemplateForm TItem="TItem" Data="@Item" EditContext="@_editContext" 
+                        Submit="@Create" InvalidSubmit="@OnInvalidSubmit" 
+                        class="create-item-form">
+        <DataAnnotationsValidator />
+        <RadzenStack Gap="1rem">
+            @Fields(Item)
+            <RadzenRow JustifyContent="JustifyContent.End">
+                <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" Text="Create"
+                              Variant="Variant.Text" IsBusy="@IsLoading" Disabled="CreateButtonDisabled"/>
+            </RadzenRow>
+        </RadzenStack>
+    </RadzenTemplateForm>
+}
+
+@code {
+    private EditContext _editContext;
+    private ServerValidationHandler _serverValidation;
+
+    [Parameter] public TItem Item { get; set; } = new();
+    [Parameter, EditorRequired] public RenderFragment<TItem> Fields { get; set; }
+    [Parameter, EditorRequired] public Func<TItem, Task> CreateFunc { get; set; }
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public EventCallback<bool> IsLoadingChanged { get; set; }
+    [Parameter] public EventCallback OnCompleted { get; set; }
+    [Parameter] public EventCallback<ValidationProblemDetails?> ValidationErrorChanged { get; set; }
+    [Parameter] public bool CreateButtonDisabled { get; set; }
+    [Parameter] public EventCallback<FormInvalidSubmitEventArgs> OnInvalidSubmit { get; set; }
+    
+    protected override void OnInitialized()
+    {
+        _editContext = new EditContext(Item);
+        _serverValidation = new ServerValidationHandler(_editContext);
+    }
+    
+    private async Task Create()
+    {
+        await ValidationErrorChanged.InvokeAsync(null);
+        
+        IsLoading = true;
+        await IsLoadingChanged.InvokeAsync(IsLoading);
+        try
+        {
+            await CreateFunc(Item);
+            await OnCompleted.InvokeAsync();
+        }
+        catch (Interfaces.ValidationException ex)
+        {
+            _serverValidation.DisplayErrors(ex.Details.Errors);
+            await ValidationErrorChanged.InvokeAsync(ex.Details);
+        }
+        catch { }
+        finally
+        {
+            IsLoading = false;
+            await IsLoadingChanged.InvokeAsync(IsLoading);
+        }
+    }
+
+}

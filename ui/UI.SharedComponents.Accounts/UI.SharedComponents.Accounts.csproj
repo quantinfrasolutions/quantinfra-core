@@ -19,6 +19,8 @@
     <ItemGroup>
       <ProjectReference Include="..\UI.Interfaces\UI.Interfaces.csproj" />
       <ProjectReference Include="..\UI.SharedComponents.Base\UI.SharedComponents.Base.csproj" />
+      <ProjectReference Include="..\UI.SharedComponents.Infrastructure\UI.SharedComponents.Infrastructure.csproj" />
+      <ProjectReference Include="..\UI.SharedComponents.StaticData\UI.SharedComponents.StaticData.csproj" />
       <ProjectReference Include="..\UI.SharedComponents\UI.SharedComponents.csproj" />
     </ItemGroup>
 
