@@ -1,9 +1,5 @@
-@* @using Services *@
-@* @using global::Binance.Common *@
 @* @using QuantInfra.Common.Interfaces.Api *@
-@* @using UI.SharedComponents.Base *@
-@* *@
-@* @inject ServiceWrapper Wrapper *@
+@* @using QuantInfra.Connectors.Binance.Common *@
 @* *@
 @* <EditableView TItem="BinanceUsdmMarketDataSubscriptionView" *@
 @*               TFilter="PagingFilter" *@
@@ -14,7 +10,7 @@
 @*               RunSearchImmediately="true"> *@
 @*     <SearchForm></SearchForm> *@
 @*     <CreateButton> *@
-@*         <SubscribeDialog /> *@
+@*         $1$ <SubscribeDialog /> #1# *@
 @*     </CreateButton> *@
 @*     <Columns> *@
 @*         <RadzenDataGridColumn TItem="BinanceUsdmMarketDataSubscriptionView" *@

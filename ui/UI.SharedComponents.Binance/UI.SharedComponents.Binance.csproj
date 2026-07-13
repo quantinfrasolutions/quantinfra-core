@@ -16,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\connectors\Binance\Binance.Common\Binance.Common.csproj" />
       <ProjectReference Include="..\UI.SharedComponents.Base\UI.SharedComponents.Base.csproj" />
     </ItemGroup>
 

@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <LangVersion>10</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>QuantInfra.UI.ApiWrapper.Backtesting</AssemblyName>
+        <RootNamespace>QuantInfra.UI.ApiWrapper.Backtesting</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\ApiClient.Binance\ApiClient.Binance.csproj" />
+      <ProjectReference Include="..\UI.Interfaces\UI.Interfaces.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Radzen.Blazor" Version="7.1.6" />
+    </ItemGroup>
+
+</Project>

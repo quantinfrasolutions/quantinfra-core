@@ -6,6 +6,8 @@ namespace QuantInfra.Databases.Main.Models.StaticData
 {
 	public class BrokerConfiguration : IEntityTypeConfiguration<Broker>
 	{
+		public const int BinanceUsdmBrokerId = 101;
+		
 		public void Configure(EntityTypeBuilder<Broker> builder)
 		{
 			builder.ToTable("brokers", "static_data");
@@ -38,7 +40,7 @@ namespace QuantInfra.Databases.Main.Models.StaticData
 			modelBuilder.Entity<Broker>().HasData(
 				new Broker
 				{
-					BrokerId = 101,
+					BrokerId = BinanceUsdmBrokerId,
 					Name = "Binance USD-m Futures",
 					BrokerType = BrokerType.BinanceUsdmFutures,
 				}

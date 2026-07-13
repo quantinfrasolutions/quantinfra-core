@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using QuantInfra.Api.Client;
+using QuantInfra.Api.Client.Binance;
+using QuantInfra.UI.ApiWrapper.Backtesting;
 using Radzen;
 using UI.ApiWrapper;
 using UI.App.Platform;
@@ -20,7 +22,11 @@ builder.Services
     .UseApiStaticDataRepository()
     .UseApiAccountsRepository()
     .UseApiStrategiesRepository()
-    .UseApiInfrastructureRepository();
+    .UseApiInfrastructureRepository()
+    
+    .ConfigureBinanceApiServiceWrapper(builder.Configuration, replaceBaseUri: builder.HostEnvironment.BaseAddress)
+    .AddScopedBinanceApiWrapper()
+    .AddBinanceApiClient();
 
 builder.Services.AddRadzenCookieThemeService(options =>
 {

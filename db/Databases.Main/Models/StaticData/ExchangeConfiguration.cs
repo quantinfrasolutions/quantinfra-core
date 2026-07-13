@@ -6,6 +6,8 @@ namespace QuantInfra.Databases.Main.Models.StaticData
 {
 	public class ExchangeConfiguration : IEntityTypeConfiguration<Exchange>
 	{
+		public const int BinanceUsdmExchangeId = 119;
+		
 		public void Configure(EntityTypeBuilder<Exchange> builder)
 		{
 			builder.ToTable("exchanges", "static_data");
@@ -25,7 +27,7 @@ namespace QuantInfra.Databases.Main.Models.StaticData
 			modelBuilder.Entity<Exchange>().HasData(
 				new Exchange
 				{
-					ExchangeId = 119,
+					ExchangeId = BinanceUsdmExchangeId,
 					Name = "Binance USD-m Futures",
 				});
 		}

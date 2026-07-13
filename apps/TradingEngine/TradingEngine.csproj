@@ -26,6 +26,8 @@
     <ItemGroup>
       <ProjectReference Include="..\..\common\Common.Utils.ExecutableAppBase\Common.Utils.ExecutableAppBase.csproj" />
       <ProjectReference Include="..\..\connectors\Binance\Binance.Futures.USDM\Binance.Futures.USDM.csproj" />
+      <ProjectReference Include="..\..\connectors\Binance\Binance.StaticDataClient\Binance.StaticDataClient.csproj" />
+      <ProjectReference Include="..\..\services\Api.Binance\Api.Binance.csproj" />
       <ProjectReference Include="..\..\services\Api.StaticData\Api.StaticData.csproj" />
       <ProjectReference Include="..\..\services\Api\Api.csproj" />
       <ProjectReference Include="..\..\services\MonolithService\MonolithService.csproj" />

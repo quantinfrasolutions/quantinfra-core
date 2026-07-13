@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>QuantInfra.Connectors.Binance.StaticDataClient</AssemblyName>
+        <RootNamespace>QuantInfra.Connectors.Binance.StaticDataClient</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Binance.Common\Binance.Common.csproj" />
+    </ItemGroup>
+
+</Project>

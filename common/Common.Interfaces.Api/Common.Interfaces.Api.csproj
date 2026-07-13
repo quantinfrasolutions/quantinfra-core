@@ -18,6 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\connectors\Binance\Binance.Common\Binance.Common.csproj" />
       <ProjectReference Include="..\Common.Accounts.Abstractions\Common.Accounts.Abstractions.csproj" />
       <ProjectReference Include="..\Common.Infrastructure.Abstractions\Common.Infrastructure.Abstractions.csproj" />
     </ItemGroup>

@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <LangVersion>10</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>QuantInfra.Api.Client.Binance</AssemblyName>
+        <RootNamespace>QuantInfra.Api.Client.Binance</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\common\Common.Interfaces.Api\Common.Interfaces.Api.csproj" />
+      <ProjectReference Include="..\..\common\Common.Messaging.Json\Common.Messaging.Json.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Net.Http.Headers" Version="2.2.8" />
+    </ItemGroup>
+
+</Project>

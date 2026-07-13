@@ -1,0 +1,55 @@
+@using QuantInfra.Common.Interfaces.Api.Binance
+@using QuantInfra.Connectors.Binance.Common
+@using QuantInfra.Connectors.Binance.StaticDataClient.Models
+@using UI.Interfaces.Binance
+@inject IUiBinanceStaticDataClient Client
+
+<EditableView TItem="BinanceContractListView"
+              TFilter="BinanceContractsFilter"
+              Filter="@_filter"
+              SearchFunc="@Client.GetContracts"
+              ButtonsColumnWidth="50px"
+              >
+    <SearchForm>
+        <ContractsFilterForm @bind-Filter="@_filter"></ContractsFilterForm>
+    </SearchForm>
+    <Columns>
+        <RadzenDataGridColumn TItem="BinanceContractListView" Property="@($"{nameof(BinanceContractListView.BinanceContract)}.{nameof(BinanceContract.Symbol)}")" Title="Symbol" Width="120px" Frozen="true"/>
+        <RadzenDataGridColumn TItem="BinanceContractListView" Property="@(nameof(BinanceContractListView.ContractId))" Title="Contract Id" Width="120px"/>
+        <RadzenDataGridColumn TItem="BinanceContractListView" Property="@(nameof(BinanceContractListView.Ticker))" Title="Ticker" Width="160px"/>
+        <RadzenDataGridColumn TItem="BinanceContractListView" Property="@($"{nameof(BinanceContractListView.BinanceContract)}.{nameof(BinanceContract.BaseAsset)}")" Title="BaseAsset" Width="120px"/>
+        <RadzenDataGridColumn TItem="BinanceContractListView" Property="@($"{nameof(BinanceContractListView.BinanceContract)}.{nameof(BinanceContract.QuoteAsset)}")" Title="QuoteAsset" Width="120px"/>
+        <RadzenDataGridColumn TItem="BinanceContractListView" Property="@($"{nameof(BinanceContractListView.BinanceContract)}.{nameof(BinanceContract.Pair)}")" Title="Pair" Width="120px"/>
+        <RadzenDataGridColumn TItem="BinanceContractListView" Property="@($"{nameof(BinanceContractListView.BinanceContract)}.{nameof(BinanceContract.Status)}")" Title="Status" Width="120px"/>
+        <RadzenDataGridColumn TItem="BinanceContractListView" Property="@($"{nameof(BinanceContractListView.BinanceContract)}.{nameof(BinanceContract.ContractType)}")" Title="ContractType" Width="120px"/>
+        <RadzenDataGridColumn TItem="BinanceContractListView" Property="@($"{nameof(BinanceContractListView.BinanceContract)}.{nameof(BinanceContract.MarginAsset)}")" Title="MarginAsset" Width="120px"/>
+        <RadzenDataGridColumn TItem="BinanceContractListView" Property="@($"{nameof(BinanceContractListView.BinanceContract)}.{nameof(BinanceContract.SettlementAsset)}")" Title="SettlementAsset" Width="120px"/>
+        <RadzenDataGridColumn TItem="BinanceContractListView" Property="@($"{nameof(BinanceContractListView.BinanceContract)}.{nameof(BinanceContract.OnboardDate)}")" Title="OnboardDate" Width="120px"/>
+        <RadzenDataGridColumn TItem="BinanceContractListView" Property="@($"{nameof(BinanceContractListView.BinanceContract)}.{nameof(BinanceContract.DeliveryDate)}")" Title="DeliveryDate" Width="120px"/>
+        <RadzenDataGridColumn TItem="BinanceContractListView" Property="@($"{nameof(BinanceContractListView.BinanceContract)}.{nameof(BinanceContract.ContractSize)}")" Title="ContractSize" Width="120px"/>
+        <RadzenDataGridColumn TItem="BinanceContractListView" Property="@($"{nameof(BinanceContractListView.BinanceContract)}.{nameof(BinanceContract.PricePrecision)}")" Title="PricePrecision" Width="120px"/>
+        <RadzenDataGridColumn TItem="BinanceContractListView" Property="@($"{nameof(BinanceContractListView.BinanceContract)}.{nameof(BinanceContract.QuantityPrecision)}")" Title="QuantityPrecision" Width="120px"/>
+        <RadzenDataGridColumn TItem="BinanceContractListView" Property="@($"{nameof(BinanceContractListView.BinanceContract)}.{nameof(BinanceContract.BaseAssetPrecision)}")" Title="BaseAssetPrecision" Width="120px"/>
+        <RadzenDataGridColumn TItem="BinanceContractListView" Property="@($"{nameof(BinanceContractListView.BinanceContract)}.{nameof(BinanceContract.QuoteAssetPrecision)}")" Title="QuoteAssetPrecision" Width="120px"/>
+        <RadzenDataGridColumn TItem="BinanceContractListView" Property="@($"{nameof(BinanceContractListView.BinanceContract)}.{nameof(BinanceContract.UnderlyingType)}")" Title="UnderlyingType" Width="120px"/>
+    </Columns>
+    <CustomItemButtons Context="contract">
+        @if (!contract.ContractId.HasValue)
+        {
+            <ImportContractButton Contract="@contract" ShowButton="true"/>
+        }
+    </CustomItemButtons>
+</EditableView>
+
+@code {
+    private BinanceContractsFilter? _filter;
+    
+    [Parameter, EditorRequired] public BinanceMarket BinanceMarket { get; set; }
+    
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        _filter = new() { Market = BinanceMarket };
+    }
+}

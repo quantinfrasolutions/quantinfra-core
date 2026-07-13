@@ -1,19 +1,23 @@
 using QuantInfra.Common.Utils.ExecutableAppBase;
+using QuantInfra.Connectors.Binance.StaticDataClient;
 using QuantInfra.Core.Services.Api.StaticData;
 using QuantInfra.Services.Api;
+using QuantInfra.Services.Api.Binance;
 using QuantInfra.Services.MonolithService;
 
 
 var host = new AppBase(args)
     .UseJsonFileConfiguration()
     .UseEnvironmentVariables()
-    .ConfigureControllers(null, typeof(AccountsController).Assembly, typeof(StaticDataController).Assembly)
+    .ConfigureControllers(null, typeof(AccountsController).Assembly, typeof(StaticDataController).Assembly,
+        typeof(BinanceController).Assembly)
     .AddCors()
     .AddJsonOptions()
     .AddLogging()
     .AddMetrics()
     .ConfigureServices((builder, services, configuration) =>
     {
+        services.AddCachingBinanceStaticDataClient();
         services.ConfigureMonolithService(configuration);
         services.AddMonolithService(configuration);
     })

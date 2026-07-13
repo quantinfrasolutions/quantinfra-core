@@ -17,10 +17,12 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\UI.ApiWrapper.Binance\UI.ApiWrapper.Binance.csproj" />
       <ProjectReference Include="..\UI.ApiWrapper\UI.ApiWrapper.csproj" />
       <ProjectReference Include="..\UI.Interfaces\UI.Interfaces.csproj" />
       <ProjectReference Include="..\UI.SharedComponents.Accounts\UI.SharedComponents.Accounts.csproj" />
       <ProjectReference Include="..\UI.SharedComponents.Base\UI.SharedComponents.Base.csproj" />
+      <ProjectReference Include="..\UI.SharedComponents.Binance\UI.SharedComponents.Binance.csproj" />
       <ProjectReference Include="..\UI.SharedComponents.StaticData\UI.SharedComponents.StaticData.csproj" />
       <ProjectReference Include="..\UI.SharedComponents.Strategies\UI.SharedComponents.Strategies.csproj" />
       <ProjectReference Include="..\UI.SharedComponents\UI.SharedComponents.csproj" />

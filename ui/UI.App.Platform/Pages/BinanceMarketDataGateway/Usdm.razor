@@ -1,0 +1,17 @@
+﻿@page "/binance/usdm"
+@using UI.SharedComponents.Binance
+@using QuantInfra.Connectors.Binance.Common;
+
+<PageTitle>Binance USD-M Futures</PageTitle>
+
+<RadzenTabs class="full-width-tabs">
+    <Tabs>
+        <RadzenTabsItem Text="Contract lookup">
+            <ContractsLookup BinanceMarket="BinanceMarket.UsdmFutures" />
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="Subscriptions">
+            <UsdmSubscriptionsView />
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="Order book subscriptions"></RadzenTabsItem>
+    </Tabs>
+</RadzenTabs>

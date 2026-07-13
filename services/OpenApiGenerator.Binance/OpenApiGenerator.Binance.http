@@ -1,0 +1,6 @@
+@OpenApiGenerator.Binance_HostAddress = http://localhost:5062
+
+GET {{OpenApiGenerator.Binance_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
