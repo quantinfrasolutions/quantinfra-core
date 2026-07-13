@@ -1,0 +1,82 @@
+@using QuantInfra.Common.Infrastructure.Abstractions
+@using UI.Interfaces
+@using UI.Interfaces.Infrastructure
+@using UI.SharedComponents.Base
+
+@inject IUiInfrastructureRepository Repository
+
+<EditableView TItem="HostedComponentStatus"
+              TFilter="EmptyFilter"
+              Filter="@new()"
+              SearchFunc="@Repository.GetHostedComponents"
+              RunSearchImmediately="true"
+              SearchButtonText="Refresh"
+              @ref="_view">
+    <Columns>
+        <RadzenDataGridColumn TItem="HostedComponentStatus" Title="Component" Property="@nameof(HostedComponentStatus.ComponentName)" Width="160px" />
+        <RadzenDataGridColumn TItem="HostedComponentStatus" Title="Status" Property="@nameof(HostedComponentStatus.Status)" Width="160px" />
+        <RadzenDataGridColumn TItem="HostedComponentStatus" Title="Exception" Property="@nameof(HostedComponentStatus.Exception)" MinWidth="260px" />
+    </Columns>
+    <CustomButtons>
+        <RadzenButton Variant="Variant.Text" Text="Clear static data cache"
+                      ButtonStyle="ButtonStyle.Secondary"
+                      Click="@ClearStaticDataCache" 
+                      IsBusy="@_cacheBeingCleared" />
+    </CustomButtons>
+    <CustomItemButtons Context="component">
+        @if (component.Status == ComponentStatus.Running)
+        {
+            <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Danger" Icon="stop" 
+                          Click="@(() => StartStop(component.ComponentName, false))"
+                          Disabled="@(_isLoading && component.ComponentName != _workingComponent)"
+                          IsBusy="@(_isLoading && component.ComponentName == _workingComponent)"/>
+        }
+        else
+        {
+            <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Success" Icon="play_arrow" 
+                          Click="@(() => StartStop(component.ComponentName, true))"
+                          Disabled="@(_isLoading && component.ComponentName != _workingComponent)"
+                          IsBusy="@(_isLoading && component.ComponentName == _workingComponent)"/>
+        }
+    </CustomItemButtons>
+</EditableView>
+
+@code {
+    private bool _isLoading;
+    private string? _workingComponent;
+    private EditableView<HostedComponentStatus, EmptyFilter> _view;
+    private bool _cacheBeingCleared;
+
+    private async Task StartStop(string name, bool start)
+    {
+        _isLoading = true;
+        _workingComponent = name;
+        try
+        {
+            if (start) await Repository.StartComponent(name); 
+            else await Repository.StopComponent(name);
+            
+            _isLoading = false;
+        }
+        finally
+        {
+            _isLoading = false;
+            _workingComponent = null;
+            await _view.RunSearch();
+        }
+    }
+
+    private async Task ClearStaticDataCache()
+    {
+        _cacheBeingCleared = true;
+        try
+        {
+            await Repository.ClearStaticDataCache();
+        }
+        finally
+        {
+            _cacheBeingCleared = false;
+        }
+    }
+
+}

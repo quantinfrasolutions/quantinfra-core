@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using QuantInfra.Common.Infrastructure.Abstractions;
+using QuantInfra.Common.Interfaces.Api.Infrastructure;
 using QuantInfra.Common.ServiceBase;
 
 namespace QuantInfra.Services.MonolithService;
@@ -96,9 +98,11 @@ public class HostedComponent : IComponentExceptionHandler
         catch (Exception e)
         {
             _logger.LogError(e, "Error stopping component {Name}", Name);
+            Exception = e;
         }
         finally
         {
+            Status = ComponentStatus.Stopped;
             _serviceProvider = null!;
         }
     }
@@ -115,11 +119,4 @@ public class HostedComponent : IComponentExceptionHandler
         }
         Task.Run(async () => await StopAsyncInternal(CancellationToken.None));
     }
-}
-
-public enum ComponentStatus
-{
-    Running,
-    Failed,
-    Stopped
 }

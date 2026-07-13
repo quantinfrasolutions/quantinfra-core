@@ -30,6 +30,7 @@ using TransportFactory = QuantInfra.Common.Messaging.InProcess.TransportFactory;
 using Disruptor.Dsl;
 using Microsoft.EntityFrameworkCore;
 using QuantInfra.Common.EventSourcing;
+using QuantInfra.Common.Interfaces.Api.Infrastructure;
 using QuantInfra.Common.MarketData.Abstractions;
 using QuantInfra.Connectors.Binance.Futures.Usdm;
 using QuantInfra.Databases.MarketDataHistory;
@@ -41,7 +42,7 @@ using MarketDataClient = QuantInfra.Services.MonolithService.MDS.MarketDataClien
 
 namespace QuantInfra.Services.MonolithService;
 
-public class Service : IHostedService
+public class Service : IHostedService, IHostedComponentsStatusProvider
 {
     private const string AsName = "AS"; 
     private const string MdsName = "mds";
@@ -673,5 +674,29 @@ public class Service : IHostedService
         ;
 
         return sp;
+    }
+
+    public Task<IReadOnlyCollection<HostedComponentStatus>> GetHostedComponentsAsync() =>
+        Task.FromResult((IReadOnlyCollection<HostedComponentStatus>)_components.Values
+            .Select(c => new HostedComponentStatus(c.Name, c.Status, c.Exception?.Message)).ToList());
+
+    public Task StartComponent(string component)
+    {
+        var comp = _components.GetValueOrDefault(component);
+        if (comp == null) throw new KeyNotFoundException();
+        if (comp.Status == ComponentStatus.Stopped || comp.Status == ComponentStatus.Failed) 
+            return comp.StartAsync(CancellationToken.None);
+
+        throw new Exception("Already running");
+    }
+
+    public Task StopComponent(string component)
+    {
+        var comp = _components.GetValueOrDefault(component);
+        if (comp == null) throw new KeyNotFoundException();
+        if (comp.Status == ComponentStatus.Running) 
+            return comp.StopAsync(CancellationToken.None);
+
+        throw new Exception("Not running");
     }
 }

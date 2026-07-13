@@ -45,4 +45,7 @@ public class ManagementServiceClient(ManagementService service) : IManagementSer
 
     public Task Reconcile(int accountId) =>
         service.Reconcile(accountId);
+    
+    public Task ClearStaticDataCache(string accountServiceName) =>
+        service.ClearStaticDataCache(accountServiceName, 0);
 }

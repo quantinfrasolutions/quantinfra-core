@@ -24,4 +24,5 @@ public interface IManagementServiceClient
     Task CreateTradingClientConfig(TradingClientConfig config);
     Task DeleteTradingClientConfig(int accountId);
     Task Reconcile(int accountId);
+    Task ClearStaticDataCache(string accountServiceName);
 }

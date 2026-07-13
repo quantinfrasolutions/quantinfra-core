@@ -53,7 +53,8 @@ public static class ConfigurationExtensions
             
             .AddSingleton<IClock>(SystemClock.Instance)
             
-            .AddSingleton<Service>();
+            .AddSingleton<Service>()
+            .AddSingleton<IHostedComponentsStatusProvider>(sp => sp.GetRequiredService<Service>());
 
         if (addHostedService) sc.AddHostedService(sp => sp.GetRequiredService<Service>());
         
