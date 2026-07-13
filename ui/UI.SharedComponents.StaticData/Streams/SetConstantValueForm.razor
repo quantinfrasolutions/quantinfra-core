@@ -1,0 +1,43 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using QuantInfra.Common.Interfaces.Api.StaticData
+@using UI.Interfaces.StaticData
+
+@inject IUiStaticDataRepository Repository
+
+<CreateItemForm TItem="SetConstantValueStreamRequest"
+                CreateFunc="@(request => Repository.SetConstantStreamValue(StreamId, request))"
+                OnCompleted="@OnCompleted"
+                @bind-IsLoading=@_isLoading>
+    <Fields Context="request">
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Value" Variant="Variant.Text">
+                    <ChildContent>
+                        <RadzenNumeric TValue="decimal" @bind-Value=@request.Value ShowUpDown="false" Disabled="@_isLoading" />
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.Value)" class="rz-message rz-messages-error" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        @* <RadzenRow> *@
+        @*     <RadzenColumn Size="12"> *@
+        @*         <RadzenFormField Text="Value" Variant="Variant.Text"> *@
+        @*             <ChildContent> *@
+        @*                 <RadzenTextBox @bind-Value=@request.ConstantValueCron /> *@
+        @*             </ChildContent> *@
+        @*             <Helper> *@
+        @*                 <ValidationMessage For="@(() => request.ConstantValueCron)" class="rz-message rz-messages-error" /> *@
+        @*             </Helper> *@
+        @*         </RadzenFormField> *@
+        @*     </RadzenColumn> *@
+        @* </RadzenRow> *@
+    </Fields>
+</CreateItemForm>
+
+@code {
+    private bool _isLoading;
+    [Parameter] public EventCallback OnCompleted { get; set; }
+    [Parameter, EditorRequired] public int StreamId { get; set; }
+}

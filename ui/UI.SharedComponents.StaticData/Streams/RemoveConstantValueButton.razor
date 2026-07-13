@@ -1,0 +1,31 @@
+@using QuantInfra.Common.Interfaces.Api.StaticData
+@using UI.Interfaces.StaticData
+
+@inject IUiStaticDataRepository Repository
+
+@if (Stream?.ConstantStreamValue is not null)
+{
+    <RadzenButton Variant="Variant.Text" Icon="delete" ButtonStyle="ButtonStyle.Danger" Click="@Delete" IsBusy="@_isLoading" />
+}
+
+@code {
+    private bool _isLoading;
+    
+    [Parameter, EditorRequired] public StreamListView Stream { get; set; }
+    [Parameter] public EventCallback OnCompleted { get; set; }
+
+    private async Task Delete()
+    {
+        _isLoading = true;
+        try
+        {
+            await Repository.DeleteConstantValue(Stream.StreamId);
+            await OnCompleted.InvokeAsync();
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+}

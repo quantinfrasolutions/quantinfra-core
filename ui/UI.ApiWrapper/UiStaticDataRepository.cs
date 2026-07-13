@@ -125,15 +125,20 @@ public partial class ApiRepository : IUiStaticDataRepository
     public Task CreateStream(CreateStreamRequest request) =>
         Call("Stream created", "Failed to create stream", () => _wrapper.Client.CreateStreamAsync(request));
 
-    public Task CreateStream(Stream stream)
-    {
-        throw new NotImplementedException();
-    }
-
     public Task DeleteStream(int id)
     {
         throw new NotImplementedException();
     }
-    
+
+    public Task SetConstantStreamValue(int streamId, SetConstantValueStreamRequest request) =>
+        Call("Constant value updated", "Failed to set constant value",
+            () => _wrapper.Client.SetConstantValueStreamAsync(streamId, request)
+        );
+
+    public Task DeleteConstantValue(int streamId) =>
+        Call("Constant value deleted", "Failed to delete constant value",
+            () => _wrapper.Client.DeleteConstantValueStreamAsync(streamId)
+        );
+
     #endregion
 }

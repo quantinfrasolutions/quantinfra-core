@@ -1,0 +1,16 @@
+<CreateItemButton TForm="SetConstantValueForm"
+                  ShowButton="@ShowButton"
+                  DialogTitle="Edit constant value"
+                  OnCompleted="@OnCompleted"
+                  Text=""
+                  Icon="edit"
+                  FormParams="@(new()
+                              {
+                                  { "StreamId", StreamId }
+                              })"/>
+
+@code {
+    [Parameter] public bool ShowButton { get; set; }
+    [Parameter] public EventCallback OnCompleted { get; set; }
+    [Parameter, EditorRequired] public int StreamId { get; set; }
+}

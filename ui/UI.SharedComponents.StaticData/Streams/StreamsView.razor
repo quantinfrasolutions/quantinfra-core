@@ -13,7 +13,8 @@
              RunSearchImmediately="false"
              Variant=@Variant
              HideActionsColumn=@(!EnableActions)
-             AllowSelectRow=@AllowSelect>
+             AllowSelectRow=@AllowSelect
+             @ref="_view">
     <SearchForm>
         <StreamFilterForm @bind-Filter=@Filter />
     </SearchForm>
@@ -30,9 +31,14 @@
         <RadzenDataGridColumn TItem="StreamListView" Property="ConstantStreamValue.Value" Width="80px" Title="Constant stream value" />
         <RadzenDataGridColumn TItem="StreamListView" Property="ConstantStreamValue.CronExpression" Width="200px" Title="Constant stream cron" />
     </Columns>
+    <CustomItemButtons Context="stream">
+        <SetConstantValueButton StreamId="@stream.StreamId" OnCompleted="@(() => _view.RunSearch())" ShowButton="true" />
+        <RemoveConstantValueButton Stream="@stream" OnCompleted="@(() => _view.RunSearch())" />
+    </CustomItemButtons>
 </EditableView>
 
 @code {
+    private EditableView<StreamListView, StreamsFilter> _view;
     [Parameter] public StreamsFilter Filter { get; set; } = new();
     [Parameter] public bool RunSearchImmediately { get; set; }
     [Parameter] public bool AllowEdit { get; set; }

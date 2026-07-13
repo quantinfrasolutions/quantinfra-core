@@ -232,6 +232,43 @@ public class StaticDataController(MainContext context, IStaticDataRepositoryRead
         );
     }
 
+    [HttpPost, Route("streams/{streamId:int}/csv")]
+    [EndpointName(nameof(SetConstantValueStream))]
+    public async Task<IActionResult> SetConstantValueStream([FromRoute] int streamId, [FromBody] SetConstantValueStreamRequest request)
+    {
+        var stream = await context.Streams
+            .Include(s => s.ConstantStreamValue)
+            .SingleOrDefaultAsync(s => s.StreamId == streamId);
+        if (stream is null) return NotFound();
+
+        if (stream.ConstantStreamValue is not null) context.ConstantStreams.Remove(stream.ConstantStreamValue);
+
+        var csv = new ConstantStreamValue()
+        {
+            StreamId = streamId,
+            Value = request.Value,
+        };
+        context.ConstantStreams.Add(csv);
+        await context.SaveChangesAsync();
+        return Ok();
+    }
+    
+    [HttpDelete, Route("streams/{streamId:int}/csv")]
+    [EndpointName(nameof(DeleteConstantValueStream))]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> DeleteConstantValueStream([FromRoute] int streamId)
+    {
+        var stream = await context.Streams
+            .Include(s => s.ConstantStreamValue)
+            .SingleOrDefaultAsync(s => s.StreamId == streamId);
+        if (stream is null) return NotFound();
+
+        if (stream.ConstantStreamValue is null) return BadRequest("Constant value is not set for stream"); 
+        context.ConstantStreams.Remove(stream.ConstantStreamValue);
+        await context.SaveChangesAsync();
+        return Ok();
+    }
+
     /// <summary>
     /// Only the following fields can be updated: ContractId, Description, Enabled, VolumeBAU (change to 0 to disable volume aggregation), TradingSessionsId
     /// </summary>

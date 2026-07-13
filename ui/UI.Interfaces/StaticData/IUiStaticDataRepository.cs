@@ -38,4 +38,6 @@ public interface IUiStaticDataRepository
     public Task<IEnumerable<StreamListView>> GetStreams(StreamsFilter? filter = null);
     public Task CreateStream(CreateStreamRequest request);
     public Task DeleteStream(int id);
+    Task SetConstantStreamValue(int streamId, SetConstantValueStreamRequest request);
+    Task DeleteConstantValue(int streamId);
 }
