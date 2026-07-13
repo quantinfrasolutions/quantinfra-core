@@ -1,8 +1,11 @@
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using QuantInfra.Connectors.Binance.Common;
 using QuantInfra.Connectors.Binance.StaticDataClient.Internal;
 using QuantInfra.Connectors.Binance.StaticDataClient.Models;
+
+[assembly:InternalsVisibleTo("QuantInfra.Connectors.Binance.StaticDataClient.Tests")]
 
 namespace QuantInfra.Connectors.Binance.StaticDataClient;
 
@@ -12,11 +15,17 @@ public sealed class BinanceStaticDataClient
     private readonly HttpClient _httpClient;
     private readonly BinanceStaticDataClientOptions _options;
 
-    public BinanceStaticDataClient(/*HttpClient? httpClient, BinanceStaticDataClientOptions? options = null*/)
+    public BinanceStaticDataClient() : this(new(), new())
     {
-        _httpClient = new HttpClient(); // httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-        _options = new(); // options ?? new BinanceStaticDataClientOptions();
     }
+
+    private BinanceStaticDataClient(HttpClient? httpClient, BinanceStaticDataClientOptions? options = null)
+    {
+        _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        _options = options ?? new BinanceStaticDataClientOptions();
+    }
+
+    internal static BinanceStaticDataClient CreateClient(HttpClient httpClient) => new(httpClient, null);
 
     public Task<BinanceExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
         GetExchangeInfoAsync(_options.DefaultMarket, cancellationToken);

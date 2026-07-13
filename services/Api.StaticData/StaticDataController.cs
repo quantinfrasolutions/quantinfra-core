@@ -513,6 +513,10 @@ public class StaticDataController(MainContext context, IStaticDataRepositoryRead
             .Where(c => 
                 (filter.TemplateId == null || filter.TemplateId == c.TemplateId)
                 && (string.IsNullOrEmpty(filter.Name) ||  c.Name.ToLower().Contains(filter.Name))
+                && (filter.BrokerId == null || filter.BrokerId == c.Broker.BrokerId)
+                && (filter.AssetId == null || filter.AssetId == c.Asset.AssetId)
+                && (filter.SettlementCurrencyId == null || filter.SettlementCurrencyId == c.SettlementCurrency.CurrencyId)
+                && (filter.SecurityType == null || filter.SecurityType == c.SecurityType)
             )
             .OrderBy(t => t.Name)
             .Skip(filter.Offset)
@@ -556,14 +560,6 @@ public class StaticDataController(MainContext context, IStaticDataRepositoryRead
 
         Currency? settlCcy = null;
         if (request.SettlementCurrencyId == 0) ModelState.AddModelError(nameof(request.SettlementCurrencyId), "Settlement currency is required");
-        else
-        {
-            settlCcy = await context.Currencies.SingleOrDefaultAsync(c => c.CurrencyId == request.SettlementCurrencyId);
-            if (settlCcy == null) ModelState.AddModelError(nameof(request.SettlementCurrencyId), $"Currency {request.SettlementCurrencyId} not found");
-        }
-        
-        Currency? baseCcy = null, quoteCcy = null;
-        if (request.BaseCurrencyId == 0) ModelState.AddModelError(nameof(request.BaseCurrencyId), "Settlement currency is required");
         else
         {
             settlCcy = await context.Currencies.SingleOrDefaultAsync(c => c.CurrencyId == request.SettlementCurrencyId);
@@ -614,7 +610,7 @@ public class StaticDataController(MainContext context, IStaticDataRepositoryRead
         
         var ct = new ContractTemplate(0, request.Name, request.SecurityType, asset, request.MinSize, request.MinSizeMoney,
             request.MaxSize, request.MaxSizeMoney, request.SizeIncrement, request.TickSize, request.TickValue ?? request.TickSize, request.PriceQuotation,
-            settlCcy!, request.PlCalculatorType, baseCcy, quoteCcy, 
+            settlCcy!, request.PlCalculatorType, null, null, 
             df, commissions, tradingSessions, exchange!, broker!, request.DaysInYear, request.Description);
         context.ContractTemplates.Add(ct);
         await context.SaveChangesAsync();

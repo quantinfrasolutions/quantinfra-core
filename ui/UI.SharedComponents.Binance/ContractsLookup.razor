@@ -4,7 +4,8 @@
 @using UI.Interfaces.Binance
 @inject IUiBinanceStaticDataClient Client
 
-<EditableView TItem="BinanceContractListView"
+<EditableView @ref="_view"
+              TItem="BinanceContractListView"
               TFilter="BinanceContractsFilter"
               Filter="@_filter"
               SearchFunc="@Client.GetContracts"
@@ -36,13 +37,14 @@
     <CustomItemButtons Context="contract">
         @if (!contract.ContractId.HasValue)
         {
-            <ImportContractButton Contract="@contract" ShowButton="true"/>
+            <ImportContractButton Contract="@contract" ShowButton="true" OnCompleted="@Refresh"/>
         }
     </CustomItemButtons>
 </EditableView>
 
 @code {
     private BinanceContractsFilter? _filter;
+    private EditableView<BinanceContractListView, BinanceContractsFilter>? _view;
     
     [Parameter, EditorRequired] public BinanceMarket BinanceMarket { get; set; }
     
@@ -52,4 +54,6 @@
         base.OnParametersSet();
         _filter = new() { Market = BinanceMarket };
     }
+
+    private Task Refresh() => _view?.RunSearch() ?? Task.CompletedTask;
 }

@@ -82,7 +82,8 @@ public partial class ApiRepository : IUiStaticDataRepository
     
     public Task<IEnumerable<ContractTemplateListView>> GetContractTemplates(ContractTemplatesFilter? filter = null) =>
         RetrieveCollection("contract templates",
-            () => _wrapper.Client.GetContractTemplatesAsync(filter?.TemplateId, filter?.Name, filter?.Limit, filter?.Offset)
+            () => _wrapper.Client.GetContractTemplatesAsync(filter?.TemplateId, filter?.Name, filter?.BrokerId,
+                filter?.AssetId, filter?.SettlementCurrencyId, filter?.SecurityType?.ToString(), filter?.Limit, filter?.Offset)
         );
 
     public Task CreateContractTemplate(CreateContractTemplateRequest request) =>

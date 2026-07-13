@@ -31,7 +31,7 @@ public class BinanceStaticDataClientTests
         }
         """;
         var handler = new StubHandler(json);
-        var client = new BinanceStaticDataClient(new HttpClient(handler));
+        var client = BinanceStaticDataClient.CreateClient(new HttpClient(handler));
 
         var result = await client.GetExchangeInfoAsync();
 
@@ -75,7 +75,7 @@ public class BinanceStaticDataClientTests
         }] }
         """;
         var handler = new StubHandler(json);
-        var client = new BinanceStaticDataClient(new HttpClient(handler));
+        var client = BinanceStaticDataClient.CreateClient(new HttpClient(handler));
 
         var result = await client.GetExchangeInfoAsync(BinanceMarket.Spot);
 
@@ -100,7 +100,7 @@ public class BinanceStaticDataClientTests
         }] }
         """;
         var handler = new StubHandler(json);
-        var client = new BinanceStaticDataClient(new HttpClient(handler));
+        var client = BinanceStaticDataClient.CreateClient(new HttpClient(handler));
 
         var contracts = await client.GetContractsAsync(BinanceMarket.CoinmFutures);
 
@@ -117,7 +117,7 @@ public class BinanceStaticDataClientTests
     public void FailedResponse_ThrowsTypedExceptionWithResponseBody()
     {
         var handler = new StubHandler("{\"code\":-1003,\"msg\":\"Too many requests\"}", HttpStatusCode.TooManyRequests);
-        var client = new BinanceStaticDataClient(new HttpClient(handler));
+        var client = BinanceStaticDataClient.CreateClient(new HttpClient(handler));
 
         var exception = Assert.ThrowsAsync<BinanceStaticDataException>(
             async () => await client.GetExchangeInfoAsync(BinanceMarket.UsdmFutures));

@@ -7,6 +7,7 @@
 @inject IUiStaticDataRepository Repository
 
 <CreateItemForm TItem="CreateAssetRequest"
+                Item="@Item"
                 CreateFunc="@Repository.CreateAsset"
                 OnCompleted="@OnCompleted"
                 @bind-IsLoading=@_isLoading>
@@ -63,5 +64,6 @@
 
 @code {
     private bool _isLoading;
+    [Parameter] public CreateAssetRequest Item { get; set; } = new();
     [Parameter] public EventCallback OnCompleted { get; set; }
 }

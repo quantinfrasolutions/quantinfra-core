@@ -1,0 +1,325 @@
+@using QuantInfra.Common.Interfaces.Api.Binance
+@using QuantInfra.Common.Interfaces.Api.StaticData
+@using QuantInfra.Connectors.Binance.Common
+@using QuantInfra.Connectors.Binance.StaticDataClient.Models
+@using QuantInfra.Sdk.StaticData
+@using QuantInfra.Sdk.Trading
+@using UI.Interfaces.StaticData
+@using UI.SharedComponents.StaticData.Assets
+@using UI.SharedComponents.StaticData.Contracts
+
+@inject IUiStaticDataRepository Repository
+
+@if (_isLoading)
+{
+    <RadzenStack AlignItems="AlignItems.Center">
+        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Primary" Value="100"
+                                   ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+    </RadzenStack>
+}
+else if (!string.IsNullOrEmpty(_error))
+{
+    <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
+        @_error
+    </RadzenAlert>
+}
+else
+{
+    <RadzenStack Gap="1rem">
+        <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter">
+            Importing <strong>@Contract.BinanceContract.Symbol</strong> from @Contract.BinanceContract.Market.
+            Review every suggested value before creating the contract.
+        </RadzenAlert>
+
+        <RadzenAccordion Multiple="true">
+            <Items>
+                <RadzenAccordionItem Text="@AssetStepTitle("Base currency", _baseAsset)">
+                    @AssetStep(_baseAsset, _baseAssetRequest, BaseAssetCreated)
+                </RadzenAccordionItem>
+                <RadzenAccordionItem Text="@AssetStepTitle("Settlement currency", _settlementAsset)">
+                    @AssetStep(_settlementAsset, _settlementAssetRequest, SettlementAssetCreated)
+                </RadzenAccordionItem>
+                <RadzenAccordionItem Text="Contract template" Disabled="@(!AssetsReady)">
+                    @if (AssetsReady)
+                    {
+                        @if (_templates.Count > 0)
+                        {
+                            <RadzenStack Gap="0.75rem">
+                                <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Info" Variant="Variant.Flat">
+                                    @_templates.Count matching template(s) found. Select one or create a new template.
+                                </RadzenAlert>
+                                <RadzenFormField Text="Contract template" Variant="Variant.Text">
+                                    <RadzenDropDown TValue="int?" Data="@_templates"
+                                                    TextProperty="@nameof(ContractTemplateListView.Name)"
+                                                    ValueProperty="@nameof(ContractTemplateListView.TemplateId)"
+                                                    Value="@_selectedTemplateId" Change="@TemplateSelected"
+                                                    Style="width: 100%" />
+                                </RadzenFormField>
+                                <RadzenCheckBox Value="@_createNewTemplate" Change="@CreateNewTemplateChanged" TValue="bool" />
+                                <RadzenLabel Text="Create a new template instead" />
+                            </RadzenStack>
+                        }
+                        else
+                        {
+                            <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Warning" Variant="Variant.Flat">
+                                No matching contract template exists. Create one with the suggested Binance values below.
+                            </RadzenAlert>
+                        }
+
+                        @if (_createNewTemplate || _templates.Count == 0)
+                        {
+                            <CreateContractTemplateForm Item="@_templateRequest" OnCompleted="@TemplateCreated" />
+                        }
+                    }
+                </RadzenAccordionItem>
+                <RadzenAccordionItem Text="Contract" Disabled="@(!_selectedTemplateId.HasValue)">
+                    @if (_selectedTemplateId.HasValue)
+                    {
+                        <CreateContractForm @key="_selectedTemplateId.Value" Item="@_contractRequest"
+                                            OnCompleted="@OnCompleted" />
+                    }
+                </RadzenAccordionItem>
+            </Items>
+        </RadzenAccordion>
+    </RadzenStack>
+}
+
+@code {
+    private const int BinanceUsdmBrokerId = 101;
+    private const int BinanceUsdmExchangeId = 119;
+
+    private bool _isLoading;
+    private bool _createNewTemplate;
+    private string? _error;
+    private BinanceContractListView? _loadedContract;
+    private AssetView? _baseAsset;
+    private AssetView? _settlementAsset;
+    private List<ContractTemplateListView> _templates = [];
+    private int? _selectedTemplateId;
+    private CreateContractRequest? _contractRequest;
+    private CreateAssetRequest _baseAssetRequest = new();
+    private CreateAssetRequest _settlementAssetRequest = new();
+    private CreateContractTemplateRequest _templateRequest = new();
+
+    [Parameter, EditorRequired] public BinanceContractListView Contract { get; set; } = default!;
+    [Parameter] public EventCallback OnCompleted { get; set; }
+
+    private bool AssetsReady => _baseAsset is not null && _settlementAsset is not null;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        if (Contract is null || ReferenceEquals(Contract, _loadedContract)) return;
+
+        _loadedContract = Contract;
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        _isLoading = true;
+        _error = null;
+        try
+        {
+            EnsureSupportedMarket();
+            InitializeRequests();
+            await LoadAssetsAndTemplates();
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void EnsureSupportedMarket()
+    {
+        if (Contract.BinanceContract.Market != BinanceMarket.UsdmFutures)
+            throw new NotSupportedException($"Importing {Contract.BinanceContract.Market} contracts is not configured yet.");
+    }
+
+    private void InitializeRequests()
+    {
+        var contract = Contract.BinanceContract;
+        var settlementName = SettlementAssetName(contract);
+
+        _baseAssetRequest = NewCurrencyRequest(contract.BaseAsset, contract.BaseAssetPrecision);
+        _settlementAssetRequest = NewCurrencyRequest(settlementName, contract.QuoteAssetPrecision ?? contract.PricePrecision);
+        _templateRequest = BuildTemplateRequest();
+        _selectedTemplateId = null;
+        _contractRequest = null;
+        _createNewTemplate = false;
+    }
+
+    private static CreateAssetRequest NewCurrencyRequest(string name, int? decimals) => new()
+    {
+        Name = name,
+        AssetType = AssetType.Currency,
+        Decimals = decimals ?? 8,
+        Description = $"Imported from Binance ({name})"
+    };
+
+    private async Task LoadAssetsAndTemplates()
+    {
+        var contract = Contract.BinanceContract;
+        var baseTask = FindAsset(contract.BaseAsset);
+        var quoteTask = FindAsset(contract.QuoteAsset);
+        var settlementTask = FindAsset(SettlementAssetName(contract));
+        await Task.WhenAll(baseTask, quoteTask, settlementTask);
+
+        _baseAsset = await baseTask;
+        _settlementAsset = await settlementTask;
+
+        _templates = [];
+        if (!AssetsReady) return;
+
+        _templateRequest = BuildTemplateRequest();
+        _templates = (await Repository.GetContractTemplates(new ContractTemplatesFilter
+        {
+            BrokerId = BinanceUsdmBrokerId,
+            SettlementCurrencyId = _settlementAsset!.AssetId,
+            SecurityType = GetSecurityType(contract),
+            Limit = 200
+        })).ToList();
+
+        SelectTemplate(_templates.Count == 1 ? _templates[0].TemplateId : null);
+        _createNewTemplate = _templates.Count == 0;
+    }
+
+    private async Task<AssetView?> FindAsset(string name) =>
+        (await Repository.GetAssets(new AssetFilter { Name = name, AssetType = AssetType.Currency, Limit = 200 }))
+        .SingleOrDefault(asset => string.Equals(asset.Name, name, StringComparison.OrdinalIgnoreCase));
+
+    private CreateContractTemplateRequest BuildTemplateRequest()
+    {
+        var contract = Contract.BinanceContract;
+        var lotSize = contract.GetFilter("LOT_SIZE");
+        var priceFilter = contract.GetFilter("PRICE_FILTER");
+        var tickSize = priceFilter?.GetDecimal("tickSize") ?? 0.01m;
+
+        return new CreateContractTemplateRequest
+        {
+            Name = $"Binance {contract.BaseAsset}/{contract.QuoteAsset} {GetSecurityType(contract)}",
+            Description = $"Imported from Binance {contract.Market}: {contract.Symbol}",
+            SecurityType = GetSecurityType(contract),
+            PlCalculatorType = PnLCalculatorType.Futures,
+            AssetId = _baseAsset?.AssetId,
+            MinSize = lotSize?.GetDecimal("minQty") ?? 1m,
+            MaxSize = lotSize?.GetDecimal("maxQty") ?? 1_000_000m,
+            SizeIncrement = lotSize?.GetDecimal("stepSize") ?? 1m,
+            TickSize = tickSize,
+            TickValue = tickSize * (contract.ContractSize ?? 1m),
+            PriceQuotation = contract.ContractSize ?? 1m,
+            SettlementCurrencyId = _settlementAsset?.AssetId ?? 0,
+            ExchangeId = BinanceUsdmExchangeId,
+            BrokerId = BinanceUsdmBrokerId,
+            DaysInYear = 365
+        };
+    }
+
+    private CreateContractRequest BuildContractRequest()
+    {
+        var contract = Contract.BinanceContract;
+        var template = _templates.SingleOrDefault(x => x.TemplateId == _selectedTemplateId);
+        return new CreateContractRequest
+        {
+            Ticker = contract.Symbol,
+            TemplateId = _selectedTemplateId!.Value,
+            AssetId = _baseAsset?.AssetId,
+            DefaultDatafeedId = template?.DefaultDatafeedId ?? 0,
+            ExternalContractId = contract.Symbol,
+            Description = $"Imported from Binance {contract.Market}",
+            FirstTradingDate = contract.OnboardDate?.ToString("yyyy-MM-dd"),
+            ExpirationDate = IsPerpetual(contract) ? null : contract.DeliveryDate?.ToString("yyyy-MM-dd")
+        };
+    }
+
+    private void TemplateSelected(object value) =>
+        SelectTemplate(value is int templateId ? templateId : null);
+
+    private void SelectTemplate(int? templateId)
+    {
+        _selectedTemplateId = templateId;
+        _contractRequest = templateId.HasValue ? BuildContractRequest() : null;
+    }
+
+    private void CreateNewTemplateChanged(bool value)
+    {
+        _createNewTemplate = value;
+        if (value) SelectTemplate(null);
+    }
+
+    private async Task BaseAssetCreated() => await ReloadAfterAssetCreated();
+    private async Task SettlementAssetCreated() => await ReloadAfterAssetCreated();
+
+    private async Task ReloadAfterAssetCreated()
+    {
+        _isLoading = true;
+        try
+        {
+            await LoadAssetsAndTemplates();
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task TemplateCreated()
+    {
+        _templates = (await Repository.GetContractTemplates(new ContractTemplatesFilter
+        {
+            Name = _templateRequest.Name,
+            BrokerId = BinanceUsdmBrokerId,
+            SettlementCurrencyId = _settlementAsset!.AssetId,
+            SecurityType = _templateRequest.SecurityType,
+            Limit = 200
+        })).ToList();
+
+        SelectTemplate(_templates.SingleOrDefault()?.TemplateId);
+        _createNewTemplate = false;
+    }
+
+    private RenderFragment AssetStep(AssetView? asset, CreateAssetRequest request, Func<Task> onCreated) => builder =>
+    {
+        if (asset is not null)
+        {
+            builder.OpenComponent<RadzenAlert>(0);
+            builder.AddAttribute(1, "AllowClose", false);
+            builder.AddAttribute(2, "AlertStyle", AlertStyle.Success);
+            builder.AddAttribute(3, "Variant", Variant.Flat);
+            builder.AddAttribute(4, "ChildContent", (RenderFragment)(content =>
+                content.AddContent(0, $"Found internal asset: {asset.Name} (ID {asset.AssetId}).")));
+            builder.CloseComponent();
+        }
+        else
+        {
+            builder.OpenComponent<RadzenAlert>(0);
+            builder.AddAttribute(1, "AllowClose", false);
+            builder.AddAttribute(2, "AlertStyle", AlertStyle.Warning);
+            builder.AddAttribute(3, "Variant", Variant.Flat);
+            builder.AddAttribute(4, "ChildContent", (RenderFragment)(content =>
+                content.AddContent(0, $"No internal currency named {request.Name} was found. Create it below.")));
+            builder.CloseComponent();
+            builder.OpenComponent<CreateAssetForm>(5);
+            builder.AddAttribute(6, "Item", request);
+            builder.AddAttribute(7, "OnCompleted", EventCallback.Factory.Create(this, onCreated));
+            builder.CloseComponent();
+        }
+    };
+
+    private static string AssetStepTitle(string title, AssetView? asset) =>
+        asset is null ? $"{title} — create" : $"{title} — {asset.Name} ({asset.AssetId})";
+
+    private static string SettlementAssetName(BinanceContract contract) =>
+        contract.SettlementAsset ?? contract.QuoteAsset;
+
+    private static SecurityType GetSecurityType(BinanceContract contract) =>
+        IsPerpetual(contract) ? SecurityType.CFD : SecurityType.Futures;
+
+    private static bool IsPerpetual(BinanceContract contract) =>
+        string.Equals(contract.ContractType, "PERPETUAL", StringComparison.OrdinalIgnoreCase);
+}

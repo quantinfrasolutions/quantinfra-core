@@ -9,6 +9,7 @@
 @inject IUiStaticDataRepository Repository
 
 <CreateItemForm TItem="CreateContractRequest"
+                Item="@Item"
                 CreateFunc="@Repository.CreateContract"
                 OnCompleted="@OnCompleted">
     <Fields Context="request">
@@ -99,5 +100,6 @@
 </CreateItemForm>
 
 @code {
+    [Parameter] public CreateContractRequest Item { get; set; } = new();
     [Parameter] public EventCallback OnCompleted { get; set; }
 }

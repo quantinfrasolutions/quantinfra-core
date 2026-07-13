@@ -1802,15 +1802,15 @@ namespace QuantInfra.Api.Client
 
         /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<ContractTemplateListView>> GetContractTemplatesAsync(int? templateId, string? name, int? limit, int? offset)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<ContractTemplateListView>> GetContractTemplatesAsync(int? templateId, string? name, int? brokerId, int? baseCurrencyId, int? quoteCurrencyId, string? securityType, int? limit, int? offset)
         {
-            return GetContractTemplatesAsync(templateId, name, limit, offset, System.Threading.CancellationToken.None);
+            return GetContractTemplatesAsync(templateId, name, brokerId, baseCurrencyId, quoteCurrencyId, securityType, limit, offset, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<ContractTemplateListView>> GetContractTemplatesAsync(int? templateId, string? name, int? limit, int? offset, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<ContractTemplateListView>> GetContractTemplatesAsync(int? templateId, string? name, int? brokerId, int? baseCurrencyId, int? quoteCurrencyId, string? securityType, int? limit, int? offset, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -1833,6 +1833,22 @@ namespace QuantInfra.Api.Client
                     if (name != null)
                     {
                         urlBuilder_.Append(System.Uri.EscapeDataString("Name")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(name, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (brokerId != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("BrokerId")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(brokerId, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (baseCurrencyId != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("BaseCurrencyId")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(baseCurrencyId, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (quoteCurrencyId != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("QuoteCurrencyId")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(quoteCurrencyId, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (securityType != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("SecurityType")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(securityType, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
                     }
                     if (limit != null)
                     {
