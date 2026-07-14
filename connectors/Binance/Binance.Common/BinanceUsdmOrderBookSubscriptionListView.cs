@@ -11,4 +11,5 @@ public class BinanceUsdmOrderBookSubscriptionListView : BinanceUsdmOrderBookSubs
     }
     
     public string Ticker { get; init; }
+    public bool IsOk { get; set; }
 }

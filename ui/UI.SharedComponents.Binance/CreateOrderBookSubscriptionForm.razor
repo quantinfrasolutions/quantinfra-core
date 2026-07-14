@@ -1,0 +1,84 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using QuantInfra.Connectors.Binance.Common
+@using QuantInfra.Sdk.MarketData
+@using UI.Interfaces.Binance
+@using UI.SharedComponents.StaticData.Contracts
+@using UI.SharedComponents.StaticData.Streams
+
+@inject IUiBinanceMarketDataClient Client
+
+<CreateItemForm TItem="BinanceUsdmOrderBookSubscriptionRequest"
+                CreateFunc="@(req => Client.CreateOrderBookSubscriptionAsync(Market, _clientName, req))"
+                OnCompleted="@OnCompleted"
+                @bind-IsLoading=@_isLoading>
+    <Fields Context="request">
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Client" Variant="Variant.Text">
+                    <ChildContent>
+                        <BinanceObClientSelector @bind-Value=@_clientName Name="Name" Market="@Market" Disabled=@_isLoading />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenRequiredValidator Component="Name" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Symbol" Variant="Variant.Text">
+                    <ChildContent>
+                        <BinanceContractsSelector Market="@Market" @bind-Value="@request.Symbol" Disabled="@_isLoading" Required="true" />
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.Symbol)" class="rz-message rz-messages-error" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Frequency" Variant="Variant.Text">
+                    <ChildContent>
+                        <RadzenNumeric TValue="int" @bind-Value="@request.Frequency" Name="Frequency" Disabled="@_isLoading" />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenRequiredValidator Component="Frequency" Text="Required" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Levels" Variant="Variant.Text">
+                    <ChildContent>
+                        <RadzenNumeric TValue="int" @bind-Value="@request.Levels" Name="Levels" Disabled="@_isLoading" />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenRequiredValidator Component="Levels" Text="Required" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Contract" Variant="Variant.Text">
+                    <ChildContent>
+                        <ContractsSelector TValue="int" @bind-Value=@request.ContractId Disabled=@_isLoading Required="false"/>
+                    </ChildContent>
+                    <Helper>
+                        <ValidationMessage For="@(() => request.ContractId)" class="rz-message rz-messages-error" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+    </Fields>
+</CreateItemForm>
+
+@code {
+    private bool _isLoading;
+    private string _clientName;
+    
+    [Parameter, EditorRequired] public BinanceMarket Market { get; set; }
+    [Parameter] public EventCallback OnCompleted { get; set; }
+}

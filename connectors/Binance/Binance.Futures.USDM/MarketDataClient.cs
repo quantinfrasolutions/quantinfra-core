@@ -218,7 +218,7 @@ public class MarketDataClient : GenericWebSocketClient.Client,
         if (_subscriptions.Count > 0 || _obSubscriptions.Count > 0)
         {
             var streams = _subscriptions.Values.Select(s => GetStreamName(s.Symbol, s.SubscriptionType))
-                .Union(_obSubscriptions.Values.Select(s => GetOBStramName(s.Symbol, s.Frequency)));
+                .Union(_obSubscriptions.Values.Select(s => GetOBStreamName(s.Symbol, s.Frequency)));
             uriBuilder.Query = $"?streams={string.Join('/', streams)}";
         }
 
@@ -328,7 +328,10 @@ public class MarketDataClient : GenericWebSocketClient.Client,
         if (!requestId.HasValue)
             throw new InvalidOperationException("Subscription acknowledgement has no request ID");
 
-        _subscriptionsManager.ConfirmSubscription(requestId.Value);
+        if (_subscriptionsManager.Subscriptions.ContainsKey(requestId.Value))
+            _subscriptionsManager.ConfirmSubscription(requestId.Value);
+        if (_obSubscriptionsManager.Subscriptions.ContainsKey(requestId.Value))
+            _obSubscriptionsManager.ConfirmSubscription(requestId.Value);
     }
     
     private readonly Dictionary<int, OrderBook> _orderbooks = new();
@@ -440,7 +443,7 @@ public class MarketDataClient : GenericWebSocketClient.Client,
     private string GetStreamName(string symbol, SubscriptionType type) =>
         $"{symbol.ToLower()}@{type.GetBinanceSubscriptionType()}";
     
-    private string GetOBStramName(string symbol, int frequency)
+    private string GetOBStreamName(string symbol, int frequency)
     {
         var sb = new StringBuilder();
         sb.Append($"{symbol.ToLower()}@depth");
@@ -449,9 +452,22 @@ public class MarketDataClient : GenericWebSocketClient.Client,
     }
 
     public IReadOnlyCollection<BinanceUsdmMarketDataSubscription> GetActiveSubscriptions() => _subscriptionsManager.Subscriptions.Values.ToList();
-    public Task Subscribe(BinanceUsdmOrderBookSubscriptionRequest request)
+    public async Task Subscribe(BinanceUsdmOrderBookSubscriptionRequest request)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var subscription = await _obSubscriptionsManager.Subscribe(request);
+            _obContractsMapping.Add(subscription.Symbol, request.ContractId);
+            _obSubscriptions.Add(subscription.SubscriptionId, subscription);
+            await _obRepository.AddSubscriptionAsync(subscription);
+            _logger.LogInformation($"Successfully subscribed: {subscription}");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to create order book subscription");
+            throw;
+        }
+        
     }
 
     public async Task Subscribe(BinanceUsdmMarketDataSubscriptionRequest request)
@@ -485,20 +501,24 @@ public class MarketDataClient : GenericWebSocketClient.Client,
     {
         if (WebSocket.State != WebSocketState.Open) throw new Exception("Gateway is not connected");
         
-        _logger.LogInformation($"Subscribe: {subscription}");
-        throw new NotImplementedException();
-        // var streamName = GetStreamName(subscription.Symbol, subscription.SubscriptionType);
-        // var msg = SubscribeMsg.CreateForSingleStream(streamName, subscription.SubscriptionId);
-        // return SendMessageAsync(msg);
+        _logger.LogInformation($"Order book subscribe: {subscription}");
+        var streamName = GetOBStreamName(subscription.Symbol, subscription.Frequency);
+        var msg = SubscribeMsg.CreateForSingleStream(streamName, subscription.SubscriptionId);
+        return SendMessageAsync(msg);
     }
 
-    IReadOnlyCollection<BinanceUsdmOrderBookSubscription> QuantInfra.Common.MarketData.Infrastructure.IMarketDataClient<BinanceUsdmOrderBookSubscriptionRequest, BinanceUsdmOrderBookSubscription>.GetActiveSubscriptions()
-    {
-        throw new NotImplementedException();
-    }
+    IReadOnlyCollection<BinanceUsdmOrderBookSubscription> QuantInfra.Common.MarketData.Infrastructure.IMarketDataClient<BinanceUsdmOrderBookSubscriptionRequest, BinanceUsdmOrderBookSubscription>.GetActiveSubscriptions() =>
+        _obSubscriptionsManager.Subscriptions.Values.ToList();
 
     public Task Unsubscribe(int requestId)
     {
-        throw new NotImplementedException();
+        // For now, unsubscribing requires restart of the client
+        if (_subscriptionsManager.Subscriptions.ContainsKey(requestId))
+            return _repository.RemoveSubscriptionAsync(requestId);
+        
+        if (_obSubscriptionsManager.Subscriptions.ContainsKey(requestId))
+            return _obRepository.RemoveSubscriptionAsync(requestId);
+        
+        return Task.CompletedTask;
     }
 }

@@ -11,4 +11,7 @@ public interface IUiBinanceMarketDataClient
     Task CreateSubscriptionAsync(BinanceMarket market, string clientName, BinanceUsdmMarketDataSubscriptionRequest request);
     Task DeleteSubscriptionAsync(BinanceMarket market, string clientName, int subscriptionId);
     
+    Task<IEnumerable<BinanceUsdmOrderBookSubscriptionListView>> GetActiveOrderBookSubscriptionsAsync(EmptyFilter filter);
+    Task CreateOrderBookSubscriptionAsync(BinanceMarket market, string clientName, BinanceUsdmOrderBookSubscriptionRequest request);
+    Task DeleteOrderBookSubscriptionAsync(BinanceMarket market, string clientName, int subscriptionId);
 }

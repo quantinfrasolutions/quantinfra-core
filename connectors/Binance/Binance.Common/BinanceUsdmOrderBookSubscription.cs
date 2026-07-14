@@ -20,11 +20,11 @@ public class BinanceUsdmOrderBookSubscription : IOrderBookSubscription
         Levels = levels;
     }
 
-    public int SubscriptionId { get; }
-    public int ContractId { get; }
-    public string Symbol { get; }
-    public int Frequency { get; }
-    public int Levels { get; }
-    public string ClientName { get; }
+    public int SubscriptionId { get; init; }
+    public int ContractId { get; init; }
+    public string Symbol { get; init; }
+    public int Frequency { get; init; }
+    public int Levels { get; init; }
+    public string ClientName { get; init; }
     public Instant? LastUpdate { get; set; }
 }

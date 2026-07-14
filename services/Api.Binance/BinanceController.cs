@@ -153,8 +153,87 @@ public class BinanceController(
     [Produces("application/json")]
     public async Task<IEnumerable<BinanceUsdmOrderBookSubscriptionListView>> GetBinanceUsdmOrderBookSubscriptions()
     {
-        throw new NotImplementedException();
+        var databaseSubscriptions = (
+            await context
+                .BinanceUsdmOrderBookSubscriptions
+                .Select(s => new BinanceUsdmOrderBookSubscriptionListView(s,
+                    context.Contracts.SingleOrDefault(x => x.ContractId == s.ContractId)))
+                .AsNoTracking()
+                .ToListAsync()
+        ).ToList();
+
+        var clients = databaseSubscriptions.Select(x => x.ClientName).Distinct().ToList();
+        
+        var inMemorySubscriptions = clients.SelectMany(c =>
+        {
+            var client = usdmOBRegistry.GetMarketDataClient(c);
+            if (client is null)
+                return Array.Empty<BinanceUsdmOrderBookSubscription>();
+
+            return client.GetActiveSubscriptions();
+        }).ToDictionary(s => s.SubscriptionId);
+
+        var res = databaseSubscriptions.Select(s =>
+        {
+            if (inMemorySubscriptions.TryGetValue(s.SubscriptionId, out var subscription))
+            {
+                s.IsOk = true;
+                s.LastUpdate = subscription.LastUpdate;
+            }
+            else s.IsOk = false;
+
+            return s;
+        });
+        return res;
     }
+    
+    [HttpPost, Route("usdm/ob/subscriptions/{clientName}")]
+    [EndpointName(nameof(CreateBinanceUsdmOrderBookSubscription))]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CreateBinanceUsdmOrderBookSubscription([FromRoute] string clientName, [FromBody] BinanceUsdmOrderBookSubscriptionRequest request)
+    {
+        var client = usdmOBRegistry.GetMarketDataClient(clientName);
+        if (client is null) return NotFound($"Client {clientName} not found or not started");
+        
+        if (string.IsNullOrEmpty(request.Symbol)) ModelState.AddModelError(nameof(request.Symbol), "Symbol is required");
+        else
+        {
+            var symbols = (await GetBinanceContracts(new() { Market = BinanceMarket.UsdmFutures, Symbol = request.Symbol }))
+                .ToList();
+            if (!symbols.Any(s =>
+                    s.BinanceContract.Symbol.Equals(request.Symbol, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                ModelState.AddModelError(nameof(request.Symbol), "Symbol not found");
+            }
+        }
+
+        if (request.ContractId == 0) ModelState.AddModelError(nameof(request.ContractId), $"Contract is required");
+        else
+        {
+            var contract = await context.Contracts.SingleOrDefaultAsync(x => x.ContractId == request.ContractId);
+            if (contract is null) ModelState.AddModelError(nameof(request.ContractId), $"Contract {request.ContractId} not found");
+        }
+
+        if (request.Frequency != 100 && request.Frequency != 250 && request.Frequency != 500)
+            ModelState.AddModelError(nameof(request.Frequency), $"Supported frequencies are 100, 250, and 500 ms");
+        
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
+
+        await client.Subscribe(request);
+        return Ok();
+    }
+    
+    [HttpDelete, Route("usdm/ob/subscriptions/{clientName}/{subscriptionId:int}")]
+    [EndpointName(nameof(DeleteBinanceUsdmOrderBookSubscription))]
+    public async Task<IActionResult> DeleteBinanceUsdmOrderBookSubscription([FromRoute] string clientName, [FromRoute] int subscriptionId)
+    {
+        var client = usdmOBRegistry.GetMarketDataClient(clientName);
+        if (client is null) return NotFound($"Client {clientName} not found or not started");
+
+        await client.Unsubscribe(subscriptionId);
+        return Ok();
+    }
+    
 
     private static int GetExchangeId(BinanceMarket market) => market switch
     {

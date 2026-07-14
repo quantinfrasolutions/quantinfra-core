@@ -1,0 +1,82 @@
+@using QuantInfra.Connectors.Binance.Common
+@using UI.Interfaces
+@using UI.Interfaces.Binance
+
+@inject IUiBinanceMarketDataClient Repository
+
+<EditableView TItem="BinanceUsdmOrderBookSubscriptionListView"
+              TFilter="EmptyFilter"
+              Filter="@new()"
+              SearchButtonText="Refresh"
+              EmptyText="No active subscriptions"
+              SearchFunc=@Repository.GetActiveOrderBookSubscriptionsAsync
+              RunSearchImmediately="true"
+              ButtonsColumnWidth="54px"
+              @ref="_view">
+    <CreateButton>
+        <CreateOrderBookSubscriptionButton ShowButton="true" Market="BinanceMarket.UsdmFutures" OnCompleted="@(() => _view.RunSearch())" />
+    </CreateButton>
+    <CustomItemButtons Context="subscription">
+        <RadzenButton ButtonStyle="ButtonStyle.Danger" Variant="Variant.Text" Icon="close" Click="@(() => DeleteSubscription(subscription))"
+                      Disabled="@(_isLoading && subscription.SubscriptionId != _deletedSubscriptionId)"
+                      IsBusy="@(_isLoading && subscription.SubscriptionId == _deletedSubscriptionId)"/>
+    </CustomItemButtons>
+    <Columns>
+        <RadzenDataGridColumn TItem="BinanceUsdmOrderBookSubscriptionListView" 
+                              Title="Subscription ID"
+                              Property="@nameof(BinanceUsdmOrderBookSubscriptionListView.SubscriptionId)"
+                              Width="120px"/>
+        <RadzenDataGridColumn TItem="BinanceUsdmOrderBookSubscriptionListView" 
+                              Title="Symbol"
+                              Property="@nameof(BinanceUsdmOrderBookSubscriptionListView.Symbol)" 
+                              Width="120px"/>
+        <RadzenDataGridColumn TItem="BinanceUsdmOrderBookSubscriptionListView" 
+                              Title="ContractId"
+                              Property="@nameof(BinanceUsdmOrderBookSubscriptionListView.ContractId)"
+                              Width="120px"/>
+        <RadzenDataGridColumn TItem="BinanceUsdmOrderBookSubscriptionListView" 
+                              Title="Ticker"
+                              Property="@nameof(BinanceUsdmOrderBookSubscriptionListView.Ticker)"
+                              Width="160px"/>
+        <RadzenDataGridColumn TItem="BinanceUsdmOrderBookSubscriptionListView" 
+                              Title="Client"
+                              Property="@nameof(BinanceUsdmOrderBookSubscriptionListView.ClientName)"
+                              Width="160px"/>
+        <RadzenDataGridColumn TItem="BinanceUsdmOrderBookSubscriptionListView" 
+                              Title="Freq"
+                              Property="@nameof(BinanceUsdmOrderBookSubscriptionListView.Frequency)"
+                              Width="100px"/>
+        <RadzenDataGridColumn TItem="BinanceUsdmOrderBookSubscriptionListView" 
+                              Title="Levels"
+                              Property="@nameof(BinanceUsdmOrderBookSubscriptionListView.Levels)"
+                              Width="100px"/>
+        <RadzenDataGridColumn TItem="BinanceUsdmOrderBookSubscriptionListView" 
+                              Title="Last update"
+                              Property="@nameof(BinanceUsdmOrderBookSubscriptionListView.LastUpdate)"
+                              Width="160px"/>
+    </Columns>
+</EditableView>
+
+@code {
+    private EditableView<BinanceUsdmOrderBookSubscriptionListView, EmptyFilter> _view;
+    private bool _isLoading;
+    private int _deletedSubscriptionId;
+
+    private async Task DeleteSubscription(BinanceUsdmOrderBookSubscriptionListView subscription)
+    {
+        try
+        {
+            _isLoading = true;
+            _deletedSubscriptionId = subscription.SubscriptionId;
+            await Repository.DeleteOrderBookSubscriptionAsync(BinanceMarket.UsdmFutures, subscription.ClientName, subscription.SubscriptionId);
+            await (_view?.RunSearch() ?? Task.CompletedTask);
+        }
+        catch { }
+        finally
+        {
+            _isLoading = true;
+            _deletedSubscriptionId = 0;
+        }
+    }
+
+}

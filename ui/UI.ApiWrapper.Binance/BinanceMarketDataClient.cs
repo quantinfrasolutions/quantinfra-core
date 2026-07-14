@@ -26,4 +26,19 @@ public partial class ApiRepository : IUiBinanceMarketDataClient
             "Subscription deleted", "Failed to delete subscription",
             () => _wrapper.Client.DeleteBinanceUsdmMarketDataSubscriptionAsync(clientName, subscriptionId)
         );
+
+    public Task<IEnumerable<BinanceUsdmOrderBookSubscriptionListView>> GetActiveOrderBookSubscriptionsAsync(EmptyFilter filter) =>
+        RetrieveCollection("order book subscriptions", () => _wrapper.Client.GetBinanceUsdmOrderBookSubscriptionsAsync());
+
+    public Task CreateOrderBookSubscriptionAsync(BinanceMarket market, string clientName, BinanceUsdmOrderBookSubscriptionRequest request) =>
+        Call(
+            "Subscription created", "Failed to create subscription",
+            () => _wrapper.Client.CreateBinanceUsdmOrderBookSubscriptionAsync(clientName, request) // TODO: market
+        );
+
+    public Task DeleteOrderBookSubscriptionAsync(BinanceMarket market, string clientName, int subscriptionId) =>
+        Call(
+            "Subscription deleted", "Failed to delete subscription",
+            () => _wrapper.Client.DeleteBinanceUsdmOrderBookSubscriptionAsync(clientName, subscriptionId)
+        );
 }

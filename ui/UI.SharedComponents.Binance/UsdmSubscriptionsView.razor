@@ -11,14 +11,20 @@
               EmptyText="No active subscriptions"
               SearchFunc=@Repository.GetActiveSubscriptionsAsync
               RunSearchImmediately="true"
+              ButtonsColumnWidth="54px"
               @ref="_view">
     <CreateButton>
         <CreateSubscriptionButton ShowButton="true" Market="BinanceMarket.UsdmFutures" OnCompleted="@(() => _view.RunSearch())" />
     </CreateButton>
+    <CustomItemButtons Context="subscription">
+        <RadzenButton ButtonStyle="ButtonStyle.Danger" Variant="Variant.Text" Icon="close" Click="@(() => DeleteSubscription(subscription))"
+                      Disabled="@(_isLoading && subscription.Data?.SubscriptionId != _deletedSubscriptionId)"
+                      IsBusy="@(_isLoading && subscription.Data?.SubscriptionId == _deletedSubscriptionId)"/>
+    </CustomItemButtons>
     <Columns>
         <RadzenDataGridColumn TItem="BinanceUsdmMarketDataSubscriptionView"
                               Property="Data.Id"
-                              Title="Request ID"
+                              Title="Subscription ID"
                               Width="270px">
             <Template Context="data">
                 @if (data.Data == null && data.AltData == null) // child subscription, case: exists in memory, not in db
@@ -64,4 +70,24 @@
 
 @code {
     private EditableView<BinanceUsdmMarketDataSubscriptionView, EmptyFilter> _view;
+    private bool _isLoading;
+    private int _deletedSubscriptionId;
+    
+    private async Task DeleteSubscription(BinanceUsdmMarketDataSubscriptionView subscription)
+    {
+        try
+        {
+            _isLoading = true;
+            _deletedSubscriptionId = subscription.Data?.SubscriptionId ?? subscription.AltData.Data.SubscriptionId;
+            await Repository.DeleteSubscriptionAsync(BinanceMarket.UsdmFutures, 
+                subscription.Data?.ClientName ?? subscription.AltData.Data.ClientName, _deletedSubscriptionId);
+            await (_view?.RunSearch() ?? Task.CompletedTask);
+        }
+        catch { }
+        finally
+        {
+            _isLoading = true;
+            _deletedSubscriptionId = 0;
+        }
+    }
 }
