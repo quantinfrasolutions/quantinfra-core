@@ -1,6 +1,4 @@
-﻿using Binance.Common;
-
-namespace QuantInfra.Connectors.Binance.Common;
+﻿namespace QuantInfra.Connectors.Binance.Common;
 
 public interface IBinanceActiveSubscriptionsRepository :
     QuantInfra.Sdk.MarketData.IActiveSubscriptionsRepository<BinanceUsdmMarketDataSubscriptionRequest, BinanceUsdmMarketDataSubscription, BinanceUsdmMarketDataSubscriptionListView>

@@ -11,6 +11,7 @@
                 AllowFiltering=@(!PreloadData)
                 FilterPlaceholder=@FilterPlaceholder
                 LoadData="Callback"
+                Name="@Name"
                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
     <Template>
         @ValueTemplate((TItem)context)
@@ -70,6 +71,7 @@
     [Parameter] public string FilterPlaceholder { get; set; } = "Start typing";
     [Parameter] public bool PreloadData { get; set; }
     [Parameter] public bool IsRequired { get; set; }
+    [Parameter] public string? Name { get; set; }
     
     public TItem? Item
     {

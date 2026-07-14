@@ -96,5 +96,6 @@ public static class Extensions
     public static IServiceCollection AddBinanceApiClient(this IServiceCollection sc) => sc
         .AddScoped<ApiRepository>()
         .AddScoped<IUiBinanceStaticDataClient>(sp => sp.GetRequiredService<ApiRepository>())
+        .AddScoped<IUiBinanceMarketDataClient>(sp => sp.GetRequiredService<ApiRepository>())
         ;
 }

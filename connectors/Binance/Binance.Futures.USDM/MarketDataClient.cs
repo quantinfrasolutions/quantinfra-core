@@ -2,7 +2,6 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Binance.Common;
 using Binance.Futures.USDM;
 using Common.Metrics;
 using Disruptor.Dsl;
@@ -37,7 +36,8 @@ namespace QuantInfra.Connectors.Binance.Futures.Usdm;
 public class MarketDataClient : GenericWebSocketClient.Client,
                                 IHostedService, 
                                 IMarketDataClient<BinanceUsdmMarketDataSubscriptionRequest, BinanceUsdmMarketDataSubscription>,
-                                IMarketDataClient<BinanceUsdmOrderBookSubscriptionRequest, BinanceUsdmOrderBookSubscription>, Disruptor.IEventHandler<IncomingDisruptorMessage>,
+                                IMarketDataClient<BinanceUsdmOrderBookSubscriptionRequest, BinanceUsdmOrderBookSubscription>, 
+                                Disruptor.IEventHandler<IncomingDisruptorMessage>,
                                 IMarketDataSnapshotsProvider
 {
     private readonly MarketDataClientConfig _config;
@@ -115,7 +115,7 @@ public class MarketDataClient : GenericWebSocketClient.Client,
         // }
 
         _subscriptionsManager = new(
-            (request, reqId) => new BinanceUsdmMarketDataSubscription(reqId, request.StreamId, request.SubscriptionType, request.Symbol),
+            (request, reqId) => new BinanceUsdmMarketDataSubscription(_config.ClientName, reqId, request.StreamId, request.SubscriptionType, request.Symbol),
             SendSubscribeMessage
         );
         
@@ -249,11 +249,18 @@ public class MarketDataClient : GenericWebSocketClient.Client,
 
     protected override void ProcessMessage(IngressMessage message)
     {
-        var kind = BinanceMessageRouter.Classify(message.Buffer, out var svc);
+        var kind = BinanceMessageRouter.Classify(message.AsSpan(), out var svc);
         switch (kind)
         {
             case BinanceMsgKind.ServiceAck:
-                // TODO: confirm subscription
+                {
+                    if (!svc.Id.HasValue)
+                        throw new InvalidOperationException("Subscription acknowledgement has no request ID");
+
+                    using var scope = _disruptor.PublishEvent();
+                    var evt = scope.Event();
+                    evt.SetSubscriptionConfirmation(svc.Id.Value);
+                }
                 return;
             case BinanceMsgKind.MarketData:
                 var json = new ReadOnlySpan<byte>(message.Buffer, 0, message.Length);
@@ -291,6 +298,10 @@ public class MarketDataClient : GenericWebSocketClient.Client,
         
         switch (data.Type)
         {
+            case IncomingMessageType.ServiceAck:
+                ProcessServiceAck(data.ConfirmedSubscriptionId);
+                break;
+
             case IncomingMessageType.Kline:
                 ProcessKLine(data.Kline1m!.Value, data.ReceivedAt, data.SwReceivedAt, swStartProcessing);
                 break;
@@ -312,10 +323,12 @@ public class MarketDataClient : GenericWebSocketClient.Client,
         }
     }
 
-    private void ProcessServiceMessage(ServiceMessage? msg)
+    private void ProcessServiceAck(int? requestId)
     {
-        if (msg == null) throw new InvalidOperationException("Msg is null");
-        _subscriptionsManager.ConfirmSubscription(msg.RequestId);
+        if (!requestId.HasValue)
+            throw new InvalidOperationException("Subscription acknowledgement has no request ID");
+
+        _subscriptionsManager.ConfirmSubscription(requestId.Value);
     }
     
     private readonly Dictionary<int, OrderBook> _orderbooks = new();

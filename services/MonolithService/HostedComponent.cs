@@ -29,6 +29,8 @@ public class HostedComponent : IComponentExceptionHandler
     public string Name { get; }
     public ComponentStatus Status { get; private set; } = ComponentStatus.Stopped;
     public Exception? Exception { get; private set; }
+    
+    internal IServiceProvider? GetServiceProvider() => _serviceProvider;
 
     private Task? _startupExceptionTask = null;
     private ManualResetEventSlim? _startupExceptionEvent = null;

@@ -15,6 +15,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\common\Common.Interfaces.Api\Common.Interfaces.Api.csproj" />
+      <ProjectReference Include="..\..\common\Common.MarketData.Infrastructure\Common.MarketData.Infrastructure.csproj" />
       <ProjectReference Include="..\..\db\Databases.Main\Databases.Main.csproj" />
     </ItemGroup>
 

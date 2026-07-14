@@ -13,7 +13,7 @@ public class RequestsManager<TId> where TId : struct
     
     public IReadOnlyDictionary<TId, AbstractRequest<TId>> Requests => _requests;
     
-    public Task<TResult> SendRequest<TResult>(Func<TId, Task> requestMethod, int timeoutMilliseconds = 10000,
+    public Task<TResult> SendRequest<TResult>(Func<TId, Task> requestMethod, int timeoutMilliseconds = 100000000,
         Func<TId, Task>? cleanupMethod = null, TId? id = null)
     {
         var (reqId, request) = CreateRequest<TResult>(id);

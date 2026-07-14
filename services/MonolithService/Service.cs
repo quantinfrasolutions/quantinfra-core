@@ -32,11 +32,13 @@ using Microsoft.EntityFrameworkCore;
 using QuantInfra.Common.EventSourcing;
 using QuantInfra.Common.Interfaces.Api.Infrastructure;
 using QuantInfra.Common.MarketData.Abstractions;
+using QuantInfra.Connectors.Binance.Common;
 using QuantInfra.Connectors.Binance.Futures.Usdm;
 using QuantInfra.Databases.MarketDataHistory;
 using QuantInfra.Services.ExecutionCore;
 using QuantInfra.Services.MarketData;
 using QuantInfra.Services.MonolithService.AccountsService;
+using QuantInfra.Services.MonolithService.MDS;
 using IncomingDisruptorMessage = QuantInfra.Common.ServiceBase.IncomingDisruptorMessage;
 using MarketDataClient = QuantInfra.Services.MonolithService.MDS.MarketDataClient;
 
@@ -134,26 +136,39 @@ public class Service : IHostedService, IHostedComponentsStatusProvider
             _components.Add(mds.Name, mds);
         }
 
+        HostedComponent? usdmMd = null;
         if (_config.EnableBinanceUsdmMarketDataService)
         {
-            var usdmMd = new HostedComponent(UsdmFuturesName, _logger,
+             usdmMd = new HostedComponent(UsdmFuturesName, _logger,
                 component => SetupBinanceFuturesUsdmMarketDataClient(component, UsdmFuturesName),
                 sp => sp.GetRequiredService<IEnumerable<IHostedService>>()
             );
             _components.Add(usdmMd.Name, usdmMd);
         }
-        
+
+        HostedComponent? usdmOb = null;
         if (_config.EnableBinanceUsdmPublicMarketDataService)
         {
-            var usdmMd = new HostedComponent(UsdmFuturesOrderBooksName, _logger,
+            usdmOb = new HostedComponent(UsdmFuturesOrderBooksName, _logger,
                 component => SetupBinanceFuturesUsdmMarketDataClient(component, UsdmFuturesOrderBooksName),
                 sp => sp.GetRequiredService<IEnumerable<IHostedService>>()
             );
-            _components.Add(usdmMd.Name, usdmMd);
+            _components.Add(usdmOb.Name, usdmOb);
         }
 
         await Task.WhenAll(_components.Values.Select(c => c.StartAsync(cancellationToken)));
         _components.Add(accSvcComponent.Name, accSvcComponent);
+
+        if (usdmMd is not null)
+        {
+            var registry = _serviceProvider.GetRequiredService<MarketDataClientsRegistry<BinanceUsdmMarketDataSubscriptionRequest, BinanceUsdmMarketDataSubscription>>();
+            registry.AddClient(usdmMd.Name, () => _components[usdmMd.Name].GetServiceProvider()?.GetRequiredService<QuantInfra.Connectors.Binance.Futures.Usdm.MarketDataClient>());
+        }
+        if (usdmOb is not null)
+        {
+            var registry = _serviceProvider.GetRequiredService<MarketDataClientsRegistry<BinanceUsdmOrderBookSubscriptionRequest, BinanceUsdmOrderBookSubscription>>();
+            registry.AddClient(usdmOb.Name, () => _components[usdmOb.Name].GetServiceProvider()?.GetRequiredService<QuantInfra.Connectors.Binance.Futures.Usdm.MarketDataClient>());
+        }
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)

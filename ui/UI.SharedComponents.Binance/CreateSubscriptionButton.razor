@@ -1,0 +1,15 @@
+@using QuantInfra.Connectors.Binance.Common
+<CreateItemButton TForm="CreateSubscriptionForm"
+                  ShowButton="@ShowButton"
+                  DialogTitle="Create asset"
+                  OnCompleted="@OnCompleted"
+                  FormParams="@(new()
+                              {
+                                  { "Market", Market },
+                              })"/>
+
+@code {
+    [Parameter] public bool ShowButton { get; set; }
+    [Parameter] public EventCallback OnCompleted { get; set; }
+    [Parameter, EditorRequired] public BinanceMarket Market { get; set; }
+}

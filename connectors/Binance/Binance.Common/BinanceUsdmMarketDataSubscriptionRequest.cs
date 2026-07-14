@@ -1,6 +1,6 @@
 using QuantInfra.Sdk.MarketData;
 
-namespace Binance.Common;
+namespace QuantInfra.Connectors.Binance.Common;
 
 public class BinanceUsdmMarketDataSubscriptionRequest
 {

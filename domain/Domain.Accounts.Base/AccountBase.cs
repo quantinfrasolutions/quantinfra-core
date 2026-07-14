@@ -689,7 +689,7 @@ public class AccountBase : Processor, IAccount
                 }
                 else
                 {
-                    value = p.TotalSettlPayments;
+                    value = p.TotalSettlPayments * p.Side.GetSign();
                 }
 
                 var successfulConversion = true;

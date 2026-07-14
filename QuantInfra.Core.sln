@@ -289,6 +289,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI.ApiWrapper.Binance", "ui
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Binance.StaticDataClient.Tests", "connectors\Binance\Binance.StaticDataClient.Tests\Binance.StaticDataClient.Tests.csproj", "{8C17089B-611C-4CCD-A4C5-E99B9934A693}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Binance.Futures.USDM.Tests", "connectors\Binance\Binance.Futures.USDM.Tests\Binance.Futures.USDM.Tests.csproj", "{E94D1D7A-1AA7-4DFE-86A4-E81E0F2D9817}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -422,6 +424,7 @@ Global
 		{33E866F5-5B6B-4020-BF1D-1824A36E6411} = {499664DF-2FD3-4A48-B723-78DD8D5A0372}
 		{40FD4F60-5F80-446B-870C-CA13872485D1} = {499664DF-2FD3-4A48-B723-78DD8D5A0372}
 		{8C17089B-611C-4CCD-A4C5-E99B9934A693} = {62DC1378-91FA-4935-BA25-16555209C540}
+		{E94D1D7A-1AA7-4DFE-86A4-E81E0F2D9817} = {62DC1378-91FA-4935-BA25-16555209C540}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{9FB43BE1-9878-4544-BA48-2BC901BC0AF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -744,6 +747,10 @@ Global
 		{42D8C584-F9E4-4083-948F-C4BB9963A31C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42D8C584-F9E4-4083-948F-C4BB9963A31C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{42D8C584-F9E4-4083-948F-C4BB9963A31C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E94D1D7A-1AA7-4DFE-86A4-E81E0F2D9817}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E94D1D7A-1AA7-4DFE-86A4-E81E0F2D9817}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E94D1D7A-1AA7-4DFE-86A4-E81E0F2D9817}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E94D1D7A-1AA7-4DFE-86A4-E81E0F2D9817}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8948F464-FF9D-4CCB-9EFE-C110C860BBEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8948F464-FF9D-4CCB-9EFE-C110C860BBEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8948F464-FF9D-4CCB-9EFE-C110C860BBEF}.Release|Any CPU.ActiveCfg = Release|Any CPU

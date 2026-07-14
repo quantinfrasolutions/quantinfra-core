@@ -35,7 +35,11 @@ public class IncomingDisruptorMessage
     }
 
 
-    public void SetSubscriptionConfirmation(int id) => ConfirmedSubscriptionId = id;
+    public void SetSubscriptionConfirmation(int id)
+    {
+        Type = IncomingMessageType.ServiceAck;
+        ConfirmedSubscriptionId = id;
+    }
     
     public void SetKline1m(Kline1m kline1m)
     {
@@ -64,6 +68,7 @@ public class IncomingDisruptorMessage
 
 public enum IncomingMessageType
 {
+    ServiceAck,
     Kline,
     OrderBookSnapshot,
     OrderBookUpdate,

@@ -5,7 +5,6 @@
 @using UI.Interfaces.Accounts
 @using UI.SharedComponents.Accounts.Balances
 @using UI.SharedComponents.Accounts.Reporting
-@using UI.SharedComponents.Components.Accounts
 @inject IUiAccountsRepository Repository
 
 @if (_tradeFilter != null && _orderFilter != null)
@@ -20,78 +19,80 @@
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow>
-            <RadzenAccordion Multiple="true">
-                <Items>
-                    <RadzenAccordionItem Text="Positions" Icon="browse_activity" @bind-Selected=@_positionsExpanded>
-                        <ActivePositionsView Account=@Account
-                                             HideFilter="true"
-                                             HideAccount="true"
-                                             RunSearchImmediately="true"
-                                             Variant="Variant.Flat"
-                                             AutoRefresh="false"
-                                             ReloadRequested=@Refresh
-                                             HideRefreshButton="true"
-                                             @ref=_positions />
-                    </RadzenAccordionItem>
-                    <RadzenAccordionItem Text="Orders" Icon="request_quote" @bind-Selected=@_ordersExpanded>
-                        <ActiveOrdersView Account=@Account
-                                          ShowFilter="false"
-                                          HideAccountFilter="true"
-                                          ShowAccountColumn=@(Account.AccountType == AccountType.BrokerAccount)
-                                          ShowBrokerAccountColumn=@(Account.AccountType == AccountType.StrategySubAccount || Account.AccountType == AccountType.ExecutableSubAccount)
-                                          RunSearchImmediately="true"
-                                          AllowNewOrder="true"
-                                          Variant="Variant.Flat"
-                                          AutoRefresh="false"
-                                          ReloadRequested=@Refresh
-                                          HideRefreshButton="true"
-                                          @ref=_orders />
-                    </RadzenAccordionItem>
-                    <RadzenAccordionItem Text="Balances" Icon="account_balance_wallet" @bind-Selected=@_balancesExpanded>
-                        <AccountBalancesView AccountId=@Account.AccountId
-                                             RunSearchImmediately="true"
-                                             HideRefreshButton="true"
-                                             Variant="Variant.Flat"
-                                             @ref=_balances />
-                    </RadzenAccordionItem>
-                    <RadzenAccordionItem Text="Recent activity" Icon="history" @bind-Selected=@_historyExpanded>
-                        <RadzenStack>
-                            <RadzenRow>
-                                <RadzenColumn Size="6">
-                                    @if (_tradeFilter != null)
-                                    {
-                                        <RadzenText TextStyle="TextStyle.Caption" Text="Trades"/>
-                                        <TradesHistory Filter=@_tradeFilter
-                                                       Columns=@(new List<string>() { "Dt", "ClOrdId", "OrderId", "Contract", "Side", "Volume", "Price" })
-                                                       HideRefreshButton="true"
-                                                       ShowFilter="false"
-                                                       RunSearchImmediately="true"
-                                                       Variant="Variant.Flat"
-                                                       AllowSorting="true"
-                                                       DefaultOrderByDescending="Dt"
-                                                       @ref=_trades
-                                                       Repository="@Repository"/>
-                                    }
-                                </RadzenColumn>
-                                <RadzenColumn Size="6">
-                                    @if (_orderFilter != null)
-                                    {
-                                        <RadzenText TextStyle="TextStyle.Caption" Text="Orders"/>
-                                        <OrdersHistory Filter=@_orderFilter
-                                                       Columns=@(new List<string>() { "ClOrdId", "OrderId", "TransactTime", "Contract", "OrdType", "Side", "OrdQty", "Price", "StopPx", "OrdStatus", "LeavesQty", "RejectReason", "RejectText" })
-                                                       HideRefreshButton="true"
-                                                       HideFilter="true"
-                                                       RunSearchImmediately="true"
-                                                       Variant="Variant.Flat"
-                                                       DefaultOrderByDescending="TransactTime"
-                                                       @ref=_ordersHistory/>
-                                    }
-                                </RadzenColumn>
-                            </RadzenRow>
-                        </RadzenStack>
-                    </RadzenAccordionItem>
-                </Items>
-            </RadzenAccordion>
+            <RadzenColumn Size="12">
+                <RadzenAccordion Multiple="true">
+                    <Items>
+                        <RadzenAccordionItem Text="Positions" Icon="browse_activity" @bind-Selected=@_positionsExpanded>
+                            <ActivePositionsView Account=@Account
+                                                 HideFilter="true"
+                                                 HideAccount="true"
+                                                 RunSearchImmediately="true"
+                                                 Variant="Variant.Flat"
+                                                 AutoRefresh="false"
+                                                 ReloadRequested=@Refresh
+                                                 HideRefreshButton="true"
+                                                 @ref=_positions />
+                        </RadzenAccordionItem>
+                        <RadzenAccordionItem Text="Orders" Icon="request_quote" @bind-Selected=@_ordersExpanded>
+                            <ActiveOrdersView Account=@Account
+                                              ShowFilter="false"
+                                              HideAccountFilter="true"
+                                              ShowAccountColumn=@(Account.AccountType == AccountType.BrokerAccount)
+                                              ShowBrokerAccountColumn=@(Account.AccountType == AccountType.StrategySubAccount || Account.AccountType == AccountType.ExecutableSubAccount)
+                                              RunSearchImmediately="true"
+                                              AllowNewOrder="true"
+                                              Variant="Variant.Flat"
+                                              AutoRefresh="false"
+                                              ReloadRequested=@Refresh
+                                              HideRefreshButton="true"
+                                              @ref=_orders />
+                        </RadzenAccordionItem>
+                        <RadzenAccordionItem Text="Balances" Icon="account_balance_wallet" @bind-Selected=@_balancesExpanded>
+                            <AccountBalancesView AccountId=@Account.AccountId
+                                                 RunSearchImmediately="true"
+                                                 HideRefreshButton="true"
+                                                 Variant="Variant.Flat"
+                                                 @ref=_balances />
+                        </RadzenAccordionItem>
+                        <RadzenAccordionItem Text="Recent activity" Icon="history" @bind-Selected=@_historyExpanded>
+                            <RadzenStack>
+                                <RadzenRow>
+                                    <RadzenColumn Size="6">
+                                        @if (_tradeFilter != null)
+                                        {
+                                            <RadzenText TextStyle="TextStyle.Caption" Text="Trades"/>
+                                            <TradesHistory Filter=@_tradeFilter
+                                                           Columns=@(new List<string>() { "Dt", "ClOrdId", "OrderId", "Contract", "Side", "Volume", "Price" })
+                                                           HideRefreshButton="true"
+                                                           ShowFilter="false"
+                                                           RunSearchImmediately="true"
+                                                           Variant="Variant.Flat"
+                                                           AllowSorting="true"
+                                                           DefaultOrderByDescending="Dt"
+                                                           @ref=_trades
+                                                           Repository="@Repository"/>
+                                        }
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="6">
+                                        @if (_orderFilter != null)
+                                        {
+                                            <RadzenText TextStyle="TextStyle.Caption" Text="Orders"/>
+                                            <OrdersHistory Filter=@_orderFilter
+                                                           Columns=@(new List<string>() { "ClOrdId", "OrderId", "TransactTime", "Contract", "OrdType", "Side", "OrdQty", "Price", "StopPx", "OrdStatus", "LeavesQty", "RejectReason", "RejectText" })
+                                                           HideRefreshButton="true"
+                                                           HideFilter="true"
+                                                           RunSearchImmediately="true"
+                                                           Variant="Variant.Flat"
+                                                           DefaultOrderByDescending="TransactTime"
+                                                           @ref=_ordersHistory/>
+                                        }
+                                    </RadzenColumn>
+                                </RadzenRow>
+                            </RadzenStack>
+                        </RadzenAccordionItem>
+                    </Items>
+                </RadzenAccordion>
+            </RadzenColumn>
         </RadzenRow>
     </RadzenStack>
 }
@@ -135,6 +136,7 @@
                 Task.Run(_balances.Refresh)
             );
         }
+        catch {}
         finally
         {
             _isLoading = false;

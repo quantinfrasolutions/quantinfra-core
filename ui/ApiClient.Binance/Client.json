@@ -44,7 +44,9 @@
         "className": "ApiClient",
         "operationGenerationMode": "SingleClientFromOperationId",
         "additionalNamespaceUsages": [
-            "QuantInfra.Common.Interfaces.Api.Binance"
+            "QuantInfra.Common.Interfaces.Api",
+            "QuantInfra.Common.Interfaces.Api.Binance",
+            "QuantInfra.Connectors.Binance.Common"
         ],
         "additionalContractNamespaceUsages": [],
         "generateOptionalParameters": false,

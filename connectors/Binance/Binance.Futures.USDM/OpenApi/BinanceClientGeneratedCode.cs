@@ -4,7 +4,6 @@
 // </auto-generated>
 //----------------------
 
-using Binance.Common;
 using QuantInfra.Connectors.Binance.Common;
 
 #pragma warning disable 108 // Disable "CS0108 '{derivedDto}.ToJson()' hides inherited member '{dtoBase}.ToJson()'. Use the new keyword if hiding was intended."
