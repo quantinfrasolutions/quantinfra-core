@@ -1,6 +1,7 @@
 @using QuantInfra.Common.Interfaces.Api.Accounts
 @using QuantInfra.Common.Interfaces.Api.Strategies
 @using QuantInfra.Sdk.Accounts
+@using QuantInfra.Sdk.Trading
 @using UI.Interfaces.Accounts
 @using UI.SharedComponents.Base
 
@@ -20,6 +21,7 @@
                   AllowSorting="true"
                   ButtonsColumnWidth="52px"
                   DefaultOrderBy=@(nameof(PositionView.ContractName))
+                  CellRender="@CellRender"
                   @ref=_view>
         <SearchForm />
         <CustomItemButtons Context="position">
@@ -34,8 +36,7 @@
             }
             <RadzenDataGridColumn TItem="PositionView" Title="Contract" Property=@nameof(PositionView.ContractId) Width="120px" />
             <RadzenDataGridColumn TItem="PositionView" Title="Ticker" Property=@nameof(PositionView.ContractName) Width="160px" />
-            <RadzenDataGridColumn TItem="PositionView" Property="Volume" Title="Volume" Width="120px"/>
-            <RadzenDataGridColumn TItem="PositionView" Property="Side" Title="Side" Width="80px"/>
+            <RadzenDataGridColumn TItem="PositionView" Property="@nameof(PositionView.SignedVolume)" Title="Volume" Width="120px"/>
             <RadzenDataGridColumn TItem="PositionView" Property="OpenDt" Title="OpenDt" Width="200px"/>
             <RadzenDataGridColumn TItem="PositionView" Property="OpenPrice" Title="OpenPrice" Width="120px"/>
             <RadzenDataGridColumn TItem="PositionView" Property="ClosePrice" Title="Price" Width="120px" />
@@ -70,4 +71,25 @@
         await ReloadRequested.InvokeAsync();
         if (AutoRefresh) await Refresh();
     }
+
+    private void CellRender(DataGridCellRenderEventArgs<PositionView> args)
+    {
+        if (args.Column.Title == "Volume")
+        {
+            args.Attributes.Add("class", args.Data.Side == Side.Buy ? "long" : "short");
+        }
+
+        if (args.Column.Title == "FPnL")
+        {
+            if (args.Data.TotalFloatingPnL < 0) args.Attributes.Add("class", "loss");
+            else if (args.Data.TotalFloatingPnL > 0) args.Attributes.Add("class", "profit");
+        }
+
+        if (args.Column.Title == "Today FPnL")
+        {
+            if (args.Data.FloatingPnL < 0) args.Attributes.Add("class", "loss");
+            else if (args.Data.FloatingPnL > 0) args.Attributes.Add("class", "profit");
+        }
+    }
+
 }

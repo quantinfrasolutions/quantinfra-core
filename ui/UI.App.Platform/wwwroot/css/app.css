@@ -185,3 +185,13 @@ tr.rz-expanded-row-content>td {
 .rz-datepicker .rz-button-icon-only {
     padding: 0 !important;
 }
+
+.rz-datatable-data td .rz-cell-data, .rz-grid-table td.long .rz-cell-data,
+.rz-datatable-data td .rz-cell-data, .rz-grid-table td.profit .rz-cell-data {
+    color: var(--rz-success);
+}
+
+.rz-datatable-data td .rz-cell-data, .rz-grid-table td.short .rz-cell-data,
+.rz-datatable-data td .rz-cell-data, .rz-grid-table td.loss .rz-cell-data {
+    color: var(--rz-danger);
+}
