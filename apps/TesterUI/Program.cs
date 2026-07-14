@@ -2,17 +2,26 @@
 using Microsoft.Extensions.Options;
 using QuantInfra.Backtesting.FileResultsRepository;
 using QuantInfra.Backtesting.LocalTestServerWrapper;
+using QuantInfra.Common.MarketData.Infrastructure;
 using QuantInfra.Common.Utils.ExecutableAppBase;
+using QuantInfra.Connectors.Binance.Common;
+using QuantInfra.Connectors.Binance.StaticDataClient;
+using QuantInfra.Core.Apps.TesterUI;
 using QuantInfra.Core.Services.Api.StaticData;
 using QuantInfra.Databases.Backtesting.Sqlite;
 using QuantInfra.Databases.Main;
 using QuantInfra.Services.Api.Backtesting;
+using QuantInfra.Services.Api.Binance;
 using QuantInfra.Services.LocalTestServer;
 
 var host = new AppBase(args)
     .UseJsonFileConfiguration()
     .UseEnvironmentVariables()
-    .ConfigureControllers(null, typeof(TestsController).Assembly, typeof(StaticDataController).Assembly)
+    .ConfigureControllers(null, 
+        typeof(TestsController).Assembly, 
+        typeof(StaticDataController).Assembly,
+        typeof(BinanceController).Assembly
+    )
     
     .AddCors()
     .AddJsonOptions()
@@ -46,6 +55,13 @@ var host = new AppBase(args)
             .ConfigureMainDb(configuration)
             .AddMainDbContext()
             .UseMainDbStaticDataRepositoryReadOnly()
+            
+            .AddSingleton<IMarketDataClientsRegistry<BinanceUsdmMarketDataSubscriptionRequest, BinanceUsdmMarketDataSubscription>,
+                MockMDClientsRegistry<BinanceUsdmMarketDataSubscriptionRequest, BinanceUsdmMarketDataSubscription>>()
+            .AddSingleton<IMarketDataClientsRegistry<BinanceUsdmOrderBookSubscriptionRequest, BinanceUsdmOrderBookSubscription>,
+                MockMDClientsRegistry<BinanceUsdmOrderBookSubscriptionRequest, BinanceUsdmOrderBookSubscription>>()
+            
+            .AddCachingBinanceStaticDataClient()
             
             .ConfigureCliWrapper(configuration)
             .AddCliWrapper();

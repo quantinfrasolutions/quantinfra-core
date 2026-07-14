@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using QuantInfra.Api.Client;
 using QuantInfra.Api.Client.Backtesting;
+using QuantInfra.Api.Client.Binance;
 using QuantInfra.UI.ApiWrapper.Backtesting;
 using Radzen;
 using UI.ApiWrapper;
@@ -27,6 +28,11 @@ builder.Services
     .AddScopedApiWrapper()
     .AddApiRepository()
     .UseApiStaticDataRepository();
+
+builder.Services
+    .ConfigureBinanceApiServiceWrapper(builder.Configuration, replaceBaseUri: builder.HostEnvironment.BaseAddress)
+    .AddScopedBinanceApiWrapper()
+    .AddBinanceApiClient();
 
 builder.Services.AddScoped<BrowserStorage>();
 

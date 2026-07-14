@@ -19,21 +19,14 @@
       <ProjectReference Include="..\..\common\Common.Interfaces.Api.Backtesting\Common.Interfaces.Api.Backtesting.csproj" />
       <ProjectReference Include="..\ApiClient.Backtesting\ApiClient.Backtesting.csproj" />
       <ProjectReference Include="..\UI.ApiWrapper.Backtesting\UI.ApiWrapper.Backtesting.csproj" />
+      <ProjectReference Include="..\UI.ApiWrapper.Binance\UI.ApiWrapper.Binance.csproj" />
       <ProjectReference Include="..\UI.ApiWrapper\UI.ApiWrapper.csproj" />
       <ProjectReference Include="..\UI.Interfaces.Backtesting\UI.Interfaces.Backtesting.csproj" />
       <ProjectReference Include="..\UI.SharedComponents.Backtesting\UI.SharedComponents.Backtesting.csproj" />
       <ProjectReference Include="..\UI.SharedComponents.Base\UI.SharedComponents.Base.csproj" />
+      <ProjectReference Include="..\UI.SharedComponents.Binance\UI.SharedComponents.Binance.csproj" />
       <ProjectReference Include="..\UI.SharedComponents.StaticData\UI.SharedComponents.StaticData.csproj" />
       <ProjectReference Include="..\UI.SharedComponents\UI.SharedComponents.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <AdditionalFiles Include="Pages\StaticData\Assets.razor" />
-      <AdditionalFiles Include="Pages\StaticData\Brokers.razor" />
-      <AdditionalFiles Include="Pages\StaticData\Commissions.razor" />
-      <AdditionalFiles Include="Pages\StaticData\Contracts.razor" />
-      <AdditionalFiles Include="Pages\StaticData\Exchanges.razor" />
-      <AdditionalFiles Include="Pages\StaticData\Streams.razor" />
     </ItemGroup>
 
 </Project>

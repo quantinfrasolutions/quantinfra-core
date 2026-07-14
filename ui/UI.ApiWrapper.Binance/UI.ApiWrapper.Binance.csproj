@@ -5,8 +5,8 @@
         <LangVersion>10</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <AssemblyName>QuantInfra.UI.ApiWrapper.Backtesting</AssemblyName>
-        <RootNamespace>QuantInfra.UI.ApiWrapper.Backtesting</RootNamespace>
+        <AssemblyName>QuantInfra.UI.ApiWrapper.Binance</AssemblyName>
+        <RootNamespace>QuantInfra.UI.ApiWrapper.Binance</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

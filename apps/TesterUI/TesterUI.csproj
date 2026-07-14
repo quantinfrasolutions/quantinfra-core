@@ -27,9 +27,11 @@
       <ProjectReference Include="..\..\backtesting\FileResultsRepository\FileResultsRepository.csproj" />
       <ProjectReference Include="..\..\backtesting\LocalTestServerWrapper\LocalTestServerWrapper.csproj" />
       <ProjectReference Include="..\..\common\Common.Utils.ExecutableAppBase\Common.Utils.ExecutableAppBase.csproj" />
+      <ProjectReference Include="..\..\connectors\Binance\Binance.StaticDataClient\Binance.StaticDataClient.csproj" />
       <ProjectReference Include="..\..\db\Databases.Backtesting.Sqlite\Databases.Backtesting.Sqlite.csproj" />
       <ProjectReference Include="..\..\db\Databases.Main\Databases.Main.csproj" />
       <ProjectReference Include="..\..\services\Api.Backtesting\Api.Backtesting.csproj" />
+      <ProjectReference Include="..\..\services\Api.Binance\Api.Binance.csproj" />
       <ProjectReference Include="..\..\services\Api.StaticData\Api.StaticData.csproj" />
       <ProjectReference Include="..\..\ui\UI.App.Backtester\UI.App.Backtester.csproj" />
       <ProjectReference Include="..\StrategyTesterCli\StrategyTesterCli.csproj"
