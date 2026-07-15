@@ -51,8 +51,8 @@ public class Storage : IMarketDataStorage
             
             foreach (var mdPath in _config.MarketDataPaths)
             {
-                var file = Directory.GetFiles(mdPath, $"{md.StreamId}_{tf}_*.csv").SingleOrDefault();
-                if (file is null) file = Directory.GetFiles(mdPath, $"{md.StreamId}_{tf}.parquet").FirstOrDefault();
+                var file = Directory.GetFiles(mdPath, $"{md.StreamId}-{tf}-*.csv").SingleOrDefault() 
+                    ?? Directory.GetFiles(mdPath, $"{md.StreamId}-{tf}.parquet").SingleOrDefault();
 
                 if (file is not null)
                 {
@@ -72,6 +72,6 @@ public class Storage : IMarketDataStorage
     {
         tf ??= Period.FromMinutes(1);
         var paths = GetPaths(reqs, PeriodPattern.Roundtrip.Format(tf));
-        return new MultipleSourcesMarketDataProvider(paths, tradingSessions);
+        return new MultipleSourcesMarketDataProvider(paths, _config.DateTimeFormat, tradingSessions);
     }
 }

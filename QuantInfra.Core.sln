@@ -291,6 +291,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Binance.StaticDataClient.Te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Binance.Futures.USDM.Tests", "connectors\Binance\Binance.Futures.USDM.Tests\Binance.Futures.USDM.Tests.csproj", "{E94D1D7A-1AA7-4DFE-86A4-E81E0F2D9817}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalMarketDataStorage.Tests", "backtesting\LocalMarketDataStorage.Tests\LocalMarketDataStorage.Tests.csproj", "{50463FDB-958F-4370-8DD7-C64A1F93B5CA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConvertCsvToParquet", "apps\ConvertCsvToParquet\ConvertCsvToParquet.csproj", "{FA9809CE-992D-4066-AA57-7C115A6A649C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -425,6 +429,8 @@ Global
 		{40FD4F60-5F80-446B-870C-CA13872485D1} = {499664DF-2FD3-4A48-B723-78DD8D5A0372}
 		{8C17089B-611C-4CCD-A4C5-E99B9934A693} = {62DC1378-91FA-4935-BA25-16555209C540}
 		{E94D1D7A-1AA7-4DFE-86A4-E81E0F2D9817} = {62DC1378-91FA-4935-BA25-16555209C540}
+		{50463FDB-958F-4370-8DD7-C64A1F93B5CA} = {052FCE92-B7AE-47BB-9BE1-E3252E5E500B}
+		{FA9809CE-992D-4066-AA57-7C115A6A649C} = {0F7D487C-C73D-4B17-9C1E-D8F6D04D9A04}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{9FB43BE1-9878-4544-BA48-2BC901BC0AF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -907,5 +913,13 @@ Global
 		{8C17089B-611C-4CCD-A4C5-E99B9934A693}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C17089B-611C-4CCD-A4C5-E99B9934A693}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C17089B-611C-4CCD-A4C5-E99B9934A693}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50463FDB-958F-4370-8DD7-C64A1F93B5CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50463FDB-958F-4370-8DD7-C64A1F93B5CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50463FDB-958F-4370-8DD7-C64A1F93B5CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50463FDB-958F-4370-8DD7-C64A1F93B5CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA9809CE-992D-4066-AA57-7C115A6A649C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA9809CE-992D-4066-AA57-7C115A6A649C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA9809CE-992D-4066-AA57-7C115A6A649C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA9809CE-992D-4066-AA57-7C115A6A649C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

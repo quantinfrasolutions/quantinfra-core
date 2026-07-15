@@ -1,14 +1,11 @@
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using NodaTime;
 using NodaTime.Text;
 using QuantInfra.Common.MarketData;
 using QuantInfra.Sdk.MarketData;
 using QuantInfra.Sdk.StaticData;
 
-namespace QuantInfra.Services.BacktestingCore.Providers;
+namespace QuantInfra.Backtesting.TextBarsStorage;
 
 public class StreamBarsStorage
 {
@@ -16,14 +13,35 @@ public class StreamBarsStorage
     private readonly Dictionary<int, StreamReader> _readers;
     private readonly Dictionary<int, int?> _streamsToContracts;
     
+    private readonly char _separator;
+    private readonly int _dtColNum,  _openColNum, _highColNum, _lowColNum, _closeColNum, _volColNum;
+    
     private TradingSessionWatcher<int>? _tsw = null;
     private readonly Duration _oneMinuteDuration = Duration.FromMinutes(1);
 
-    public StreamBarsStorage(StreamReader reader, int streamId, int? contractId, LocalDateTimePattern? dateTimeFormat = null)
+    public StreamBarsStorage(StreamReader reader,
+        int streamId,
+        int? contractId,
+        LocalDateTimePattern? dateTimeFormat = null,
+        char separator = ',',
+        int dtColNum = 0,
+        int openColNum = 1,
+        int highColNum = 2,
+        int lowColNum = 3,
+        int closeColNum = 4,
+        int volColNum = 5
+    )
     {
         _dateTimeFormat = dateTimeFormat ?? LocalDateTimePattern.ExtendedIso;
         _readers = new() { { streamId, reader } };
         _streamsToContracts = new() { { streamId, contractId } };
+        _separator = separator;
+        _dtColNum = dtColNum;
+        _openColNum = openColNum;
+        _highColNum = highColNum;
+        _lowColNum = lowColNum;
+        _closeColNum = closeColNum;
+        _volColNum = volColNum;
     }
 
     public StreamBarsStorage(
@@ -74,23 +92,23 @@ public class StreamBarsStorage
 
     public bool CanRead => !_readers.Values.Any(r => r.EndOfStream);
 
-    ExchangeBar Read(int streamId, Duration? tf = null, DateTimeZone? tz = null)
+    public ExchangeBar Read(int streamId, Duration? tf = null, DateTimeZone? tz = null)
     {
         tf ??= Duration.FromMinutes(1);
         tz ??= DateTimeZoneProviders.Tzdb["UTC"];
         
-        var line = _readers[streamId].ReadLine()!.Split(',');
+        var line = _readers[streamId].ReadLine()!.Split(_separator);
         var contractId = _streamsToContracts[streamId];
         
-        var dt = _dateTimeFormat.Parse(line[0]).Value
+        var dt = _dateTimeFormat.Parse(line[_dtColNum]).Value
             .InZoneStrictly(tz).ToInstant();
         var (tsId, closeDt) = ApplyDtAndGetTradingSessionIdAndCloseDt(streamId, tf.Value, dt);
         return new ExchangeBar(streamId, contractId, dt, closeDt,
-            double.Parse(line[1], CultureInfo.InvariantCulture),
-            double.Parse(line[2], CultureInfo.InvariantCulture),
-            double.Parse(line[3], CultureInfo.InvariantCulture),
-            double.Parse(line[4], CultureInfo.InvariantCulture),
-            double.Parse(line[5], CultureInfo.InvariantCulture),
+            double.Parse(line[_openColNum], CultureInfo.InvariantCulture),
+            double.Parse(line[_highColNum], CultureInfo.InvariantCulture),
+            double.Parse(line[_lowColNum], CultureInfo.InvariantCulture),
+            double.Parse(line[_closeColNum], CultureInfo.InvariantCulture),
+            double.Parse(line[_volColNum], CultureInfo.InvariantCulture),
             0,
             tsId
         );

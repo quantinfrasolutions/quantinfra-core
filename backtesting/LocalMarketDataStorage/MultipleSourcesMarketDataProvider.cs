@@ -10,14 +10,17 @@ namespace QuantInfra.Backtesting.LocalMarketDataStorage;
 
 public class MultipleSourcesMarketDataProvider : IMarketDataHistoryProvider
 {
+    private readonly string _dateTimeFormat;
     private readonly IReadOnlyDictionary<int, IMarketDataHistoryProvider> _providers;
     private readonly Dictionary<int, int> _contractsToStreams;
     
     public MultipleSourcesMarketDataProvider(
         IReadOnlyCollection<RequiredMarketDataUnitWithPath> units,
+        string dateTimeFormat,
         IReadOnlyDictionary<int, IReadOnlyCollection<TradingSession>>? contractsTradingSessions = null
     )
     {
+        _dateTimeFormat = dateTimeFormat;
         _providers = units
             .Where(u => u is { IsOk: true, StreamId: not null, DataRequired: true })
             .Select(u => new
@@ -51,14 +54,14 @@ public class MultipleSourcesMarketDataProvider : IMarketDataHistoryProvider
             : new Dictionary<int, IReadOnlyCollection<TradingSession>>();
         
         var extension = Path.GetExtension(path);
-        var fileName = Path.GetFileNameWithoutExtension(path).Split('_');
+        var fileName = Path.GetFileNameWithoutExtension(path).Split('-');
         
         return extension switch
         {
             ".csv" or ".txt" => new TextFileMarketDataHistoryProvider(path, streamId, contractId, 
                 PeriodPattern.Roundtrip.Parse(fileName[1]).Value.ToDuration(), 
-                DateTimeZoneProviders.Tzdb[fileName[2]],
-                tradingSessionsDict),
+                DateTimeZoneProviders.Tzdb[fileName[2].Replace(':', '/')],
+                tradingSessionsDict, dateTimeFormat: _dateTimeFormat),
             ".parquet" => new ParquetFileMarketDataHistoryProvider(path, streamId, contractId,
                 PeriodPattern.Roundtrip.Parse(fileName[1]).Value.ToDuration(),
                 tradingSessionsDict),
@@ -78,14 +81,17 @@ public class MultipleSourcesMarketDataProvider : IMarketDataHistoryProvider
 
     public IEnumerable<ExchangeBar> GetBAUsByStream(int streamId, Instant from, Instant to)
     {
-        throw new NotImplementedException();
+        if (!_providers.TryGetValue(streamId, out var provider))
+            throw new KeyNotFoundException(streamId.ToString());
+        
+        return provider.GetBAUsByStream(streamId, from, to);
     }
 
     public IEnumerable<ExchangeBar> GetBAUsByContract(int contractId, Instant from, Instant to)
     {
         if (!_contractsToStreams.TryGetValue(contractId, out var streamId)
             || !_providers.TryGetValue(streamId, out var provider)
-           ) return Enumerable.Empty<ExchangeBar>();
+           ) throw new KeyNotFoundException(contractId.ToString());
         
         return provider.GetBAUsByContract(contractId, from, to);
     }
@@ -95,7 +101,7 @@ public class MultipleSourcesMarketDataProvider : IMarketDataHistoryProvider
     {
         if (!_contractsToStreams.TryGetValue(contractId, out var streamId)
             || !_providers.TryGetValue(streamId, out var provider)
-        ) return Enumerable.Empty<ExchangeBar>();
+        ) throw new KeyNotFoundException(contractId.ToString());
         
         return provider.GetAggregatedCandlesByContract(contractId, from, to, timeframe, timezone);
     }
@@ -103,6 +109,9 @@ public class MultipleSourcesMarketDataProvider : IMarketDataHistoryProvider
     public IEnumerable<ExchangeBar> GetAggregatedBausByStream(int streamId, Instant from, Instant to, Period timeframe,
         string timezone)
     {
-        throw new NotImplementedException();
+        if (!_providers.TryGetValue(streamId, out var provider))
+            throw new KeyNotFoundException(streamId.ToString());
+        
+        return provider.GetAggregatedBausByStream(streamId, from, to, timeframe, timezone);
     }
 }

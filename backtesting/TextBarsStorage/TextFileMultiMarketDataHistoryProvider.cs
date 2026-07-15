@@ -2,14 +2,13 @@
 using QuantInfra.Common.MarketData.Abstractions;
 using QuantInfra.Sdk.MarketData;
 using QuantInfra.Sdk.StaticData;
-using QuantInfra.Services.BacktestingCore.Providers;
 
 namespace QuantInfra.Backtesting.TextBarsStorage;
 
 public class TextFileMultiHistoryProviderConfig
 {
-    public Dictionary<long, string> Streams { get; set; } = new();
-    public Dictionary<long, long?> StreamsToContracts { get; set; } = new();
+    public Dictionary<int, string> Streams { get; set; } = new();
+    public Dictionary<int, int?> StreamsToContracts { get; set; } = new();
 }
 
 public class TextFileMultiMarketDataHistoryProvider :
@@ -48,6 +47,8 @@ public class TextFileMultiMarketDataHistoryProvider :
         return bars;
     }
 
+    // TODO: aggregation is currently not supported for the provider
+    
     public IEnumerable<ExchangeBar> GetAggregatedCandlesByContract(int contractId, Instant from, Instant to,
         Period timeframe, string timezone) =>
         GetBAUsByContract(contractId, from, to);
@@ -63,6 +64,19 @@ public class TextFileMultiMarketDataHistoryProvider :
 
     public IEnumerable<ExchangeBar> GetBAUsByStream(int streamId, Instant from, Instant to)
     {
-        throw new System.NotImplementedException();
+        var storage = new StreamBarsStorage(new StreamReader(_config.Streams[streamId]), streamId, 
+            _config.StreamsToContracts.GetValueOrDefault(streamId));
+        
+        List<ExchangeBar> bars = new List<ExchangeBar>();
+        while (storage.CanRead)
+        {
+            var bar = storage.Read(_tf, _tz)[0];
+            if (bar.OpenDt >= from && bar.CloseDt <= to)
+            {
+                bars.Add(bar);
+            }
+            if (bar.CloseDt > to) break;
+        }
+        return bars;
     }
 }

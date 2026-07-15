@@ -16,6 +16,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\common\Common.MarketData.Abstractions\Common.MarketData.Abstractions.csproj" />
       <ProjectReference Include="..\..\common\Common.MarketData\Common.MarketData.csproj" />
+      <ProjectReference Include="..\..\common\Common.Utils.Collections\Common.Utils.Collections.csproj" />
     </ItemGroup>
 
 </Project>

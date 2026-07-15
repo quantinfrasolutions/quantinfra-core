@@ -82,7 +82,11 @@ public class LocalTestServer : ITestServer, ITypeResolver
 
     private IMarketDataStorage GetMarketDataStorage()
     {
-        return new Storage(new() { MarketDataPaths = _config.MarketDataPaths });
+        return new Storage(new()
+        {
+            MarketDataPaths = _config.MarketDataPaths,
+            DateTimeFormat = _config.DateTimeFormat,
+        });
     }
 
     public Task<IReadOnlyCollection<string>> GetSupportedActionsAsync() =>

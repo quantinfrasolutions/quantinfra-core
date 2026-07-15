@@ -6,4 +6,5 @@ public class LocalTestServerConfig
     public List<string> PluginAssembliesPaths { get; init; } = new();
     public List<string> MarketDataPaths { get; init; } = new();
     public string WorkingDirectory { get; set; }
+    public string DateTimeFormat { get; set; } = "uuuu'-'MM'-'dd' 'HH':'mm':'ss";
 }
