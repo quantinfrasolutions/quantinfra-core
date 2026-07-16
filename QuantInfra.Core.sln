@@ -267,8 +267,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "trading-engine", "trading-e
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tester-ui", "tester-ui", "{46C690F4-EE56-4142-8BBE-5DB0425B9979}"
 	ProjectSection(SolutionItems) = preProject
-		deployment\tester-ui\docker-run.sh = deployment\tester-ui\docker-run.sh
 		deployment\tester-ui\.env = deployment\tester-ui\.env
+		deployment\tester-ui\compose.yaml = deployment\tester-ui\compose.yaml
+		deployment\tester-ui\compose.paths.yaml = deployment\tester-ui\compose.paths.yaml
+		deployment\tester-ui\compose.postgres.yaml = deployment\tester-ui\compose.postgres.yaml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI.SharedComponents.Infrastructure", "ui\UI.SharedComponents.Infrastructure\UI.SharedComponents.Infrastructure.csproj", "{E1450928-7407-4797-8392-AA4ABD6EF011}"

@@ -22,6 +22,7 @@ public class AppBase
     bool _useCors, _useHealthChecks, _useSwagger, _useMetrics, _useOpenApi;
     private int _healthChecksIntervalSeconds = 30;
     Action<MetricServerMiddleware.Settings> configureMetrics;
+    private bool _useDevExceptionPage;
 
     public AppBase(string[] args)
     {
@@ -145,6 +146,12 @@ public class AppBase
         else _builder.Services.AddOpenApi(documentName);
         return this;
     }
+    
+    public AppBase UseDeveloperExceptionPageForProd()
+    {
+        _useDevExceptionPage = true;
+        return this;
+    }
 
     public AppBase AddCors()
     {
@@ -246,6 +253,9 @@ public class AppBase
         {
             app.MapMetrics(configureMetrics, "/api/metrics");
         }
+        
+        if (_useDevExceptionPage || app.Environment.IsDevelopment())
+            app.UseDeveloperExceptionPage();
         app.UseStaticFiles();
 
         return app;

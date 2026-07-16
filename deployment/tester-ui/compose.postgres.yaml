@@ -1,0 +1,38 @@
+services:
+  tester-ui:
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:${POSTGRES_VERSION:-17}
+    container_name: quantinfra-postgres
+
+    profiles:
+      - postgres
+
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-quantinfra}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+
+    # Publishing the port is not required by tester-ui, but allows the
+    # client to connect to Postgres from the host using localhost.
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-quantinfra} -d ${POSTGRES_DB:-quantinfra}"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+    networks:
+      - quantinfra-tester-ui

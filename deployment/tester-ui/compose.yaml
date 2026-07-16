@@ -1,0 +1,53 @@
+# See https://quantinfra.gitbook.io/quantinfra-docs/installation/tester for instructions
+
+name: quantinfra-tester-ui
+
+services:
+  tester-ui:
+    image: "ghcr.io/quantinfrasolutions/tester-ui:${VERSION:-latest}"
+    container_name: tester-ui
+
+    restart: unless-stopped
+
+    ports:
+      - "${PORT:-8080}:8080"
+
+    environment:
+      cli-wrapper__UseEnv: true
+      cli-wrapper__WorkingDirPath: ./cli
+      cli-wrapper__StrategyTesterCliPath: ./cli/StrategyTesterCli.dll
+      
+      local-test-server__WorkingDirectory: /results
+      
+      nlog__targets__console__type: Console
+      nlog__targets__console__layout: $${longdate} | $${level:uppercase=true:padding=-5} | $${logger} | $${message}$${onexception:inner=$${newline}$${exception:format=tostring}}
+      nlog__rules__0__logger: Microsoft.AspNetCore.*
+      nlog__rules__0__maxLevel: info
+      nlog__rules__0__writeTo:
+      nlog__rules__0__final: true
+      nlog__rules__1__logger: Microsoft.*
+      nlog__rules__1__maxLevel: debug
+      nlog__rules__1__writeTo:
+      nlog__rules__1__final: true
+      nlog__rules__2__logger: Quartz.*
+      nlog__rules__2__maxLevel: debug
+      nlog__rules__2__writeTo:
+      nlog__rules__2__final: true
+      nlog__rules__3__logger: "*"
+      nlog__rules__3__minLevel: info
+      nlog__rules__3__writeTo: console
+      nlog-testing__targets__test__type: File
+      nlog-testing__rules__0__name: test
+      nlog-testing__rules__0__logger: "*"
+      nlog-testing__rules__0__minLevel: info
+      nlog-testing__rules__0__writeTo: test
+    
+    env_file:
+      - .env
+    
+    networks:
+      - quantinfra-tester-ui
+
+networks:
+  quantinfra-tester-ui:
+    name: quantinfra-tester-ui

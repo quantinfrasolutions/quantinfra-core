@@ -326,6 +326,7 @@
              _isLoading = true;
              _mdReqs = null;
              _status = null;
+             _runError = null;
              await SaveOptionsAsync();
              var unit = _model.ToTestUnit();
              await Repository.CreateTestUnit(unit);

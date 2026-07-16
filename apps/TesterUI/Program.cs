@@ -23,6 +23,7 @@ var host = new AppBase(args)
         typeof(BinanceController).Assembly
     )
     
+    .UseDeveloperExceptionPageForProd()
     .AddCors()
     .AddJsonOptions()
     .AddLogging()

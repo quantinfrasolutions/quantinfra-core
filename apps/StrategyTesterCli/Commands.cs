@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using ConsoleAppFramework;
+using Microsoft.Extensions.DependencyInjection;
 using NodaTime.Serialization.SystemTextJson;
 using QuantInfra.Services.LocalTestServer;
 
@@ -87,6 +88,42 @@ internal class Commands(LocalTestServer server, IServiceProvider serviceProvider
         await server.RunAsync(unitId);
     }
 
+    [Command("view-options")]
+    public Task ViewOptionsAsync(string configName)
+    {
+        object? config = null;
+        switch (configName)
+        {
+            case "db.sqlite":
+            {
+                config = serviceProvider.GetService<QuantInfra.Databases.Backtesting.Sqlite.Config>();
+                Console.WriteLine(config);
+            } break;
+            
+            case "db.main":
+            {
+                config = serviceProvider.GetService<QuantInfra.Databases.Main.Config>();
+                Console.WriteLine(config);
+            } break;
+
+            case "fileResults":
+            {
+                config = serviceProvider.GetService<QuantInfra.Backtesting.FileResultsRepository.Config>();
+                Console.WriteLine(config);
+            } break;
+
+            case "local-test-server":
+            {
+                config = serviceProvider.GetService<QuantInfra.Services.LocalTestServer.LocalTestServerConfig>();
+                Console.WriteLine(config);
+            } break;
+        }
+        
+        Console.WriteLine(JsonSerializer.Serialize(config, ConfigOptions.Value));
+        
+        return Task.CompletedTask;
+    }
+
     
     
     private static readonly Lazy<JsonSerializerOptions> Options = new(() =>
@@ -109,4 +146,23 @@ internal class Commands(LocalTestServer server, IServiceProvider serviceProvider
     });
 
     public static JsonSerializerOptions JsonSerializerOptions => Options.Value;
+    
+    private static readonly Lazy<JsonSerializerOptions> ConfigOptions = new(() =>
+    {
+        var options = new JsonSerializerOptions()
+        {
+            NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals | JsonNumberHandling.AllowReadingFromString,
+            WriteIndented = true,
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            UnknownTypeHandling = JsonUnknownTypeHandling.JsonNode,
+            PropertyNameCaseInsensitive = true,
+            AllowTrailingCommas = true,
+            ReadCommentHandling = JsonCommentHandling.Skip,
+        };
+
+        options.ConfigureForNodaTime(NodaTime.DateTimeZoneProviders.Tzdb);
+        options.Converters.Add(new JsonStringEnumConverter());
+        return options;
+    });
 }
