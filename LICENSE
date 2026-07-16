@@ -1,0 +1,72 @@
+# License
+
+QuantInfra Source Available License 0.9.0
+
+Copyright (c) 2026 QuantInfra Solutions, Inc. All rights reserved.
+
+# Acceptance
+
+In order to get any license under these terms, You must agree to them as both strict obligations and conditions to all your licenses.
+
+# Copyright License
+
+The Licensor grants You a copyright license for the Software to do everything You might do with the Software that would otherwise infringe the Licensor's copyright in it for any **Permitted Purpose**. However, You may only make changes or new works based on the Software according to the **Changes and New Works License**.
+
+# Changes and New Works License
+
+The Licensor grants You an additional copyright license to make changes and create Derivative Works based on the Software for any Permitted Purpose. Nothing in this License requires You to make the Derivative Works publicly available. Modifications to the Software and Derivative Works of the Software are subject to this License.
+
+You may copy, modify, compile, deploy, and distribute the Software internally within Your company, including to Your employees, contractors, consultants, and systems under Your control, solely for Permitted Purpose. You may not distribute the Software or any Derivative Works to any third party without the Licensor’s prior written consent, except as expressly permitted by this License.
+
+# Permitted Purpose
+
+Permitted Purpose is the use of the Software for the internal business operations of You and Your company.
+
+For the avoidance of doubt, internal business use includes trading, research, backtesting, execution, portfolio management, and risk management in test and production environments, on demo and live accounts, conducted by You or Your company for its own business. It also includes using the Software or Derivative Works to execute strategies on accounts owned by, managed by, or maintained for Your company's clients.
+
+Trading strategies, models, signals, indicators, analytics, machine learning models, parameters, optimization results, datasets, portfolio allocations, and other software developed using the Software through its documented APIs are not part of the Software and remain the exclusive property of their respective owners. Nothing in this License requires You to make such software publicly available.
+
+# Patent License
+
+The Licensor grants You a patent license for the Software that covers patent claims the Licensor can license, or becomes able to license, that are necessarily infringed by use of the Software.
+
+# Fair Use
+
+Nothing in this License limits any rights You may have under applicable copyright law, including fair use, fair dealing, or similar statutory exceptions.
+
+# No Other Rights
+
+These terms do not allow You to sublicense or transfer any of Your licenses to anyone else or prevent the Licensor from granting licenses to anyone else. These terms do not imply any other licenses.
+
+This License grants no right to use the QuantInfra name, trademarks, logos, service marks, or branding.
+
+# Patent Defense
+
+If You initiate a patent infringement claim that the Software infringes or contributes to the infringement of any patent, Your patent license for the Software granted under these terms ends immediately. If You or Your company makes such a claim, Your patent license ends immediately for work on behalf of Your company.
+
+# Violations
+
+The first time You are notified in writing that You have violated any of these terms, or done anything with the Software not covered by Your licenses, Your licenses can nonetheless continue if You come into full compliance with these terms, and take practical steps to correct past violations, within 32 days of receiving notice. Otherwise, all Your licenses end immediately.
+
+# No Liability
+
+Unless required by applicable law or agreed to in writing, Licensor provides the Software on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied, including, without limitation, any warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A PARTICULAR PURPOSE. You are solely responsible for determining the appropriateness of using the Software and assume any risks associated with Your exercise of permissions under this License.
+
+In no event and under no legal theory, whether in tort (including negligence), contract, or otherwise, unless required by applicable law (such as deliberate and grossly negligent acts) or agreed to in writing, shall the Licensor be liable to You for damages, including any direct, indirect, special, incidental, or consequential damages of any character arising as a result of this License or out of the use or inability to use the Software (including but not limited to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any and all other commercial damages or losses), even if the Licensor has been advised of the possibility of such damages.
+
+# **Commercial license**
+
+Organizations wishing to engage in activities prohibited by this License may obtain a commercial license from QuantInfra Solutions, Inc.
+
+# Definitions
+
+The **Licensor** is QuantInfra Solutions, Inc., and the **Software** is the Software the Licensor makes available under these terms.
+
+- **Derivative work** is any work, whether in Source or Object form, that is based on (or derived from) the Software and for which the editorial revisions, annotations, elaborations, or other modifications represent, as a whole, an original work of authorship. For the avoidance of doubt, trading strategies, plugins, connectors, indicators, and other software that merely use the Software through its documented APIs are not considered Derivative Works of the Software solely by reason of such use.
+- **Source form** means the preferred form for making modifications, including but not limited to Software source code, documentation source, and configuration files.
+- **Object form** means any form resulting from mechanical transformation or translation of a source form, including but not limited to compiled object code, generated documentation,
+and conversions to other media types.
+- **You** refers to the individual or entity agreeing to these terms.
+- **Your company** is any legal entity, sole proprietorship, or other kind of organization that You work for, plus all organizations that have control over, are under the control of, or are under common control with that organization. Control means ownership of substantially all the assets of an entity, or the power to direct its management and policies by vote, contract, or otherwise. Control can be direct or indirect.
+- **Your licenses** are all the licenses granted to You for the Software under these terms.
+- **Use** means anything You do with the Software requiring one of Your licenses.
