@@ -46,7 +46,7 @@ jobs:
           elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             TAG="${GITHUB_REF#refs/tags/}"
 
-            if [[ "$TAG" =~ ^platform-v(.+)$ ]]; then
+            if [[ "$TAG" =~ ^tester-v(.+)$ ]]; then
               VERSION="${BASH_REMATCH[1]}"
             else
               echo "Invalid tag: $TAG"
