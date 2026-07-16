@@ -1,7 +1,3 @@
-# README
-
-# QuantInfra Core
-
 **QuantInfra** is an open trading infrastructure platform for building, testing, deploying, and operating systematic trading strategies.
 
 The platform provides a unified architecture that covers the entire strategy lifecycle from historical research and backtesting to live execution and portfolio management, enabling quantitative traders and investment firms to build institutional-grade trading systems without assembling dozens of disconnected components.
@@ -17,6 +13,8 @@ The platform is multi-asset and multi-account. Every strategy trades on its own 
 ---
 
 ## Currently available
+
+![image](https://github.com/quantinfrasolutions/quantinfra-core/blob/main/.github/backtester.png)
 
 Current beta includes support for:
 
