@@ -1,7 +1,3 @@
-# README
-
-# QuantInfra Core
-
 **QuantInfra** is an open trading infrastructure platform for building, testing, deploying, and operating systematic trading strategies.
 
 The platform provides a unified architecture that covers the entire strategy lifecycle from historical research and backtesting to live execution and portfolio management, enabling quantitative traders and investment firms to build institutional-grade trading systems without assembling dozens of disconnected components.
@@ -14,7 +10,7 @@ The platform is multi-asset and multi-account. Every strategy trades on its own 
 > This is the first public beta release of QuantInfra. While the platform is already fully functional for many use cases, APIs and functionality may evolve before the first stable release. Feedback, bug reports, and feature requests are highly appreciated.
 > 
 
----
+![image](https://github.com/quantinfrasolutions/quantinfra-core/blob/main/.github/backtester.png)
 
 ## Currently available
 
@@ -32,7 +28,6 @@ Current beta includes support for:
 - Live strategy execution
 - UI for managing strategies and accounts and viewing reports
 
----
 
 ## Documentation
 
@@ -47,7 +42,6 @@ Useful starting points:
 - **Trading Engine Installation** [https://quantinfra.gitbook.io/quantinfra-docs/installation/trading-engine](https://quantinfra.gitbook.io/quantinfra-docs/installation/trading-engine)
 - **Strategy Implementation Guide** [https://quantinfra.gitbook.io/quantinfra-docs/strategies/implementing-strategies](https://quantinfra.gitbook.io/quantinfra-docs/strategies/implementing-strategies)
 
----
 
 ## Roadmap
 
@@ -67,7 +61,6 @@ The current development roadmap includes:
 - Tick-level backtesting with realistic execution simulation
 - Continued platform performance and usability improvements
 
----
 
 ## Repository overview
 
@@ -95,7 +88,6 @@ Contains the public SDK used to develop trading strategies and integrations.
 
 A collection of commonly used technical indicators implemented on top of the SDK.
 
----
 
 ## Commercial Edition
 
@@ -105,7 +97,6 @@ More information:
 
 - [https://www.quantinfra.solutions](https://www.quantinfra.solutions)
 
----
 
 ## Reporting issues
 
@@ -113,7 +104,6 @@ If you encounter a bug, have a feature request, or would like to suggest an impr
 
 Community feedback is one of the most valuable inputs during the beta period.
 
----
 
 ## License
 
