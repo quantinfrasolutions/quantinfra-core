@@ -8,3 +8,5 @@ riderModule.iml
 appsettings.Development.json
 *.DotSettings.user
 Directory.Build.props
+build-tester-ui-local.sh
+build-trading-engine-local.sh
