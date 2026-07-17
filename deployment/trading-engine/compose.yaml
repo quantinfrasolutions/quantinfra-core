@@ -1,0 +1,16 @@
+# See https://quantinfra.gitbook.io/quantinfra-docs/installation/trading-engine for instructions
+
+name: quantinfra-trading-engine
+
+services:
+  trading-engine:
+    image: "ghcr.io/quantinfrasolutions/trading-engine-ui:${VERSION:-latest}"
+    container_name: trading-engine
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8080}:8080"
+    
+    #environment:
+      
+    env_file:
+      - .env

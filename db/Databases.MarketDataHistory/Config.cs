@@ -1,5 +1,4 @@
-﻿using System;
-namespace Databases.MarketDataHistory
+﻿namespace QuantInfra.Databases.MarketDataHistory
 {
 	public class Config
 	{

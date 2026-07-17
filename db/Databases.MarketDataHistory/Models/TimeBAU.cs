@@ -1,10 +1,9 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Databases.MarketDataHistory.Models
+namespace QuantInfra.Databases.MarketDataHistory.Models
 {
-	[Table("time_bau")]
+	[Table("time_bau", Schema = "data")]
 	public class TimeBAU : CandlesHistory
 	{
 		[Column("trading_session_id")]

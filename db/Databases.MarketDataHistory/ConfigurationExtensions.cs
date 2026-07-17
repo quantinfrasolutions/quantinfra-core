@@ -1,5 +1,4 @@
-﻿using Databases.MarketDataHistory;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -24,14 +23,17 @@ namespace QuantInfra.Databases.MarketDataHistory
 			.AddSingleton<MDDatasource>(dataSource);
 
 		public static IServiceCollection AddMarketDataHistoryDbContext(this IServiceCollection services) => services
-			.AddScoped<MDTimescaleContext>()
-			.AddScoped<MDTimescaleContextDesign>(sp => sp.GetRequiredService<MDTimescaleContext>());
+			.AddDbContext<MDTimescaleContextDesign>()
+			.AddDbContext<MDTimescaleContext>();
+			// .AddScoped<MDTimescaleContext>()
+			// .AddScoped<MDTimescaleContextDesign>(sp => sp.GetRequiredService<MDTimescaleContext>());
 		
 		internal static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, NpgsqlDataSource dataSource, Config config)
 		{
 			optionsBuilder.UseNpgsql(dataSource, o =>
 			{
 				o.UseNodaTime();
+				o.MigrationsHistoryTable("migrations_history", "public");
 			});
 
 			if (config.IncludeErrorDetail)

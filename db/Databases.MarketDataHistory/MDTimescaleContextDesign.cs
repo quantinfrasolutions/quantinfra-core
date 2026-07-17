@@ -1,10 +1,8 @@
-﻿using Databases.MarketDataHistory.Models;
-using Databases.MarketDataHistory.Models.CorporateEvents;
-using Microsoft.EntityFrameworkCore;
-using QuantInfra.Databases.MarketDataHistory;
+﻿using Microsoft.EntityFrameworkCore;
+using QuantInfra.Databases.MarketDataHistory.Models;
 using QuantInfra.Sdk.MarketData;
 
-namespace Databases.MarketDataHistory;
+namespace QuantInfra.Databases.MarketDataHistory;
 
 public class MDTimescaleContextDesign : DbContext
 {
@@ -27,51 +25,10 @@ public class MDTimescaleContextDesign : DbContext
 
 
     public DbSet<TimeBAU> TimeBAU { get; set; } = default!;
-    public DbSet<FaceVolumeBAU> VolumeBAU { get; set; } = default!;
-    public DbSet<DollarValueBAU> DollarValueBAU { get; set; } = default!;
-    public DbSet<Dividend> Dividends { get; set; } = default!;
-    public DbSet<Split> Splits { get; set; } = default!;
-    public DbSet<RollingContract> RollingContracts { get; set; } = default!;
-
-    // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
-    //     OnConfiguring(optionsBuilder, _config);
-    //
-    // public static void OnConfiguring(DbContextOptionsBuilder optionsBuilder, Config config)
-    // {
-    //     optionsBuilder
-    //         .UseNpgsql(
-    //             new NpgsqlConnectionStringBuilder
-    //             {
-    //                 Host = config.Host,
-    //                 Port = config.Port,
-    //                 Username = config.User,
-    //                 Password = config.Password,
-    //                 Database = config.Database,
-    //                 IncludeErrorDetail = config.IncludeErrorDetail,
-    //                 MaxPoolSize = config.MaxPoolSize,
-    //                 Timeout = config.ConnectionTimeoutSec,
-    //                 CommandTimeout = config.CommandTimeoutSec,
-    //                 InternalCommandTimeout = config.CommandTimeoutSec,
-    //             }.ConnectionString + $";{config.ConnectionStringExtras}",
-    //             //$"Server={config.Host};User Id={config.User};Password={config.Password};Database={config.Database};Include Error Detail={config.IncludeErrorDetail};Maximum Pool Size={config.MaxPoolSize};Timeout={config.ConnectionTimeoutSec};Command Timeout={config.ConnectionTimeoutSec};{config.ConnectionStringExtras}",
-    //             o => o.UseNodaTime()
-    //         );
-    //
-    //     if (config.IncludeErrorDetail)
-    //     {
-    //         optionsBuilder.EnableSensitiveDataLogging();
-    //     }
-    //
-    //     if (config.EnableLowLevelLogging)
-    //     {
-    //         optionsBuilder
-    //             .LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Trace);
-    //     }
-    // }
+    
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.AddCorporateEventsRelations();
         Models.TimeBAU.CreateRelations(modelBuilder);
     }
 
@@ -84,7 +41,7 @@ public class MDTimescaleContextDesign : DbContext
 
     string GetAppendTimeBAUSql(ExchangeBar bau) =>
         $"""
-            INSERT INTO public.time_bau(
+            INSERT INTO data.time_bau(
                 stream_id,
                 open_dt,
                 close_dt,
@@ -110,29 +67,6 @@ public class MDTimescaleContextDesign : DbContext
             );
         """;
 
-
-    //public void AppendFaceVolumeBAU(ExchangeBar bau)
-    //{
-    //    // TODO: dollar value
-    //    var sql = $"""
-    //        INSERT INTO public.face_volume_bau(
-    //        open_dt, close_dt, stream, open, high, low, close, face_volume, dollar_value)
-    //        VALUES ('{bau.OpenDt}', '{bau.CloseDt}', '{bau.UniqueTicker}', {bau.Open}, {bau.High}, {bau.Low}, {bau.Close}, {bau.Volume}, 0);
-    //    """;
-    //    this.Database.ExecuteSqlRaw(sql);
-    //}
-
-    //public void AppendDollarValueBAU(ExchangeBar bau)
-    //{
-    //    // TODO: dollar value
-    //    var sql = $"""
-    //        INSERT INTO public.dollar_value_bau(
-    //        open_dt, close_dt, stream, open, high, low, close, face_volume, dollar_value)
-    //        VALUES ('{bau.OpenDt}', '{bau.CloseDt}', '{bau.UniqueTicker}', {bau.Open}, {bau.High}, {bau.Low}, {bau.Close}, {bau.Volume}, 0);
-    //    """;
-    //    this.Database.ExecuteSqlRaw(sql);
-    //}
-
     public void AppendBAU(ExchangeBar bar, BarAggregationType aggType)
     {
         switch (aggType)
@@ -144,7 +78,7 @@ public class MDTimescaleContextDesign : DbContext
                 throw new NotImplementedException();
                 break;
             default:
-                throw new ArgumentException();
+                throw new ArgumentException(nameof(aggType));
                 break;
         }
     }

@@ -11,8 +11,8 @@
   <ItemGroup>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime" Version="9.0.4" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.6">
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -22,7 +22,7 @@
     <None Remove="Models\CorporateEvents\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Models\CorporateEvents\" />
+    <Folder Include="Migrations\Sql\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\common\Common.MarketData\Common.MarketData.csproj" />

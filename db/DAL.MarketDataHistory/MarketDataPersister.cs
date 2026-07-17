@@ -1,10 +1,9 @@
-﻿using Databases.MarketDataHistory;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using QuantInfra.Common.MarketData.Infrastructure;
 using QuantInfra.Sdk.MarketData;
 
-namespace DAL.MarketDataHistory
+namespace QuantInfra.Databases.MarketDataHistory.DAL
 {
     public class MarketDataPersister(IServiceProvider sp) :
         IMarketDataPersister

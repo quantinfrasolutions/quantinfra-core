@@ -1,38 +1,18 @@
-# See https://quantinfra.gitbook.io/quantinfra-docs/installation/tester for instructions
+# See https://quantinfra.gitbook.io/quantinfra-docs/installation/trading-engine for instructions
 
 services:
-  tester-ui:
+  trading-engine:
     volumes:
-      
       # STRATEGIES
       # If you have a single project with strategies
-      - /PUBLISH DIRECTORY PATH ON YOUR COMPUTER:/strategies:ro
+      - /PUBLISH DIRECTORY PATH:/strategies:ro
       
-      # If you test multiple projects, comment the line about and use this:
+      # If you use multiple projects, comment the line about and use this:
       # - /PUBLISH DIRECTORY 1 PATH:/strategies/project-1:ro
-      # - /PUBLISH DIRECTORY 2 PATH:/strategies/project-2:ro      
-
-
-      # MARKET DATA
-      # If you keep all market data files in a single folder
-      - /PATH DO DIRECTORY WITH MARKET DATA FILES ON YOUR COMPUTER:/market-data:ro
-      
-      # If you use multiple folders, comment the line above and use this:      
-      # - /PATH 1 ON YOUR COMPUTER:/market-data/source1:ro
-      # - /PATH 2 ON YOUR COMPUTER:/market-data/source2:ro
-
-
-      # TEST RESULTS      
-      # A single directory for storing test results 
-      - /PATH ON YOUR COMPUTER/quantinfra-tester-ui:/results
+      # - /PUBLISH DIRECTORY 2 PATH:/strategies/project-2:ro
         
-      # PLUGINS
-      # If you have assemblies with the tester extensions (custom metrics and pipelines)
-      # - /PUBLISH DIRECTORY PATH ON YOUR COMPUTER:/extensions-project-1:ro
-      # For multiple extensions projects, map several subdirectories into /estensions, like with strategies or market data
-  
-# Uncomment the section below if you're using --profile postgres
-#  postgres:
-#    volumes:
-#      # You can reuse the results directory
-#      - /PATH ON YOUR COMPUTER/quantinfra-tester-ui/.postgres:/var/lib/postgresql/data
+      # WAL
+      - /WAL DIRECTORY LOCATION:/wal
+        
+      # Working directory
+      - /WORKING DIRECTORY PATH:/working_dir

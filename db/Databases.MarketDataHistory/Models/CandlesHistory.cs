@@ -1,15 +1,14 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
 
-namespace Databases.MarketDataHistory.Models
+namespace QuantInfra.Databases.MarketDataHistory.Models
 {
 	[Keyless]
 	public abstract class CandlesHistory
 	{
         [Column("stream_id")]
-		public long StreamId { get; set; }
+		public int StreamId { get; set; }
 		[Column("open_dt")]
 		public Instant OpenDt { get; set; }
         [Column("close_dt")]

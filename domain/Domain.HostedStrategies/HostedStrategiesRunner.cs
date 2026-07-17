@@ -66,7 +66,9 @@ public sealed class HostedStrategiesRunner :
         ILoggerFactory loggerFactory,
         IHostedStrategiesFactory hostedHostedStrategiesFactory,
         ILogger<HostedStrategiesRunner> logger,
-        IClock clock, IQueryBus queryBus)
+        IClock clock, 
+        IQueryBus queryBus
+    )
     {
         _config = config;
         _loggerFactory = loggerFactory;

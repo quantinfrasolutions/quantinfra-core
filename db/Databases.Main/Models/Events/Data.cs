@@ -7,40 +7,40 @@ namespace QuantInfra.Databases.Main.Models.Events;
 
 internal readonly struct ExternalExecutionReportEvtData(BrokerType brokerType, string? externalContractId)
 {
-    public BrokerType BrokerType { get; } = brokerType;
-    public string? ExternalContractId { get; } = externalContractId;
+    public BrokerType BrokerType { get; init; } = brokerType;
+    public string? ExternalContractId { get; init; } = externalContractId;
 }
 
 internal readonly struct NewUnmappedContractRegisteredEvtData(string? externalContractId, string? externalAssetId)
 {
-    public string? ExternalContractId { get; } = externalContractId;
-    public string? ExternalAssetId { get; } = externalAssetId;
+    public string? ExternalContractId { get; init; } = externalContractId;
+    public string? ExternalAssetId { get; init; } = externalAssetId;
 }
 
 internal readonly struct StrategyLastCalculationTsEvtData(Instant ts)
 {
-    public Instant Ts { get; } = ts;
+    public Instant Ts { get; init; } = ts;
 }
 
 internal readonly struct AccountReconciliationStatusChangedEvtData(bool needsReconciliation, string message)
 {
-    public bool NeedsReconciliation { get; } = needsReconciliation;
-    public string Message { get; } = message;
+    public bool NeedsReconciliation { get; init; } = needsReconciliation;
+    public string Message { get; init; } = message;
 }
 
 internal readonly struct OrderCancelReplaceRejectEvtData(CxlRejReason reason, string? rejectText)
 {
-    public CxlRejReason Reason { get; } = reason;
-    public string? RejectText { get; } = rejectText;
+    public CxlRejReason Reason { get; init; } = reason;
+    public string? RejectText { get; init; } = rejectText;
 }
 
 internal readonly struct TradeEvtData(int assetId, PnLCalculatorOptions options)
 {
-    public int AssetId { get; } = assetId;
-    public PnLCalculatorOptions Options { get; } = options;
+    public int AssetId { get; init; } = assetId;
+    public PnLCalculatorOptions Options { get; init; } = options;
 }
 
 internal readonly struct AccountEndOfDayEvtData(IReadOnlyDictionary<int, PnLCalculatorOptions> options)
 {
-    public IReadOnlyDictionary<int, PnLCalculatorOptions> Options { get; } = options;
+    public IReadOnlyDictionary<int, PnLCalculatorOptions> Options { get; init; } = options;
 }

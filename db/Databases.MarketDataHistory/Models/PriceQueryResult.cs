@@ -1,16 +1,14 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
-using QuantInfra.Sdk.MarketData;
 
-namespace Databases.MarketDataHistory.Models
+namespace QuantInfra.Databases.MarketDataHistory.Models
 {
 	[Keyless]
 	public class PriceQueryResult
 	{
 		[Column("stream_id")]
-		public long StreamId { get; init; }
+		public int StreamId { get; init; }
 		[Column("open_dt")]
 		public Instant OpenDt { get; init; }
 		[Column("close_dt")]
@@ -30,8 +28,8 @@ namespace Databases.MarketDataHistory.Models
 		[Column("trading_session_id")]
 		public int? TradingSessionId { get; init; }
 
-		public QuantInfra.Sdk.MarketData.ExchangeBar ToExchangeBar(int? contractId = null) => new(
-			(int)StreamId, contractId,
+		public Sdk.MarketData.ExchangeBar ToExchangeBar(int? contractId = null) => new(
+			StreamId, contractId,
 			OpenDt, CloseDt, Open, High, Low, Close, FaceVolume, DollarValue, 
 			TradingSessionId
 		);

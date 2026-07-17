@@ -254,15 +254,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{D628
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{8F121863-88E7-4B5B-BE90-2AB3ACAA2B4B}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\publish-trading-platform.yml = .github\workflows\publish-trading-platform.yml
 		.github\workflows\run-unit-tests.yml = .github\workflows\run-unit-tests.yml
 		.github\workflows\publish-tester.yml = .github\workflows\publish-tester.yml
+		.github\workflows\publish-trading-engine.yml = .github\workflows\publish-trading-engine.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "trading-engine", "trading-engine", "{27C64D78-7FB0-4E1D-B40D-EED43D889541}"
 	ProjectSection(SolutionItems) = preProject
-		deployment\trading-engine\docker-run.sh = deployment\trading-engine\docker-run.sh
 		deployment\trading-engine\.env = deployment\trading-engine\.env
+		deployment\trading-engine\compose.yaml = deployment\trading-engine\compose.yaml
+		deployment\tester-ui\compose.paths.yaml = deployment\tester-ui\compose.paths.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tester-ui", "tester-ui", "{46C690F4-EE56-4142-8BBE-5DB0425B9979}"

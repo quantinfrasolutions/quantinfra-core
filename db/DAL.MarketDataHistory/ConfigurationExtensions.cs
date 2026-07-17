@@ -1,10 +1,8 @@
-﻿using System;
-using Common.MarketData;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using QuantInfra.Common.MarketData.Abstractions;
 using QuantInfra.Common.MarketData.Infrastructure;
 
-namespace DAL.MarketDataHistory.Configuration
+namespace QuantInfra.Databases.MarketDataHistory.DAL
 {
 	public static class ConfigurationExtensions
 	{

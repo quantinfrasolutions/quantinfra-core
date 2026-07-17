@@ -925,9 +925,7 @@ public class BrokerAccount : AccountBase, IBrokerAccount
                     ?? 1m; // TODO
             }
             
-            offsetTrades = ep.GetOffsetTrades(ServiceName, TradeIdProvider, AccountId, contract.ContractId, 
-                p.SignedVolume, openPayments, referenceDt, contract.GetCalculator(), 
-                contract.Template.SettlementCurrency.CurrencyId, fxRate);
+            offsetTrades = GetOffsetTrades(ep, p.SignedVolume, p.OpenPrice, openPayments, referenceDt, contract, fxRate);
             foreach (var t in offsetTrades)
             {
                 ProcessTrade(t, processingDt);
@@ -1055,16 +1053,52 @@ public class BrokerAccount : AccountBase, IBrokerAccount
         _accountState.Apply(evt, true);
     }
     
-    // private void EnsureContractIdAddedToUsed(int contractId, Instant processingDt)
-    // {
-    //     if (BrokerType == BrokerType.Binance)
-    //     {
-    //         if (!_accountState.UsedContractIds.Contains(contractId))
-    //         {
-    //             var evt = new ContractIdAddedToUsedContractsEvt(AccountId, contractId, referenceDt, processingDt);
-    //             Apply(evt);
-    //             Emit(evt);
-    //         }
-    //     }
-    // }
+    private List<Trade> GetOffsetTrades(
+        Position position,
+        decimal targetSignedVolume,
+        decimal openPrice,
+        decimal targetPayments,
+        Instant dt,
+        Contract contract,
+        decimal fxRate
+    )
+    {
+        var res = new List<Trade>(2);
+
+        long? openTradeId = targetSignedVolume != 0 ? TradeIdProvider.GetNextTradeId() : null;
+        if (position.Volume != 0)
+        {
+            res.Add(new Trade(
+                AccountRecord.AccountServiceName, 
+                TradeIdProvider.GetNextTradeId(), 
+                $"Offset {dt}-C", 
+                AccountId, position.ContractId, null, null, position.StrategyPositionId, null, 
+                PositionEffect.Close, position.Side.Invert(), position.Volume, position.SettlPrice, 
+                0, dt, null, null, 
+                new Dictionary<int, decimal>(),
+                contract.Template.SettlementCurrency.CurrencyId, fxRate,
+                position.TotalSettlPayments,
+                position.ParentPositionId, openTradeId, position.IsSynthetic
+            ));
+        }
+        if (targetSignedVolume != 0)
+        {
+            // Reopen the position by the given price
+            res.Add(new Trade(
+                AccountRecord.AccountServiceName, 
+                openTradeId!.Value, 
+                $"Offset {dt}-O", 
+                AccountId, contract.ContractId, null, null, position.StrategyPositionId, null, 
+                PositionEffect.Open, targetSignedVolume.FromSign(), Math.Abs(targetSignedVolume), 
+                contract.NormalizePrice(openPrice), 
+                0, dt, null, null,
+                new Dictionary<int, decimal>(),
+                contract.Template.SettlementCurrency.CurrencyId, fxRate,
+                targetPayments, 
+                position.ParentPositionId, null, position.IsSynthetic
+            ));
+        }
+        
+        return res;
+    }
 }

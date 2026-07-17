@@ -1,8 +1,6 @@
 ﻿using System.Reflection;
 using Common.Infrastructure.Abstractions;
 using Common.Utils.Reflection;
-using DAL.MarketDataHistory.Configuration;
-using Databases.MarketDataHistory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -35,6 +33,7 @@ using QuantInfra.Common.MarketData.Abstractions;
 using QuantInfra.Connectors.Binance.Common;
 using QuantInfra.Connectors.Binance.Futures.Usdm;
 using QuantInfra.Databases.MarketDataHistory;
+using QuantInfra.Databases.MarketDataHistory.DAL;
 using QuantInfra.Services.ExecutionCore;
 using QuantInfra.Services.MarketData;
 using QuantInfra.Services.MonolithService.AccountsService;

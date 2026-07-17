@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Databases.MarketDataHistory.Models;
+namespace QuantInfra.Databases.MarketDataHistory.Models;
 
 [Keyless]
 public class ContractsLastPriceResult

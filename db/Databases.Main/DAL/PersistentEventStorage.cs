@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
@@ -168,6 +169,7 @@ public class PersistentEventStorage(IServiceProvider serviceProvider) : IPersist
             
             case "QuantInfra.Domain.Events.Accounts.AccountsService.Primary.AccountReconciliationStatusChangedEvt":
                 var reconData = JsonSerializer.Deserialize<AccountReconciliationStatusChangedEvtData>(e.Data!);
+                if (e.EventId == 1000000100) Debugger.Break(); 
                 return new AccountReconciliationStatusChangedEvt(e.EventId, e.AccountId!.Value, e.Version,
                     reconData.NeedsReconciliation,
                     reconData.Message, e.Timestamp);
