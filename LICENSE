@@ -9,7 +9,7 @@ In order to get any license under these terms, You must agree to them as both st
 
 Copyright License
 
-The Licensor grants You a copyright license for the Software to do everything You might do with the Software that would otherwise infringe the Licensor's copyright in it for any **Permitted Purpose**. However, You may only make changes or new works based on the Software according to the **Changes and New Works License**.
+The Licensor grants You a copyright license for the Software to do everything You might do with the Software that would otherwise infringe the Licensor's copyright in it for any Permitted Purpose. However, You may only make changes or new works based on the Software according to the Changes and New Works License.
 
 
 Changes and New Works License
@@ -69,7 +69,7 @@ Organizations wishing to engage in activities prohibited by this License may obt
 
 Definitions
 
-The Licensor is QuantInfra Solutions, Inc., and the **Software** is the Software the Licensor makes available under these terms.
+The Licensor is QuantInfra Solutions, Inc., and the Software is the Software the Licensor makes available under these terms.
 
 - "Derivative work" is any work, whether in Source or Object form, that is based on (or derived from) the Software and for which the editorial revisions, annotations, elaborations, or other modifications represent, as a whole, an original work of authorship. For the avoidance of doubt, trading strategies, plugins, connectors, indicators, and other software that merely use the Software through its documented APIs are not considered Derivative Works of the Software solely by reason of such use.
 - "Source form" means the preferred form for making modifications, including but not limited to Software source code, documentation source, and configuration files.
