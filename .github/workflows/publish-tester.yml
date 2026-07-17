@@ -86,11 +86,12 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./apps/TradingEngine/Dockerfile
+          file: ./apps/TesterUI/Dockerfile
           push: true
           platforms: ${{ steps.platforms.outputs.value }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
+            ${{ github.ref_type == 'tag' && format('{0}/{1}:latest', env.REGISTRY, env.IMAGE_NAME) || '' }}
           labels: |
             org.opencontainers.image.version=${{ steps.version.outputs.version }}
             org.opencontainers.image.revision=${{ github.sha }}
