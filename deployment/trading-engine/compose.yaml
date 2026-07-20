@@ -4,7 +4,7 @@ name: quantinfra-trading-engine
 
 services:
   trading-engine:
-    image: "ghcr.io/quantinfrasolutions/trading-engine-ui:${VERSION:-latest}"
+    image: "ghcr.io/quantinfrasolutions/trading-engine:${VERSION:-latest}"
     container_name: trading-engine
     restart: unless-stopped
     ports:
