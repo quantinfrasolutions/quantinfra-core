@@ -37,7 +37,6 @@ The complete documentation is available in the QuantInfra Knowledge Base:
 
 Useful starting points:
 
-- **Getting Started** [https://quantinfra.gitbook.io/quantinfra-docs/tutorials/getting-started](https://quantinfra.gitbook.io/quantinfra-docs/tutorials/getting-started)
 - **Backtester Installation** [https://quantinfra.gitbook.io/quantinfra-docs/installation/tester](https://quantinfra.gitbook.io/quantinfra-docs/installation/tester)
 - **Trading Engine Installation** [https://quantinfra.gitbook.io/quantinfra-docs/installation/trading-engine](https://quantinfra.gitbook.io/quantinfra-docs/installation/trading-engine)
 - **Strategy Implementation Guide** [https://quantinfra.gitbook.io/quantinfra-docs/strategies/implementing-strategies](https://quantinfra.gitbook.io/quantinfra-docs/strategies/implementing-strategies)
