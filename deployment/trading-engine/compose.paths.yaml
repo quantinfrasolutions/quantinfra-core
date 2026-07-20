@@ -1,0 +1,18 @@
+# See https://quantinfra.gitbook.io/quantinfra-docs/installation/trading-engine for instructions
+
+services:
+  trading-engine:
+    volumes:
+      # STRATEGIES
+      # If you have a single project with strategies
+      - /PUBLISH DIRECTORY PATH:/strategies:ro
+      
+      # If you use multiple projects, comment the line about and use this:
+      # - /PUBLISH DIRECTORY 1 PATH:/strategies/project-1:ro
+      # - /PUBLISH DIRECTORY 2 PATH:/strategies/project-2:ro
+        
+      # WAL
+      - /WAL DIRECTORY LOCATION:/wal
+        
+      # Working directory
+      - /WORKING DIRECTORY PATH:/working_dir

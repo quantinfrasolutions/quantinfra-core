@@ -263,7 +263,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "trading-engine", "trading-e
 	ProjectSection(SolutionItems) = preProject
 		deployment\trading-engine\.env = deployment\trading-engine\.env
 		deployment\trading-engine\compose.yaml = deployment\trading-engine\compose.yaml
-		deployment\tester-ui\compose.paths.yaml = deployment\tester-ui\compose.paths.yaml
+		deployment\trading-engine\compose.paths.yaml = deployment\trading-engine\compose.paths.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tester-ui", "tester-ui", "{46C690F4-EE56-4142-8BBE-5DB0425B9979}"
