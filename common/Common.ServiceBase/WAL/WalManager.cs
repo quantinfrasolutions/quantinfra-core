@@ -150,7 +150,11 @@ public sealed class WalManager<TState>: Disruptor.IEventHandler<IncomingDisrupto
     {
         if (data.Skip) return;
         if (data.IsReplay) return;
-        if (_stopRequested) return;
+        if (_stopRequested)
+        {
+            data.Skip = true;
+            return;
+        }
 
         if (data.ParsedMessage is StopEvt)
         {

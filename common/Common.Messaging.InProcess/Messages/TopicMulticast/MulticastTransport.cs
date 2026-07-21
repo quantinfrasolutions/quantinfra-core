@@ -25,6 +25,12 @@ public class MulticastTransport :
         _topology.RegisterMulticastControlHandler(_serverName, this);
     }
 
+    public override async Task StopAsync(CancellationToken cancellationToken)
+    {
+        await base.StopAsync(cancellationToken);
+        _topology.UnregisterMulticastControlHandler(_serverName);
+    }
+
     public void SendMessage(QuantInfra.Common.Messaging.Patterns.TopicMulticast.DownstreamMessage message)
     {
         message.LogSendingTime(MetricsUtils.GetUnixMicro());

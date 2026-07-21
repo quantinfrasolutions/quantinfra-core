@@ -33,7 +33,9 @@ public enum MsgType
     RegisterRouter,
     SendToRouter,
     RequestSnapshot,
-    RegisterMulticastControlHandler
+    RegisterMulticastControlHandler,
+    UnregisterRouter,
+    UnregisterMulticastControlHandler,
 }
 
 public sealed class Topology : IEventHandler<DisruptorMessage>
@@ -92,6 +94,14 @@ public sealed class Topology : IEventHandler<DisruptorMessage>
         data.MulticastTransport = multicastTransport;
     }
     
+    public void UnregisterMulticastControlHandler(string serverName)
+    {
+        using var scope = _disruptor.PublishEvent();
+        var data = scope.Event();
+        data.MessageType = MsgType.UnregisterMulticastControlHandler;
+        data.ServerName = serverName;
+    }
+    
     public void RegisterDealer(string serverName, string clientName, IListener listener)
     {
         throw new NotImplementedException();
@@ -108,6 +118,14 @@ public sealed class Topology : IEventHandler<DisruptorMessage>
         var data = scope.Event();
         data.MessageType = MsgType.RegisterRouter;
         data.Listener = listener;
+        data.ServerName = serverName;
+    }
+    
+    public void UnregisterRouter(string serverName)
+    {
+        using var scope = _disruptor.PublishEvent();
+        var data = scope.Event();
+        data.MessageType = MsgType.UnregisterRouter;
         data.ServerName = serverName;
     }
     
@@ -155,6 +173,10 @@ public sealed class Topology : IEventHandler<DisruptorMessage>
                 _routers.Add(data.ServerName!, data.Listener!);
                 break;
             
+            case MsgType.UnregisterRouter:
+                _routers.Remove(data.ServerName!);
+                break;
+            
             case MsgType.SendToRouter:
                 _routers[data.ServerName!].ReceiveMessage(data.Message!);
                 break;
@@ -166,6 +188,10 @@ public sealed class Topology : IEventHandler<DisruptorMessage>
             
             case MsgType.RegisterMulticastControlHandler:
                 _multicastControlHandlers.Add(data.ServerName!, data.MulticastTransport!);
+                break;
+            
+            case MsgType.UnregisterMulticastControlHandler:
+                _multicastControlHandlers.Remove(data.ServerName!);
                 break;
             
             default:

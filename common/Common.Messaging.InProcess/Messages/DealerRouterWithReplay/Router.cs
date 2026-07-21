@@ -57,7 +57,7 @@ public class Router :
     public Task StopAsync(CancellationToken cancellationToken)
     {
         _started = false;
-        // TODO: unregister self from topology
+        _topology.UnregisterRouter(_serverName);
         return Task.CompletedTask;
     }
 }
