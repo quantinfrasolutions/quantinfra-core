@@ -92,7 +92,7 @@ public class AccountsService : IHostedService
         if (config.Monolith)
         {
             if (config.UseSingleThread)
-                _inputDisruptor.HandleEventsWith(serializer, _walManager, bpl);
+                _inputDisruptor.HandleEventsWith(new SingleThreadProcessingGroup<IncomingDisruptorMessage>(serializer, _walManager, bpl));
             else
                 _inputDisruptor.HandleEventsWith(serializer).Then(_walManager).Then(bpl);
         }

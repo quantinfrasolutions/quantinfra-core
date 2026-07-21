@@ -122,21 +122,7 @@ public abstract class BusinessLogicProcessorBase<TState> : IEventHandler<Incomin
                 if (data.WalPartition < _currentWalPartition)
                     throw new Exception(
                         $"Received an event with partition {data.WalPartition}, current partition is {_currentWalPartition}");
-
-                // if (data.ParsedMessage is FinalizeEvt fin)
-                // {
-                //     if (data.IsReplay)
-                //     {
-                //         // _filter.UpdateLastSentEventId(fin.EventId);
-                //         // _finalizer.UpdateLastSentEventId(fin.EventId, fin.TimeStamp);
-                //         // State.UpdateLastSentEventId(fin.EventId, fin.TimeStamp);
-                //     }
-                //     else
-                //     {
-                //         _outputDisruptor.PublishMessage(data.ParsedMessage);
-                //     }
-                // }
-
+                
                 var handleStart = MetricsUtils.GetUnixMicro();
                 if (data.ParsedMessage != null)
                 {
