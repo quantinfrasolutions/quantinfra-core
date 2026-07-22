@@ -14,7 +14,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(UseLocalSdkReference)' != 'true'">
-        <PackageReference Include="QuantInfra.Sdk" Version="0.9.3-beta1" />
+        <PackageReference Include="QuantInfra.Sdk" Version="0.9.4-beta" />
     </ItemGroup>
 
 </Project>

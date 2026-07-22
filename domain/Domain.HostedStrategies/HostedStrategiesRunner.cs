@@ -424,29 +424,22 @@ public sealed class HostedStrategiesRunner :
                     context.ReferenceDt = bar.CloseDt;
                 }
                 
-                if (!isHistory && bar.CloseDt < context.StrategyState.LastCalculationTs) continue; // dedup
                 if (!context.StrategyRecord.Status.IsActive()) continue;
                 
                 long co2 = 0;
                 if (_writePerformanceMetrics && !isHistory) co2 = MetricsUtils.GetUnixMicro();
                 
                 strategy.Context = context;
-                var calculated = strategy.ProcessClosedBar(bsQualifier);
+                strategy.ProcessClosedBar(bsQualifier);
                 strategy.ClearContext();
                 long co3 = 0;
-                if (_writePerformanceMetrics && !isHistory) co3 = MetricsUtils.GetUnixMicro();
-                if (calculated && !context.IsHistory)
+                if (_writePerformanceMetrics && !isHistory)
                 {
-                    context.Strategy!.UpdateLastCalculationTs(context.ReferenceDt);
-                    if (_writePerformanceMetrics)
-                    {
-                        _strategiesProcessClosedBarMetric!.Observe(co3 - co2);
-                    }
+                    co3 = MetricsUtils.GetUnixMicro();
+                    _strategiesProcessClosedBarMetric!.Observe(co3 - co2);
                 }
-                long co4 = 0;
-                if (_writePerformanceMetrics && !isHistory) co4 = MetricsUtils.GetUnixMicro();
 
-                service += co2 - co1 + co4 - co3;
+                service += co3 - co1;
             }
         }
 

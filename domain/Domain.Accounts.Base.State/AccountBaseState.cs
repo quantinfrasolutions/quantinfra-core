@@ -199,7 +199,7 @@ public class AccountBaseState : Aggregate, IAccountStateReadonly
         if (tradeEvt.SecurityType != SecurityType.FX) // Positions are not tracked for spot FX conversions
         {
             var strategyPositionId = PositionAccounting == PositionAccounting.Netted
-                ? string.Empty
+                ? null
                 : trade.StrategyPositionId;
             var effect = PositionChangeType.Open;
 

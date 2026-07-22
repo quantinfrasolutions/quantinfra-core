@@ -19,7 +19,7 @@ public class TradeOnEveryBarStrategy : AbstractSingleBarHostedStrategy<TradeOnEv
 
     protected override void CalculateVector(string barQualifier, StrategyCalculationContext context)
     {
-        if (IsInPosition())
+        if (context.AccountState.Positions.Any())
         {
             ClosePosition();
             return;
@@ -35,11 +35,11 @@ public class TradeOnEveryBarStrategy : AbstractSingleBarHostedStrategy<TradeOnEv
 
         if (Params.TradeSize.HasValue)
         {
-            NewOrder("main", Params.TradeSize.Value * side.GetSign(), PositionEffect.Open);
+            OpenPosition(Params.TradeSize.Value * side.GetSign());
         }
         else
         {
-            OpenPosition("main", side.GetSign());
+            OpenPosition("main", GetVolume() * side.GetSign());
         }
     }
 
