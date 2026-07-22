@@ -18,7 +18,7 @@ public abstract class Client : IHostedService
     private readonly BaseConfig _config;
     private readonly SemaphoreSlim _sendSemaphore = new(1, 1);
     private bool _stopRequested;
-    private readonly SemaphoreSlim _closeSempaphore = new(1, 1);
+    private readonly SemaphoreSlim _closeSempaphore = new(0, 1);
     
     protected ClientWebSocket WebSocket { get; private init; }
     
@@ -46,7 +46,7 @@ public abstract class Client : IHostedService
 
     public bool IsConnected() => WebSocket.State == WebSocketState.Open;
     
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public virtual async Task StartAsync(CancellationToken cancellationToken)
     {
         await OnBeforeStartAsync();
         
@@ -64,7 +64,7 @@ public abstract class Client : IHostedService
     
     protected virtual Task<Uri> GetUri() => Task.Run(() => new Uri($"{_config.Uri}"));
 
-    public async Task StopAsync(CancellationToken cancellationToken)
+    public virtual async Task StopAsync(CancellationToken cancellationToken)
     {
         Logger.LogInformation("Stopping web socket");
         if (_stopRequested)
@@ -135,7 +135,14 @@ public abstract class Client : IHostedService
                 acc = ArrayPool<byte>.Shared.Rent(64 * 1024);
                 accLen = 0;
 
-                ProcessMessage(msg);
+                try
+                {
+                    ProcessMessage(msg);
+                }
+                finally
+                {
+                    ArrayPool<byte>.Shared.Return(msg.Buffer);
+                }
             }
         }
         catch (Exception ex)
@@ -150,19 +157,30 @@ public abstract class Client : IHostedService
             // Return current accumulator (might be the fresh one or partially filled)
             ArrayPool<byte>.Shared.Return(acc);
 
+            _closeSempaphore.Release();
+
             // _channel.Writer.TryComplete();
         }
     }
 
-    protected void SendMessage(object message) => SendMessageAsync(message).RunSynchronously();
+    protected void SendMessage(object message) => SendMessageAsync(message).GetAwaiter().GetResult();
     
     protected async Task SendMessageAsync(object message)
     {
         await _sendSemaphore.WaitAsync();
-        if (WebSocket.State != WebSocketState.Open || _stopRequested) throw new WebSocketNotConnectedException();
-        var payload = JsonSerializer.Serialize(message);
-        Logger.LogDebug($"Sending message {payload}");
-        await WebSocket.SendAsync(Encoding.UTF8.GetBytes(payload), WebSocketMessageType.Text, true, CancellationToken.None);
-        _sendSemaphore.Release();
+        try
+        {
+            if (WebSocket.State != WebSocketState.Open || _stopRequested) throw new WebSocketNotConnectedException();
+            var payload = JsonSerializer.Serialize(message);
+            LogOutgoingMessage(message, payload);
+            await WebSocket.SendAsync(Encoding.UTF8.GetBytes(payload), WebSocketMessageType.Text, true, CancellationToken.None);
+        }
+        finally
+        {
+            _sendSemaphore.Release();
+        }
     }
+
+    protected virtual void LogOutgoingMessage(object message, string payload) =>
+        Logger.LogDebug("Sending message {Payload}", payload);
 }

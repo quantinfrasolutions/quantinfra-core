@@ -31,4 +31,8 @@
       <ProjectReference Include="..\Binance.Common\Binance.Common.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <InternalsVisibleTo Include="QuantInfra.Connectors.Binance.Futures.Usdm.Tests" />
+    </ItemGroup>
+
 </Project>

@@ -122,6 +122,7 @@ public class ExternalTradingEventsHandler(
             // TODO
             return;
         }
+        
         RequestFullReconciliation(client, evt.AccountId, evt.LastReceivedTradesDts, evt.LastReceivedBalanceOperationsDt);
     }
 

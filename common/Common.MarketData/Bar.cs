@@ -30,8 +30,8 @@ namespace QuantInfra.Common.MarketData
         }
 
         public string BarToLogFormat =>
-            $"'dt':'{this.CloseDt}', 'o':{this.Open},'h':{this.High}," +
-            $"'l':{this.Low},'c':{this.Close},'v':{this.Volume}";
+            $"'open_dt':'{OpenDt}', 'close_dt':'{CloseDt}', 'o':{Open},'h':{High}," +
+            $"'l':{Low},'c':{Close},'v':{Volume}";
 
         public void AppendIndicator(int k, double? v) =>
             // _indicatorValues.Add(k, v);

@@ -28,6 +28,8 @@ public class TradingClient : GenericWebSocketClient.Client, IHostedService, IHos
     private readonly ISchedulerFactory _schedulerFactory;
     
     private readonly RestClient _restClient;
+    private readonly OrderWebSocketClient _orderWebSocketClient;
+    private CancellationToken _startCancellationToken;
 
     private readonly JsonSerializerOptions _serializerOptions = new()
     {
@@ -48,7 +50,38 @@ public class TradingClient : GenericWebSocketClient.Client, IHostedService, IHos
         _clock = clock;
         _accountId = config.AccountId;
         _restClient = new(_config, config.TradingClientSecret!, loggerFactory);
+        _orderWebSocketClient = new(_config, config.TradingClientSecret!, loggerFactory, ProcessOrderCommandFailure);
         _schedulerFactory = serviceProvider.GetService<ISchedulerFactory>()!;
+    }
+
+    public override async Task StartAsync(CancellationToken cancellationToken)
+    {
+        _startCancellationToken = cancellationToken;
+        try
+        {
+            await base.StartAsync(cancellationToken);
+        }
+        catch
+        {
+            if (_orderWebSocketClient.IsConnected())
+                await _orderWebSocketClient.StopAsync(CancellationToken.None);
+            if (IsConnected())
+                await base.StopAsync(CancellationToken.None);
+            throw;
+        }
+    }
+
+    public override async Task StopAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            if (_orderWebSocketClient.IsConnected())
+                await _orderWebSocketClient.StopAsync(cancellationToken);
+        }
+        finally
+        {
+            await base.StopAsync(cancellationToken);
+        }
     }
 
     protected override async Task OnBeforeStartAsync()
@@ -71,7 +104,7 @@ public class TradingClient : GenericWebSocketClient.Client, IHostedService, IHos
 
     protected override void ProcessMessage(IngressMessage message)
     {
-        var document = JsonDocument.Parse(new ReadOnlyMemory<byte>(message.Buffer, 0, message.Length)); // TODO: options
+        using var document = JsonDocument.Parse(new ReadOnlyMemory<byte>(message.Buffer, 0, message.Length)); // TODO: options
         var evt = document.RootElement.GetProperty("e").GetString();
         // var ts = document.RootElement.GetProperty("E").GetInt64();
 
@@ -119,10 +152,10 @@ public class TradingClient : GenericWebSocketClient.Client, IHostedService, IHos
         }
     }
 
-    protected override Task OnAfterWebSocketConnectedAsync()
+    protected override async Task OnAfterWebSocketConnectedAsync()
     {
+        await _orderWebSocketClient.StartAsync(_startCancellationToken);
         _responsesHandler.OnConnect(_accountId);
-        return Task.CompletedTask;
     }
     
     protected override void OnStop()
@@ -133,136 +166,117 @@ public class TradingClient : GenericWebSocketClient.Client, IHostedService, IHos
     public void PlaceOrder(NewOrderSingleExternal order)
     {
         Logger.LogInformation("PlaceOrder, order={order}", order);
-        var orderId = order.OrderId;
         try
         {
-            var res = _restClient.PlaceOrder(order).ConfigureAwait(false).GetAwaiter().GetResult();
-            // In case of successful placement of the order, the result is retrieved from the socket
-            return;
+            _orderWebSocketClient.PlaceOrder(order);
         }
-        catch (Exception e)
+        catch (Exception exception)
         {
-            ExternalExecutionReport extEr;
             var now = _clock.GetCurrentInstant();
-            var swNow = MetricsUtils.GetUnixMicro();
-            if (e is SwaggerException<OrderErrorResponse> typedEx)
-            {
-                Logger.LogError(e, "Error placing order: code: {code}, msg: {msg}", typedEx.Result.Code, typedEx.Result.Msg);
-
-                _responsesHandler.OnExecutionReport(
-                    order.OutrightReject(now,
-                        rejectReason: typedEx.Result.Code?.FromBinanceErrorCode() ?? RejectReason.NotSpecified,
-                        rejectText: $"code: {typedEx.Result.Code}, msg: {typedEx.Result.Msg}"
-                    ), 
-                    now.ToUnixTimeMilliseconds(), 
-                    swNow
-                );
-            }
-            else
-            {
-                Logger.LogError(e, "Error placing order");
-                _responsesHandler.OnExecutionReport(
-                    order.OutrightReject(now, rejectReason: RejectReason.NotSpecified, rejectText: e.Message),
-                    now.ToUnixTimeMilliseconds(), swNow);
-            }
+            ProcessOrderCommandFailure(new OrderCommandFailure(
+                new PendingOrderCommand(OrderCommandKind.Place, order),
+                null,
+                exception.Message,
+                exception,
+                now.ToUnixTimeMilliseconds(),
+                MetricsUtils.GetUnixMicro()));
         }
     }
 
     public void CancelOrder(OrderCancelRequestExternal ocr)
     {
-        Logger.LogInformation($"CancelOrder, ocr={ocr}");
+        Logger.LogInformation("CancelOrder, ocr={ocr}", ocr);
         try
         {
-            var res = Task.Run(() => _restClient.CancelOrder(ocr)).ConfigureAwait(false).GetAwaiter().GetResult();
-            Logger.LogDebug("Received REST response: {res}", res);
-            // In case of successful cancellation the update received through WS is used to generate the ER
-            return;
+            _orderWebSocketClient.CancelOrder(ocr);
         }
-        catch (Exception ex)
+        catch (Exception exception)
         {
             var now = _clock.GetCurrentInstant();
-            var swNow = MetricsUtils.GetUnixMicro();
-            
-            if (ex is SwaggerException<OrderErrorResponse> typedEx)
-            {
-                if (typedEx.Result.Code == -2011) // Unknown order sent.
-                {
-                    // If we're trying to cancel a non-existent order, it means that the order is actually cancelled
-                    _responsesHandler.OnOrderCancelReject(
-                        new(_accountId, ocr.OrderId, ocr.ExternalOrderId, string.Empty, CxlRejReason.UnknownOrder, typedEx.Result.Msg),
-                        now.ToUnixTimeMilliseconds(), swNow
-                    );
-
-                    return;
-                }
-
-                Logger.LogError(ex, "Error canceling order");
-                _responsesHandler.OnOrderCancelReject(new(_accountId, ocr.OrderId, ocr.ExternalOrderId, string.Empty, CxlRejReason.Other, typedEx.Result.Msg),
-                    now.ToUnixTimeMilliseconds(), swNow);
-                return;
-            }
-
-            Logger.LogError(ex, "Error canceling order");
-            Logger.LogError(ex, "Error canceling order");
-            _responsesHandler.OnOrderCancelReject(new(_accountId, ocr.OrderId, ocr.ExternalOrderId, string.Empty, CxlRejReason.Other, ex.Message),
-                now.ToUnixTimeMilliseconds(), swNow);
+            ProcessOrderCommandFailure(new OrderCommandFailure(
+                new PendingOrderCommand(OrderCommandKind.Cancel, ocr),
+                null,
+                exception.Message,
+                exception,
+                now.ToUnixTimeMilliseconds(),
+                MetricsUtils.GetUnixMicro()));
         }
     }
     
     public void ReplaceOrder(OrderReplaceRequestExternal ocr)
     {
-        Logger.LogInformation($"ReplaceOrder, ocr={ocr}");
+        Logger.LogInformation("ReplaceOrder, ocr={ocr}", ocr);
         try
         {
-            var res = Task.Run(() => _restClient.ModifyOrder(ocr)).ConfigureAwait(false).GetAwaiter().GetResult();
-            Logger.LogInformation($"Received REST response: {res}");
-            // In case of successful cancellation the update received through WS is used to generate the ER
-            return;
+            _orderWebSocketClient.ModifyOrder(ocr);
         }
-        catch (Exception ex)
+        catch (Exception exception)
         {
             var now = _clock.GetCurrentInstant();
-            var swNow = MetricsUtils.GetUnixMicro();
-            
-            if (ex is InvalidModifyRequestException)
-            {
-                throw new NotImplementedException();
-                // TODO
-            }
-            if (ex is SwaggerException<OrderErrorResponse> typedEx)
-            {
-                if (typedEx.Result.Code == -2011    // Unknown order sent.
-                    || typedEx.Result.Code == -2013 // Order does not exist
-                )
-                {
-                    _responsesHandler.OnOrderCancelReject(
-                        new(_accountId, ocr.OrderId, ocr.ExternalOrderId, string.Empty, CxlRejReason.UnknownOrder, typedEx.Result.Msg),
-                        now.ToUnixTimeMilliseconds(), swNow
-                    );
-                    return;
-                }
-
-                if (typedEx.Result.Code == -5027) // No need to modify the order
-                {
-                    // The order is already modified
-                    _responsesHandler.OnOrderCancelReject(
-                        new(_accountId, ocr.OrderId, ocr.ExternalOrderId, string.Empty, CxlRejReason.OrderUnchanged, typedEx.Result.Msg),
-                        now.ToUnixTimeMilliseconds(), swNow
-                    );
-                    return;
-                }
-                
-                Logger.LogError(ex, "Error replacing order");
-                _responsesHandler.OnOrderCancelReject(new(_accountId, ocr.OrderId, ocr.ExternalOrderId, string.Empty, CxlRejReason.Other, typedEx.Result.Msg),
-                    now.ToUnixTimeMilliseconds(), swNow);
-                return;
-            }
-            
-            Logger.LogError(ex, "Error replacing order");
-            _responsesHandler.OnOrderCancelReject(new(_accountId, ocr.OrderId, ocr.ExternalOrderId, string.Empty, CxlRejReason.Other, ex.Message),
-                now.ToUnixTimeMilliseconds(), swNow);
+            ProcessOrderCommandFailure(new OrderCommandFailure(
+                new PendingOrderCommand(OrderCommandKind.Modify, ocr),
+                null,
+                exception.Message,
+                exception,
+                now.ToUnixTimeMilliseconds(),
+                MetricsUtils.GetUnixMicro()));
         }
     }
+
+    private void ProcessOrderCommandFailure(OrderCommandFailure failure)
+    {
+        Logger.LogError(
+            failure.Exception,
+            "Binance {CommandKind} request failed: code={Code}, message={Message}",
+            failure.Command.Kind,
+            failure.ErrorCode,
+            failure.ErrorMessage);
+
+        switch (failure.Command.Kind)
+        {
+            case OrderCommandKind.Place:
+            {
+                var order = (NewOrderSingleExternal)failure.Command.Request;
+                _responsesHandler.OnExecutionReport(
+                    order.OutrightReject(
+                        _clock.GetCurrentInstant(),
+                        rejectReason: failure.ErrorCode?.FromBinanceErrorCode() ?? RejectReason.NotSpecified,
+                        rejectText: FormatOrderCommandError(failure)),
+                    failure.ReceivedAt,
+                    failure.SwReceivedAt);
+                break;
+            }
+            case OrderCommandKind.Cancel:
+            {
+                var request = (OrderCancelRequestExternal)failure.Command.Request;
+                var reason = failure.ErrorCode == -2011 ? CxlRejReason.UnknownOrder : CxlRejReason.Other;
+                _responsesHandler.OnOrderCancelReject(
+                    new(_accountId, request.OrderId, request.ExternalOrderId, string.Empty, reason, FormatOrderCommandError(failure)),
+                    failure.ReceivedAt,
+                    failure.SwReceivedAt);
+                break;
+            }
+            case OrderCommandKind.Modify:
+            {
+                var request = (OrderReplaceRequestExternal)failure.Command.Request;
+                var reason = failure.ErrorCode switch
+                {
+                    -2011 or -2013 => CxlRejReason.UnknownOrder,
+                    -5027 => CxlRejReason.OrderUnchanged,
+                    _ => CxlRejReason.Other,
+                };
+                _responsesHandler.OnOrderCancelReject(
+                    new(_accountId, request.OrderId, request.ExternalOrderId, request.RequestId, reason, FormatOrderCommandError(failure)),
+                    failure.ReceivedAt,
+                    failure.SwReceivedAt);
+                break;
+            }
+        }
+    }
+
+    private static string FormatOrderCommandError(OrderCommandFailure failure) => failure.ErrorCode.HasValue
+        ? $"code: {failure.ErrorCode}, msg: {failure.ErrorMessage}"
+        : failure.ErrorMessage;
     
     public void RequestAccountFullSnapshot(IReadOnlyDictionary<string, Instant>? lastReceivedTradeDts,
         Instant? lastReceivedBalanceOperationDt, Guid? requestId = null) =>
