@@ -89,6 +89,7 @@ jobs:
           file: ./apps/TesterUI/Dockerfile
           push: true
           platforms: ${{ steps.platforms.outputs.value }}
+          visibility: public
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
             ${{ github.ref_type == 'tag' && format('{0}/{1}:latest', env.REGISTRY, env.IMAGE_NAME) || '' }}
