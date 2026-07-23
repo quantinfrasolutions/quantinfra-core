@@ -85,7 +85,7 @@ public class PersistentEventStorage(IServiceProvider serviceProvider) : IPersist
         switch (e.EventType)
         {
             case "QuantInfra.Domain.Events.Accounts.AccountsService.Primary.AccountEndOfDayEvt":
-                var eodData = e.Data!.Deserialize<AccountEndOfDayEvtData>();
+                var eodData = e.Data!.Deserialize<AccountEndOfDayEvtData>(JsonSerializerOptions);
                 return new AccountEndOfDayEvt(e.EventId, e.AccountId!.Value, e.Version,
                         e.EndOfDayPositions.ToDictionary(p => p.PositionId),
                         e.EndOfDayBalances.ToDictionary(b => b.Currency.CurrencyId, b => (BalanceValue)b),
@@ -104,7 +104,7 @@ public class PersistentEventStorage(IServiceProvider serviceProvider) : IPersist
                     e.ExecutionReport!, e.Timestamp);
 
             case "QuantInfra.Domain.Events.Accounts.AccountsService.Primary.ExternalExecutionReportEvt":
-                var eerData = e.Data!.Deserialize<ExternalExecutionReportEvtData>();
+                var eerData = e.Data!.Deserialize<ExternalExecutionReportEvtData>(JsonSerializerOptions);
                 return new ExternalExecutionReportEvt(e.EventId, e.AccountId!.Value, e.Version,
                     eerData.BrokerType, eerData.ExternalContractId, e.ExecutionReport!, e.Timestamp);
 
@@ -122,13 +122,13 @@ public class PersistentEventStorage(IServiceProvider serviceProvider) : IPersist
                     e.Version, e.Timestamp);
 
             case "QuantInfra.Domain.Events.Accounts.AccountsService.Primary.NewUnmappedContractRegisteredEvt":
-                var unmData = e.Data!.Deserialize<NewUnmappedContractRegisteredEvtData>();
+                var unmData = e.Data!.Deserialize<NewUnmappedContractRegisteredEvtData>(JsonSerializerOptions);
                 return new NewUnmappedContractRegisteredEvt(e.EventId, e.AccountId!.Value,
                     unmData.ExternalContractId, unmData.ExternalAssetId, e.Version, e.Timestamp);
 
             case "QuantInfra.Domain.Events.Accounts.AccountsService.Primary.OrderCancelRejectEvt":
                 var ocrrData = e.Data != null 
-                    ? JsonSerializer.Deserialize<OrderCancelReplaceRejectEvtData?>(e.Data)
+                    ? e.Data.Deserialize<OrderCancelReplaceRejectEvtData?>(JsonSerializerOptions)
                     : null;
                 return new OrderCancelRejectEvt(e.AccountId!.Value, e.EventId, 
                     new(e.AccountId!.Value, null, string.Empty, ocrrData?.Reason ?? CxlRejReason.Other, ocrrData?.RejectText),
@@ -161,14 +161,14 @@ public class PersistentEventStorage(IServiceProvider serviceProvider) : IPersist
                     e.SharePriceUpdate.SharePrice, e.SharePriceUpdate!.DailyReturn, e.Version, e.Timestamp, e.Timestamp);
 
             case "QuantInfra.Domain.Events.Accounts.AccountsService.Primary.TradeEvt":
-                var tradeData = e.Data!.Deserialize<TradeEvtData>()!;                
+                var tradeData = e.Data!.Deserialize<TradeEvtData>(JsonSerializerOptions)!;                
                 return new TradeEvt(e.EventId, e.AccountId!.Value, e.Trade!, e.Version, e.Timestamp,
                     tradeData.AssetId, e.Trade!.PaymentCurrency.Decimals,
                     e.Trade.Contract.Template.SecurityType, e.Account!.Currency.Decimals,
                     tradeData.Options);
             
             case "QuantInfra.Domain.Events.Accounts.AccountsService.Primary.AccountReconciliationStatusChangedEvt":
-                var reconData = JsonSerializer.Deserialize<AccountReconciliationStatusChangedEvtData>(e.Data!);
+                var reconData = e.Data!.Deserialize<AccountReconciliationStatusChangedEvtData>(JsonSerializerOptions);
                 return new AccountReconciliationStatusChangedEvt(e.EventId, e.AccountId!.Value, e.Version,
                     reconData.NeedsReconciliation,
                     reconData.Message, e.Timestamp);
@@ -198,7 +198,7 @@ public class PersistentEventStorage(IServiceProvider serviceProvider) : IPersist
                     e.Subaccount!, e.Timestamp);
             
             case "QuantInfra.Domain.Events.Accounts.Management.TradingClientConfigurationChangedEvt":
-                var tc = JsonSerializer.Deserialize<TradingClientConfig>(e.Data!);
+                var tc = e.Data!.Deserialize<TradingClientConfig>(JsonSerializerOptions);
                 return new TradingClientConfigurationChangedEvt(e.EventId, e.AccountId!.Value, tc, e.Timestamp);
 
             case "QuantInfra.Domain.Events.Strategies.AccountsService.StrategyInternalStateUpdatedEvt":
@@ -207,7 +207,7 @@ public class PersistentEventStorage(IServiceProvider serviceProvider) : IPersist
                     stData, e.Version, e.Timestamp);
 
             case "QuantInfra.Domain.Events.Strategies.AccountsService.StrategyLastCalculationTsUpdatedEvt":
-                var strData = e.Data!.Deserialize<StrategyLastCalculationTsEvtData>();
+                var strData = e.Data!.Deserialize<StrategyLastCalculationTsEvtData>(JsonSerializerOptions);
                 return new StrategyLastCalculationTsUpdatedEvt(e.EventId, e.StrategyId!.Value,
                     strData.Ts, e.Version, e.Timestamp);
 
