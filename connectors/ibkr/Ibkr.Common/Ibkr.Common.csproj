@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <LangVersion>default</LangVersion>
+    <RootNamespace>QuantInfra.Connectors.Ibkr.Common</RootNamespace>
+    <TargetFramework>net9.0</TargetFramework>
+    <AssemblyName>QuantInfra.Connectors.Ibkr.Common</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Interfaces\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Connectors.Common\Connectors.Common.csproj" />
+<!--    <ProjectReference Include="..\CSharpClient\client\CSharpAPI.csproj" />-->
+    <ProjectReference Include="..\Ibkr.Interfaces\Ibkr.Interfaces.csproj" />
+  </ItemGroup>
+</Project>
